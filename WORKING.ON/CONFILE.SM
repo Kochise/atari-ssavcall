@@ -1,0 +1,165 @@
+; D‚finition du systŠme d'AUTO-Configuration
+;
+; CONFIG_Tree : WORD - Nombre de CONFIG_Data
+; CONFIG_Data : LONG - Adresse du ParamTree
+;               LONG - Adresse du ParamCode
+;
+; ParamTree   : WORD - Nombre de ParamData
+;               .... - Identificateur - NULL
+;               LONG - Adresse du r‚sultat du 1er SParam
+;              (LONG)- ...
+;               ....
+; ParamData   : WORD - Nombre de SParam
+;               WORD - Type du SParam
+;               LONG - Adresse de la routine
+;               LONG - Adresse du premier SParam
+;              (LONG)- ....
+;               ....
+;
+; Type : 0 - List0 - NULL - List1 - NULL - ... - ListN - NULL-NULL
+;        1 - List0 - NULL-NULL (Char A-Z or a-z -> 0-25 : WORD)
+;        2 - List0 - NULL-NULL (NumString -> LONG)
+;        3 - PathBuffer (80 Chars)
+;        4 - ExtBuffer (4 Chars)
+;        5 -
+;        6 -
+;        7 -
+
+	SECTION	TEXT
+
+PINPATH_Code	RTS
+ACCPATH_Code	RTS
+CLIPATH_Code	RTS
+JARSIZE_Code	RTS
+VIRTUAL_Code	RTS
+
+	SECTION	DATA
+
+CONFIG_Name	dc.b	"SSAVCALL.CNF",0
+
+CONFIG_Tree	dc.w	5
+	dc.l	PINPATH_Tree,PINPATH_Code
+	dc.l	ACCPATH_Tree,ACCPATH_Code
+	dc.l	CLIPATH_Tree,CLIPATH_Code
+	dc.l	JARSIZE_Tree,JARSIZE_Code
+	dc.l	VIRTUAL_Tree,VIRTUAL_Code
+		
+OPT_YesNo	dc.b	"YES",0
+	dc.b	"NO",0,0
+OPT_Boot	dc.b	"BOOT",0,0
+OPT_Max	dc.b	"MAX",0,0
+
+; Chemin des fichiers Plug'In
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Valid    : [Kind]
+; Invalid  : [Kind]
+
+PINPATH_Tree	dc.w	4
+	dc.b	"PINPATH=",0
+	dc.l	PINPATH_Drive
+	dc.l	PINPATH_Path
+	dc.l	PINPATH_Valid
+	dc.l	PINPATH_Invalid
+	
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	0,3
+	dc.w	0,4
+	dc.w	0,4
+
+PINPATH_Drive	ds.w	1
+PINPATH_Path	ds.b	80
+PINPATH_Valid	ds.b	4
+PINPATH_Invalid	ds.b	4
+	
+; Chemin des accessoires
+; Merci pour l'id‚e … MURPHY Dave (ACCFOLDR) et COUSIN Micka‰l (ACCS)
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Valid    : [Kind]
+; Invalid  : [Kind]
+
+ACCPATH_Tree	dc.w	4
+	dc.b	"ACCPATH=",0
+	dc.l	ACCPATH_Drive
+	dc.l	ACCPATH_Path
+	dc.l	ACCPATH_Valid
+	dc.l	ACCPATH_Invalid
+	
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	0,3
+	dc.w	0,4
+	dc.w	0,4
+
+ACCPATH_Drive	ds.w	1
+ACCPATH_Path	ds.b	40
+ACCPATH_Valid	ds.b	4
+ACCPATH_Invalid	ds.b	4
+	
+; Chemin du ClipBoard
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Create   : [YES/NO] (Only if directory NOT FOUND or NOT VALID)
+
+CLIPATH_Tree	dc.w	3
+	dc.b	"CLIPATH=",0
+	dc.l	CLIPATH_Drive
+	dc.l	CLIPATH_Path
+	dc.l	CLIPATH_Create
+	
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	0,3
+	dc.w	1,0
+	dc.l	OPT_YesNo
+
+CLIPATH_Drive	ds.w	1
+CLIPATH_Path	ds.b	80
+CLIPATH_Create	ds.w	1	
+
+; Nombre de Cookies
+; Merci pour l'id‚e aux REMOVERS [Seb/Stabylo] (Cook-It)
+; Number   : [DEFAULT/Number]
+
+JARSIZE_Tree	dc.w	1
+	dc.b	"JARSIZE",0
+	dc.l	JARSIZE_Number
+	
+	dc.w	1,2
+	dc.l	JARSIZE_Opt1
+	
+JARSIZE_Opt1	dc.b	"DEFAULT",0,0
+
+JARSIZE_Number	ds.l	1
+
+; Gestionnaire de m‚moire virtuelle
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Size     : [SizeInMb]
+
+VIRTUAL_Tree	dc.w	3
+	dc.b	"VIRTUAL=",0
+	dc.l	VIRTUAL_Drive
+	dc.l	VIRTUAL_Path
+	dc.l	VIRTUAL_Size
+	
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	0,3
+	dc.w	1,2
+	dc.l	VIRTUAL_Range
+	
+VIRTUAL_Range	dc.b	"DEV",0,0
+
+VIRTUAL_Drive	ds.w	1
+VIRTUAL_Path	ds.b	40
+VIRTUAL_Size	ds.l	1
+
+	SECTION	BSS
+	
+
+
+
+	
