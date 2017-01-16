@@ -1,0 +1,23 @@
+/// Informations utiles... ///////////////////////////////////////////////////
+
+Le ST, lorsqu'il copie un fichier d'un p‚riph‚rie … l'autre :
+  Lit le nom
+  Lit les donn‚es
+  Ecrit le nom
+  Ecrit les donn‚es
+
+Le Falcon030, lorsqu'il fait la mˆme chose :
+  Lit le nom
+  Ecrit le nom
+  Lit les donn‚es
+  Ecrit les donn‚es
+
+Le probleme c'est qu'entre une lecture et une ‚criture, si les deux
+p‚riph‚riques sont des disquette, il faut changer.
+Sur ST une fois par fichier, et sur Falcon030 deux fois.
+FICHIERS est originellement con‡us pour le ST, mais son utilit‚ est d'autant
+plus importante avec le Falcon030 et son cr‚tin de systeme de copie de
+fichiers.
+Vous pouvez aussi, si vous avez un disque dur, cr‚er un r‚pertoire temporaire
+o— l'on copie tous les fichiers d‚sir‚s (UpLoad), pouis on change de
+disquette et on y ‚crit les fichiers (DownLoad).

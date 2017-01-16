@@ -1,0 +1,79 @@
+; /// La ligne de Titre avec Version et Date ///
+;
+; Used registers : D7.l - Progiz' Size
+;                  D3.w > TrashCan
+;                  D2.w > TrashCan
+;                  D1.w > TrashCan
+;                  D0.l > TrashCan
+;                  A0.l > TrashCan
+;                  A1.l > TrashCan
+
+	lea	Start_SSAV,A1
+	move.w	(-6,A1),D0	; Version
+	
+	unpk	D0,D1,#$3030	; Version ".xx"
+	ror.w	#8,D0
+	unpk	D0,D2,#$3030	; Version "xx."
+	
+	cmpi.w	#$3039,D2	; Version "0x."
+	BGT	TITLE_Version
+	
+	andi.w	#255,D2	; On transforme "0x." en
+	ori.w	#$2000,D2	; " x."
+	
+TITLE_Version	lea	TITLE_Text,A0	; On s‚lectionne le Titre
+	
+	move.w	D2,(14,A0)	; On place "xx."
+	move.w	D1,(17,A0)	; et ".xx"
+	
+	move.w	(-4,A1),D0	; On charge la date
+	
+	move.w	D0,D1	; Correct_Day
+	andi.w	#%11111,D1
+	
+	BSR	TITLE_Date
+
+	move.w	D2,(41,A0)	; On place le Jour
+	
+	move.w	D0,D1	; Correct_Month
+	andi.w	#%111100000,D1
+	lsr.w	#5,D1
+	
+	BSR	TITLE_Date
+	
+	move.w	D2,(44,A0)	; On place le Mois
+	
+	move.w	D0,D1	; Correct_Year
+	andi.w	#%1111111000000000,D1
+	rol.w	#7,D1	; On pousse sur la gauche ;-)
+	addi.w	#80,D1	; Correction … partir de 1980
+	
+	BSR	TITLE_Date
+	
+	move.w	D2,(47,A0)	; On place l'Ann‚e
+	
+	move.l	#TITLE_Text,D0
+
+	BSR	C_ConWS
+
+	RTS
+
+TITLE_Date	move.w	D1,D3
+	divu.w	#10,D3	; Dizaine de la date
+	move.w	D3,D2
+	
+TITLE_Up100	cmpi.w	#10,D2	; Sup‚rieur … cent (10*10)
+	BLT	TITLE_Down100	; En de‡a, Let's Go...
+	
+	subi.w	#10,D2	; On retranche cent
+	
+	BRA	TITLE_Up100	; On v‚rifie
+	
+TITLE_Down100	lsl.w	#8,D2	; On place les dizaines en BCD
+	mulu.w	#10,D3	; On obtient les dizaines
+			; (les unit‚es en reste ne sont pas utilis‚es)
+	sub.w	D3,D1	; Unit‚
+	or.w	D1,D2	; On place les unit‚es en BCD
+	add.w	#$3030,D2	; Correction ASCII … la main
+	
+	RTS

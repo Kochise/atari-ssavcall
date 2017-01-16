@@ -1,0 +1,26 @@
+/// Utilisation imm‚diate de SSAVCALL /////////////////////////////////////////
+
+La pr‚tention de ce fichier est de vous mettre imm‚diatement en condition pour
+programmer sous SSAVCALL, sch‚mas … l'appui.
+SSAVCALL est une collection de routines de gestion d'interface. Elles se
+placent en m‚moire au Boot de votre ATARI, y apporte quelques modifications au
+besoin, et c'est tout. C'est tout? OUI, c'est tout, de mon cot‚ j'ai fini!
+A pr‚sent, il va vous falloir utiliser le plus intelligement SSAVCALL, sachant
+que ses routines sont celles que vous auriez ‚crite pour gerer votre interface.
+Mais … pr‚sent, c'est bon, elle ont ‚t‚ ‚crite une fois pour toute, et vous
+n'avez (th‚oriquement) plus qu'a les associer simplement entre elles pour
+quelles s'occupent de gerer votre interface. Vous n'aurez mˆme plus … savoir
+quoi faire des messages que le GEM pourrais vous envoyer, puisque SSAVCALL
+s'occupe vraiment de tout, y compris les r‚actions de votre programme par
+rapport … l'interface.
+"Allez, dis nous tout! Tu triche, hein? Traitre, je vois bien une grosse
+incompatibilit‚ l…..." : Meuh non, ‡a marche trŠs bien puisque SSAVCALL ne fait
+qu'ajouter les fonctions que Digital Research aurait pus imm‚diatement
+implanter afin d'‚viter aux programmeurs de se prendre la tˆte.
+Vous appellez bien le systeme d'exploitation, et celui ci ne plante pas? Alors
+pourquoi donc voudriez vous que SSAVCALL plante. Il met … disposition de chacun
+des routines comme le systeme d'exploitation le fat d‚j…...
+Grosse diff‚rence : le systeme d'exploitation s'appelle via un TRAP, alors que
+SSAVCALL s'appelle via un simple JSR. De ce fait, SSAVCALL repr‚sente un peu
+des sous routines ‚loign‚es, mais faisant ainsi completement partie int‚grante
+de votre programme lorsque vous faites appel … SSAVCALL. Malin...

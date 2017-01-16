@@ -1,0 +1,129 @@
+; /// Partie GEM (SSAV) de l'installateur ///
+;
+; No registers have to be saved (goto Exit...)
+	
+	move.w	D0,AES_Handle	; L'AP_ID
+
+	; GRAF_MOUSE, pour rendre l'aspect normal … la souris
+	
+	clr.w	-(SP)
+	clr.l	-(SP)
+	pea	AES_Params
+	move.w	#78,-(SP)	; - GRAF_MOUSE -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+	
+	lea	(14,SP),SP
+
+	; RSRC_OBFIX, on reloge la ressource,
+	; et on corrige les infos
+	
+	move.w	#13,D7
+	clr.w	D6
+	
+Reloc_RSC	move.l	Rs_trindex,-(SP)
+	move.w	D6,-(SP)
+	pea	AES_Params
+	move.w	#114,-(SP)	; - RSRC_OBFIX -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+
+	lea	(14,SP),SP
+	
+	addq.w	#1,D6
+	
+	DBF	D7,Reloc_RSC
+
+	; FORM_CENTER, pour centrer
+	
+	move.l	Rs_trindex,-(SP)	; L'adresse de l'arbre
+	pea	AES_Params
+	move.w	#54,-(SP)	; - FORM_CENTER -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+	
+	lea	(12,SP),SP
+	
+	movea.l	D0,A0
+	move.w	(A0),-(SP)
+	move.w	(2,A0),-(SP)
+	move.w	(4,A0),-(SP)
+	move.w	(6,A0),-(SP)
+	
+	; FORM_DIAL, pour r‚server
+	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
+	
+	clr.w	-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	pea	AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV	
+
+	lea	(26,SP),SP
+
+	; OBJC_DRAW, pour tracer
+	
+	move.l	Rs_trindex,-(SP)	; L'adresse de l'arbre
+	clr.w	-(SP)
+	move.w	#4,-(SP)
+	move.l	(12,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(12,SP),-(SP)	; Les dimensions de FORM_CENTER
+	pea	AES_Params
+	move.w	#42,-(SP)	; - OBJC_DRAW -
+	move.w	#200,-(SP)	; *** AES ***	
+
+	JSR	Start_SSAV
+	
+	lea	(24,SP),SP
+	
+	; FORM_DO, pour gerer
+	
+	move.l	Rs_trindex,-(SP)	; L'adresse de l'arbre
+	move.w	#-1,-(SP)	; Pas de champs ‚ditables
+	pea	AES_Params
+	move.w	#50,-(SP)	; - FORM_DO -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+
+	lea	(14,SP),SP
+	
+	; FORM_DIAL, pour effacer
+	
+	move.w	#3,-(SP)
+	move.l	(6,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(6,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les dimensions de FORM_CENTER
+	pea	AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+
+	JSR	Start_SSAV
+	
+	lea	(26,SP),SP
+
+	addq.l	#8,SP	; On restaure vu que l'on … plus besoin des valeurs
+
+	; APPL_EXIT
+
+	pea	AES_Params
+	move.w	#19,-(SP)	; - APPL_EXIT -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+
+	addq.l	#8,SP
+
+	; P_TERM0
+
+P_Term0	clr.w	-(SP)
+	trap	#1

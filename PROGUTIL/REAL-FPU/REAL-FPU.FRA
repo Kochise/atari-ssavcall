@@ -1,0 +1,9 @@
+/// Real 68882 _FPU Cookie - KOSS Production 1997 /////////////////////////////
+
+J'en avais marre que mon ATARI ne sache pas d‚terminer quelle version du
+coprocesseur math‚matique 6888? il avait dans ses entrailles.
+Ce programme modifie juste le Cookie "_FPU" pour qu'il donne 68882 (celui que
+j'ai dans ma machine). Il ne laisse rien en m‚moire, et ne sert pas vraiment …
+grand chose.
+
+Regardez comment on cherche un Cookie avec les modes d'adressages du 68030...

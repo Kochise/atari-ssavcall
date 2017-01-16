@@ -1,0 +1,3006 @@
+ATTENTION : Comme vous devriez tous le faire, c'est utiliser les registres
+            hauts (comme D7-D4/A6-A3) en priorit‚, car le systŠme
+            d'exploitation utilise et ‚crase les registres bas (comme D0 pour
+            les r‚ponses, ainsi que A0-A2).
+            A l'image du systeme d'exploitation, cette partie de SSAVCALL
+            utilise les registres bas D0-D2/A0-A2. Evitez donc de les utiliser
+            lors de vos programmes avant d'utiliser SSAVCALL, car vos donn‚es
+            seront ‚cras‚es par celle de SSAV.
+
+/// L'AES, num‚ro 200 /////////////////////////////////////////////////////////
+
+--- LIBRAIRIE APPLICATIONS ---
+
+/// AES  10 : APPL_INIT ///
+
+  Cette fonction sert au GEM pour savoir que vous etes l…. Il peut donc vous
+envoyer des messages, par exemple pour vous dire qu'une fenetre doit etre
+ferm‚e. Cela sert aussi pour dialoguer avec d'autres taches, ou les
+accessoires.
+  Une autre utilisation, c'est de savoir si l'AES est install‚ ou non. Dans la
+pratique vous avez fait un programme qui permet de se configurer. Maintenant il
+sagit de savoir s'il est execut‚ pendant la phase de d‚marrage de l'ordinateur,
+ou depuis le Bureau.
+  Pendant la phase de d‚marrage, l'AES n'est pas install‚. Vous trouvez 0 comme
+AP_ID, et en regardant la version de l'AES install‚e (Global0), vous trouvez
+0 au lieu d'un nombre BCD sur un WORD.
+  Depuis le Bureau, l'AES est install‚, et vous obtenez donc un nombre positif,
+ainsi qu'une version de l'AES diff‚rente de 0.
+Dans ce cas, appelez l'interface de configuration, et utilisez la pour changer
+les parametres. N'oubliez pas que vous pouvez les sauver directement dans le
+programme (voyez la fin de la doc, sur la BasePage, et le ProgHeader)
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 10
+             WORD : 200
+Retour : D0.w = AP_ID (Le Handle du GEM, … retenir imp‚rativement)
+                -1 si erreur, sinon OK (mˆme 0)
+Pile : 8
+
+ATTENTION : ATARI conseille d'ecraser GlobaL0 pour etre sur que le num‚ro de
+            l'AES est 0. AprŠs APPL_INIT, v‚rifiez Global0. S'il est toujours …
+            0, c'est que l'AES n'est pas install‚, sinon le num‚ro dans Global0
+            donne la version de l'AES install‚ sous forme de BCD.
+              N'oubliez pas qu'un AES sup‚rieur ou ‚gal … 4, ‡a veut dire que
+            votre AES est multitache (MultiTOS).
+              Pour etre sur, v‚rifiez GLOBAL1. S'il est … -1, ‡a veut dire que
+            votre AES est multitache sinon, le nombre peut etre moins grand si
+            vous d‚coupez la m‚moire en pages limit‚es (14Mo divis‚e en pages
+            de 2Mo, donc 7 pages soit 7 programmes max).
+
+/// AES  11 : APPL_READ ///
+
+  Sert … lire un message "Custom", particulier, qui ne tient pas dans les 8
+WORDs pr‚vus … cet effet (Voir la LIBRAIRIE EVENEMENTS). Cette fonction sert
+essentiellement pour les dialogues entre les applications, lorsque vous
+d‚finissez vos propres messages. Mais peut aussi recevoir des messages au format
+GEM...
+  Justement, … ce sujet, voyez EVNT_MESAG (AES 23) pour obtenir le format d'un
+message typiquement GEM.
+
+ParamŠtres : WORD : AP_ID de l'application Expeditrice
+                    -1 fait une lecture seulement s'il y a un message, sinon
+                    revient imm‚diatement … votre programme.
+             WORD : Longueur du message … lire
+             LONG : Adresse du tampon du message … stocker
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 11
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon c'est OK
+Pile : 16
+
+/// AES  12 : APPL_WRITE ///
+
+  Sert … envoyez un message "Normal" (8 WORDs), ou "Perso" (plus ...), … une
+application. Il est souhaitable que les 8 premiers mots correspondent au format
+standard du GEM, "le reste vous appartient" (½ Indiana Jones). Pour vos
+messages, tachez cependant de garder une certaine logique dans leur
+construction.
+
+ParamŠtres : WORD : AP_ID de l'application Destinataire
+             WORD : Longueur du message … ‚crire
+             LONG : Adresse du tampon du message … envoyer
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 12
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon c'est OK
+Pile : 16
+
+/// AES  13 : APPL_FIND ///
+
+  Tout programme charg‚ est plac‚ en m‚moire avec le nom du fichier associ‚. En
+clair, vous chargez TESTSSAV.PRG, et en m‚moire vous obtenez son code et son nom
+(en fait, c'est un peu plus compliqu‚, mais ‡a marche dans ce style). Grace …
+cela, le GEM, lors de APPL_INIT, y associe l'AP_ID de TESTSSAV, et simplement
+en connaissant le nom du programme, vous pouvez retrouver son AP_ID. Vous
+pouvez donc grƒce … cela lui envoyer un message, et le GEM se chargera d‚j… de
+lui le faire parvenir.
+  C'est en autre pour cela qu'il est important de passer par APPL_INIT (AES 10).
+
+ParamŠtres : LONG : Pointeur vers le nom de l'application … chercher (8
+                    caractŠres termin‚s par un octet nul. Combler avec des
+                    Espaces si le nom fait moins de 8 caractŠres)
+                    ATTENTION : Si cette adresse ressemble …:
+                                - $FFFFxxxx o— xxxx est l'ID sous MultiTOS du
+                                    programme cherch‚, APPL_FIND vous donne son
+                                    AP_ID sous l'AES
+                                - $FFFExxxx o— xxxx est l'AP_ID du programme
+                                    cherch‚, APPL_FIND vous donne son ID
+                                    correspondant sous MultiTOS
+                                - $0, APPL_FIND vous donne votre AP_ID
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 13
+             WORD : 200
+Retour : D0.w = AP_ID de l'application cherch‚e, sinon -1
+Pile : 12
+
+/// AES  14 : APPL_TPLAY ///
+
+Sert … rejouer un enregistrement obtenu avec APPL_TRECORD (AES 15).
+
+ParamŠtres : LONG : Adresse de l'enregistrement.
+             WORD : Vitesse de lecture
+                    ATTENTION : Ceci est un diviseur.
+                                  Lors de l'enregistrement, les ‚v‚nements Timer
+                                sont calcul‚s en milliŠme de seconde. Cependant,
+                                lors de la lecture, ces ‚v‚nements Timer sont
+                                pris comme dixiŠme de seconde. Pour obtenir une
+                                vitesse de reproduction identique, il suffit de
+                                mettre 100 ici (1000/100=10).
+                                  Cela sert pour synchroniser la lecture, pour
+                                que la vitesse soit la mˆme sur des
+                                configurations diff‚rentes.
+                                  En principe, lorsque vous bougez la souris,
+                                entre deux position diff‚rente, vous devriez
+                                trouver un ‚v‚nement Timer, qui permet de
+                                reproduire la temporisation du "coul‚" lorsque
+                                vous d‚placez la bˆte en question.
+                                  En fait, chaque enregistrement est ponctu‚
+                                d'‚v‚nements Timer.
+             WORD : Nombre d'action … ex‚cuter.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 14
+             WORD : 200
+Retour : Aucun
+Pile : 16
+
+/// AES  15 : APPL_TRECORD ///
+
+  Sert … enregistrer des actions utilisateur, comme on peut enregistrer le son
+sur FALCON030. Le son est compos‚ de deux fois 16 bits pour chaque canal audio
+(plus ou moins suivant sont choix). Ici, chaque action est sauvegard‚e sur 6
+octets.
+
+Le format est le suivant :
+OCTET 0-1 : Type d'‚v‚nement (0=Timer, 1=Bouton, 2=Souris, 3=Clavier)
+OCTET 2-5 : Donn‚e en fonction du type de l'‚v‚nement (0=Nombre de
+            millisecondes ‚coul‚es, 1=‚tat des boutons, 2=Coordonn‚es X.w et
+            Y.w de la souris, 3=CaractŠres et ‚tat du clavier)
+
+  N'ayez cependant pas peur que votre m‚moire se remplisse trop vite: s'il ne ce
+passe rien pendant un certain temps, vous n'obtiendrez qu'un ‚v‚nement Timer qui
+vous indiquera la dur‚e entre deux ‚v‚nements. Mais si vous jonglez avec votre
+souris, l…, attendez vous rapidement … un "Plus de m‚moire..." (meuh non,
+n'ayez donc pas peur, vous pouvez limiter l'enregistrement, c'‚tait pour vous
+faire peur...).
+
+ParamŠtres : LONG : Adresse o— enregistrer. Faites donc attention … bien
+                    pr‚voir une m‚moire au moins six fois plus importante que
+                    le nombre d'actions … enregistrer.
+             WORD : Nombre d'actions … enregistrer (L…, vous voyez bien!).
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 15
+             WORD : 200
+Retour : D0.w = Nombre d'actions enregistr‚es.
+Pile : 14
+
+/// AES  18 : APPL_SEARCH ///
+
+  Sert … chercher toutes les applications s'ayant fait connaitre … l'AES, et qui
+tournent avec vous en m‚moire.
+
+ParamŠtres : WORD : Mode
+                    0 = Trouver la premiere application
+                    1 = Trouver l'application suivante
+                    2 = Trouver le Bureau (il est le seul)
+                    Cela fonctionne comme F_SFIRST et F_SNEXT du GEMDOS.
+             LONG : Adresse du Nom
+                    Ce buffer doit faire 9 BYTEs ou plus, pour contenir le nom
+                    de l'application. Voyez APPL_FIND.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 18
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau de r‚ponses du GEM
+         Structure du tableau : WORD 0 : R‚sultat
+                                         0 = Plus d'application
+                                         1 = Pas d'erreur
+                                WORD 1 : Type de l'application
+                                         1 = Systeme
+                                         2 = Application standar
+                                         4 = Accessoire
+                                WORD 2 : AP_ID de l'application cherch‚e.
+Pile : 14
+
+/// AES  19 : APPL_EXIT ///
+
+  Sert … indiquer au GEM que l'on voudrait bien … pr‚sent se passer de ses
+inestimables services. En soit, indique au GEM qu'on le quitte, et que ce n'est
+plus la peine de nous envoyer les messages d'autres applications, au d'autres
+choses.
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 19
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 8
+
+/// AES 130 : APPL_GETINFO ///
+
+  Sert … avoir des informations trŠs g‚n‚rale sur l'AES install‚.
+
+ParamŠtres : WORD : Type
+                    0 : Informations sur les fontes normales
+                          Retour1 : Hauteur de la fonte
+                          Retour2 : ID de la fonte
+                          Retour3 : Type de la fonte
+                                    0 = Fonte systeme
+                                    1 = Fonte externe (GDOS par exemple)
+                                    2 = R‚serv‚
+                    1 : Informations sur les petites fontes
+                          Retour1 : Hauteur de la fonte
+                          Retour2 : ID de la fonte
+                          Retour3 : Type de la fonte
+                                    0 = Fonte systeme
+                                    1 = Fonte externe (GDOS par exemple)
+                                    2 = R‚serv‚
+                    2 : Informations sur la r‚solution et le nombre de couleurs
+                        affichables pour les objets
+                          Retour1 : Num‚ro de la r‚solution
+                          Retour2 : Nombre de couleurs utilisables pour les
+                                    objets (suivant l'AES)
+                          Retour3 : Icones couleurs
+                                    0 = Pas support‚s
+                                    1 = Support‚s
+                          Retour4 : Nouvelle version des fichiers ressources
+                                    0 = Pas support‚e
+                                    1 = Support‚e
+                    3 : Informations sur le langage de l'AES
+                          Retour1 : Langage utilis‚
+                                    0 = Anglais
+                                    1 = Allemand
+                                    2 = Fran‡ais
+                                    3 = R‚serv‚
+                                    4 = Espagnol
+                                    5 = Italien
+                                    6 = Suedois
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 130
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau de r‚ponses du GEM
+         Structure du tableau : WORD 0 : R‚sultat
+                                         0 = Erreur
+                                         1 = Pas d'erreur
+                                WORD 1 : Retour1
+                                WORD 2 : Retour2
+                                WORD 3 : Retour3
+                                WORD 4 : Retour4
+         Retour1,2,3 et 4 d‚pendent du type d'informations demand‚es
+Pile : 10
+
+--- LIBRAIRIE EVENEMENTS ---
+
+/// AES  20 : EVNT_KEYBD ///
+
+  Attend une touche (obtient … peu prŠs le mˆme r‚sultat que VOID INP(2) en
+GFA). Cependant, ne bloque pas le systŠme, bien que le d‚roulement du programme
+se trouve suspendu (appelez voir un accessoire pour vous rendre compte par vous
+mˆme)
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 20
+             WORD : 200
+Retour : D0.w = Code de la touche enfonc‚e (Comme C_RAWCIN (GEMDOS 7))
+Pile : 8
+
+/// AES  21 : EVNT_BUTTON ///
+
+  Attend une certaine action de la part de la souris (‚loignez le chat, quelle
+trouve le courage de sortir de son trou).
+
+ParamŠtres : WORD : Nombre de clicks
+                    Cela dans un intervalle de temps d‚termin‚ par EVNT_DCLICK
+                    (AES 26)
+             WORD : Masque de s‚lection
+                    BIT 0 = Bouton gauche
+                    BIT 1 = Bouton droit
+             WORD : Etat attendu
+                    BIT 0 = Etat du bouton gauche
+                    BIT 1 = Etat du bouton droit
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 21
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau de r‚ponses du GEM
+         Structure du tableau : WORD 0 : Nombre de clicks
+                                WORD 1 : Coordonn‚es X lors de l'action
+                                WORD 2 : Coordonn‚es Y lors de l'action
+                                WORD 3 : Etat des boutons
+                                         BIT 0 = Bouton gauche
+                                         BIT 1 = Bouton droit
+                                WORD 4 : Etat des touches sp‚ciales
+                                         BIT 0 = SHIFT Droit
+                                         BIT 1 = SHIFT Gauche
+                                         BIT 2 = CONTROL
+                                         BIT 3 = ALTERNATE
+Pile : 14
+
+/// AES  22 : EVNT_MOUSE ///
+
+  Ici, on attend que la souris se positionne (mais pas toute seule) dans un
+certains rectangle d‚finit par des coordonn‚es.
+
+ParamŠtres : WORD : Choix de la position
+                    0 = Si la souris est dans le rectangle
+                    1 = Si la souris est hors du rectangle
+             WORD : Coordonn‚e X du coin sup‚rieur gauche du rectangle
+             WORD : Coordonn‚e Y du coin sup‚rieur gauche du rectangle
+             WORD : Largeur du rectangle en points
+             WORD : Hauteur du rectangle en points
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 22
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau de r‚ponses du GEM
+         Structure du tableau : WORD 0 : Coordonn‚es X lors de l'action
+                                WORD 2 : Coordonn‚es Y lors de l'action
+                                WORD 3 : Etat des boutons
+                                         BIT 0 = Bouton gauche
+                                         BIT 1 = Bouton droit
+                                WORD 4 : Etat des touches sp‚ciales
+                                         BIT 0 = SHIFT Droit
+                                         BIT 1 = SHIFT Gauche
+                                         BIT 2 = CONTROL
+                                         BIT 3 = ALTERNATE
+Pile : 18
+
+/// AES  23 : EVNT_MESAG ///
+
+  Attend un message GEM, voire un message personnel, mais n'exc‚dant pas 8
+WORDs (taille standard d'un message GEM).
+
+  Voici la structure d'un message GEM, et des autres, comme les v“tres par
+exemple : WORD 0 : Type de message
+          WORD 1 : AP_ID de l'application Expeditrice du message
+          WORD 2 : Si ce WORD n'est pas nul, c'est que le message n'est pas au
+                   format GEM Stardard, et comporte des octets suppl‚mentaires
+                   qu'il vous faudra r‚cup‚rer avec APPL_READ (AES 11). Ce
+                   nombre est en principe le nombre d'OCTETs suppl‚mentaires …
+                   lire avec APPL_READ (AES11). Pour cela, vous disposez de tout
+                   ce qui est n‚cessaire dans ce message (AP_ID, taille, ...).
+          WORD 3 … 7 : Suivant le Type de message
+
+Voici … pr‚sent la liste des diff‚rents messages GEM (attention les yeux, c'est
+parti) :
+
+> MN_SELECTED (Type 10)
+  Un ‚l‚ment du menu a ‚t‚ s‚lectionn‚.
+  WORD 3 : Num‚ro du Titre du menu s‚lectionn‚ (vous savez, ce qui se trouve
+           dans la barre de menu)
+  WORD 4 : Num‚ro de l'‚l‚ment s‚lectionn‚ dans ce Titre
+  LONG 5 : Adresse de l'arbre contenant le menu PopUp (dans le cas d'une
+           gestion de menu PopUp)
+  WORD 7 : Num‚ro de l'Objet PŠre du sous menu (Idem)
+
+  ATTENTION : Gerer les menus n'est pas si simple, vu qu'ils sont arborescent.
+              Il y a cependant une astuce, car dans un menu, aucun Titre ou
+              Entr‚e n'a le mˆme num‚ro. Ainsi, il suffit de travailler avec les
+              num‚ro des entr‚es pour se diriger de sous routines en sous
+              routines, le num‚ro du Titre n'‚tant l… que pour nous permettre de
+              le faire revenir en ‚criture normale avec Menu_TNormal (AES 33).
+              Pour plus de d‚tails, voyez Menu_Bar (AES 30), y'a une Grosse
+              Surprize.
+
+> WM_REDRAW (Type 20)
+  Une demande de restauration d'une fenˆtre (suite … la fermeture d'une autre,
+  par exemple).
+  WORD 3 : Handle de la fenˆtre … redessiner
+  WORD 4 : X du coin sup‚rieur gauche
+  WORD 5 : Y du coin sup‚rieur gauche
+  WORD 6 : Largeur de la zone … redessiner
+  WORD 7 : Hauteur de la zone … redessiner
+
+> WM_TOPPED (Type 21)
+  Une fenˆtre vient d'ˆtre mise au premier plan (s‚lectionn‚e). C'est … vous
+  cependant de mettre ladites fenˆtre au premier plan, ou ne pas le faire (pour
+  d'obscures raisons).
+  WORD 3 : Handle de la fenˆtre concern‚e
+
+> WM_CLOSED (Type 22)
+  Le bouton "Closer" (coin sup‚rieur gauche) d'une fenˆtre a ‚t‚ cliqu‚, et le
+  GEM vous en informe.
+  WORD 3 : Handle de la fenˆtre sollicit‚e … disparaŒtre
+
+  ATTENTION : AprŠs que vous ayez r‚ellement ferm‚ cette fenˆtre, vous devez
+              vous attendre … recevoir des messages de Redraw s'il y avait
+              d'autres ‚l‚ments … l'‚cran que la fenˆtre avait recouverte. Dans
+              ce cas, voyez la section Window (rien … voir avec la daube du mˆme
+              nom).
+
+> WM_FULLED (Type 23)
+  Le bouton "Fuller" (coin sup‚rieur droit) d'une fenˆtre a ‚t‚ cliqu‚. Comme il
+  est d'usage … pr‚sent (et tous les livres sur le sujet vous le noterons), au
+  premier clic sur cette case, vous devez normalement ‚taler la fenˆtre sur tout
+  le bureau.
+    Au deuxiŠme clic cependant, il s'agit de faire revenir … son ‚tat initial,
+  si vous ne l'aviez modifi‚e entre temps. Ainsi, vous devez toujours avoir une
+  fenˆtre dont les dimension sont celles d‚finies par l'utilisateur, et une
+  fenˆtre ouverte sur le bureau.
+  WORD 3 : Handle de la fenˆtre
+
+> WM_ARROWED (Type 24)
+  Une partie des ascenseurs de la fenˆtre … ‚t‚ activ‚e (suivant les ‚l‚ments
+  dont dispose effectivement la fenˆtre, Voir WIND_CREATE (AES 100)).
+  WORD 3 : Handle de la fenˆtre
+  WORD 4 : Element des ascenseurs s‚lectionn‚ et action demand‚e
+           0 = WA_UPPAGE : La partie entre la "Cabine" et la flŠche vers le haut
+                           a ‚t‚ cliqu‚e. Cela signifie que l'utilisateur d‚sire
+                           remonter rapidement d'une page vers le haut.
+                           Cependant, … vous de v‚rifier si vous vous trouvez
+                           d‚j… tout en haut, ou presque (moins d'une page). La
+                           notion de page vient en fait des traitement de
+                           textes. La taille de la colonne de l'ascenseur doit
+                           ˆtre proportionnelle … la longueur du document (Voir
+                           VDI), et la "Cabine" repr‚sente le contenu de la
+                           fenˆtre sur le document.
+                             La taille de cette cabine doit ˆtre elle aussi
+                           proportionnelle … la taille de la page affich‚e par
+                           rapport … la taille du document r‚el. Ainsi, si le
+                           document ne fait qu'une page, et est affich‚ en
+                           entier dans la fenˆtre, la "Cabine" doit occuper
+                           toute la colonne de l'ascenseur. Si le document
+                           occupe deux fois la page affich‚e, la "Cabine"
+                           n'occupera que la moiti‚ de la colonne. Cela d‚pend
+                           donc aussi de la taille de la fenˆtre.
+           1 = WA_DNPAGE : Idem que pr‚c‚demment, mais c'est la partie entre la
+                           "Cabine" et la flŠche vers le bas qui a ‚t‚ cliqu‚e.
+                           L'utilisateur demande donc d'aller une page vers le
+                           bas. Mˆmes remarques que pr‚c‚demment.
+           2 = WA_UPLINE : La flŠche vers le haut a ‚t‚ cliqu‚. Si votre
+                           programme est un traitement de texte, l'utilisateur
+                           demande donc que la fenˆtre affiche le document …
+                           partir d'une ligne pr‚c‚dente (en principe). S'il
+                           s'agit d'un programme de dessin, cela peut vouloir
+                           signifier "Afficher la ligne pr‚c‚dent" ou "Afficher
+                           les 8 lignes pr‚c‚dentes". A vous de voir...
+           3 = WA_DNLINE : Pareil, mais flŠche vers le bas.
+           4 = WA_LFPAGE : Comme WA_UPPAGE ou WA_DNPAGE, mais ici il s'agit de
+                           la partie entre la "Cabine Horizontale" et la flŠche
+                           de gauche.
+           5 = WA_RTPAGE : Idem, vers la droite
+           6 = WA_LFLINE : Fleche vers la gauche
+           7 = WA_RTLINE : Fleche vers la droite
+
+> WM_HSLID (Type 25)
+  L'utilisateur … directement s‚lectionn‚ la "Cabine Horizontale", la d‚plac‚e,
+  et la relƒch‚e … un nouvel endroit.
+  WORD 3 : Handle de la fenˆtre concern‚e
+  WORD 4 : Nombre entre 0 (la "Cabine" … ‚t‚ d‚plac‚e complŠtement … gauche)
+           et 1000 (la "Cabine" butte … droite du couloir horizontal)
+
+> WM_VSLID (Type 26)
+  Mˆme chose que pr‚c‚demment, mais pour la "Cabine Verticale".
+  WORD 3 : Handle de la fenˆtre constern‚e.
+  WORD 4 : Nombre entre 0 (o— la "Cabine" est tout en haut) et 1000 (o— elle
+           est au "Rez de Chauss‚")
+
+> WM_SIZED (Type 27)
+  L'utilisateur a utilis‚ le bouton "Sizer" (coin inf‚rieur droit), … changer la
+  taille de la fenˆtre, et a relƒch‚ le bouton. Le GEM vous communique
+  accessoirement la nouvelle taille (mais n‚anmoins la mˆme coordonn‚e, car
+  "Sizer" n'affecte que la taille), que devrait prendre votre fenˆtre.
+  WORD 3 : Handle de la fenˆtre affect‚e
+  WORD 4 : X de la fenˆtre (en principe, le mˆme que pr‚c‚demment)
+  WORD 5 : Y de la fenˆtre (idem...)
+  WORD 6 : Nouvelle largeur
+  WORD 7 : Nouvelle hauteur
+
+  ATTENTION ICI : Il se trouve que le GEM, bien qu'‚crit dans un langage pas
+                  vraiment speed, vous donne des coordonn‚es "optimis‚es" pour
+                  avoir le moins possible … rafraŒchir l'‚cran. Donc, si la
+                  nouvelle taille est inf‚rieure, le GEM ne vous donnera …
+                  retracer que les parties recouvertes, et si les nouvelles
+                  dimensions sont sup‚rieures, le GEM ne vous demande que
+                  d'ajouter ce qu'il y a … ajouter.
+                    L… o— le bas blesse, c'est que s'il se produite un bug …
+                  l'‚cran, sur une fenˆtre, et que vous esp‚rez le voir
+                  disparaŒtre en la modifiant (sur laquelle se trouve, ou en
+                  partie, le bug), celui ci restera.
+                    Cependant, rien ne vous empˆche de retracer … chaque fois
+                  toute la fenˆtre, mais le mieux est bien ‚videment d'avoir un
+                  programme rapide, et notoirement bien ‚crit pour ‚viter les
+                  gros m‚chants Bugs.
+
+> WM_MOVED (Type 28)
+  L'utilisateur a utilis‚ la "Barre de Titre", et … boug‚ la fenˆtre.
+  WORD 3 : Handle de la fenˆtre "Emmigr‚e"
+  WORD 4 : Nouveau X
+  WORD 5 : Nouveau Y
+  WORD 6 : Largeur (ne devrait pas avoir boug‚, car la "Barre de Menu" ne
+           devrait pas avoir affect‚ la taille)
+  WORD 7 : Hauteur (ma foi, ...)
+
+  ATTENTION : Mˆme remarque que pr‚c‚demment. La fenˆtre boug‚e n'est en
+              principe pas retrac‚e mais copi‚e, et seules les parties occult‚es
+              sont retrac‚es.
+
+> WM_NEWTOP (Type 29)
+  €a existe, mais je sait pas … quoi ‡a sert. Mˆmes paramŠtres que WM_TOPPED. Je
+  pr‚sume que c'est aprŠs la premiŠre ouverture de la fenˆtre, pour que le
+  programme sache qu'il a … sauvegarder les nouveaux paramŠtres de cette
+  fenˆtre, mais ce n'est que pure sp‚culation de ma part, et le modeste
+  programmeur que je suis (mais quelle grande G...) ne dispose pas d'assez de
+  documentations pour vous fournir de plus amples explications.
+  WORD 3 : Handle de la fenˆtre
+
+> WM_UNTOPPED (Type 30)
+  Est envoy‚ lorsque la fenetre en premier plan est envoy‚e en arriere plan par
+  la s‚lection d'une autre fenetre.
+  Entre nous, c'est juste envoy‚ pour information, pour que vous soyez plus
+  pr‚cis‚ment au courant de ce que l'AES fabrique. Je doute que vous puissiez y
+  trouver une utilit‚ quelconque.
+  WORD 3 : Handle de la fenˆtre
+
+> WM_ONTOP (Type 31)
+  L… aussi, c'est juste pour info, histoire que vous n'alliez pas crier sur les
+  toits que l'on ne vous tienne pas inform‚ de ce qui ce passe, et que l'on
+  vous cache quelque chose.
+  Faites gaffe, si vous cherchez … utiliser ce message, car ATARI pr‚cise qu'il
+  peut se passer plein de choses entre le moment o— la fenetre arrive en
+  premier plan, et que vous receviez ce message. Par exemple, que la fenetre en
+  question ne soit d‚j… plus au premier plan.
+  WORD 3 : Handle de la fenˆtre
+
+> AC_OPEN (Type 40)
+  Sert … "‚veiller" un accessoire, soit lorsque l'on le choisit via le "Menu
+  Bureau", ou … la main, avec APPL_WRITE.
+  WORD 3 : Num‚ro de l'entr‚e du "Menu Bureau".
+           ATTENTION : Rien … voir avec le num‚ro r‚el du G_STRING qui forme le
+                       nom de l'accessoire (voyez MENU_BAR (AES 30)), mais bel
+                       et bien le num‚ro de l'accessoire.
+                         En principe, l'accessoire … re‡ut le mˆme lors de son
+                       installation par MENU_REGISTER. Juste histoire de voir
+                       s'il n'y a pas de Bug...
+
+  REMARQUE : Il existe un moyen de faire des accessoire auto r‚current. Bien que
+             l'info ait ‚t‚ diffus‚e dans StraTOS, je l'avais trouv‚ une semaine
+             avant (t‚l‚pathie? Non, logique!).
+             Pour fermer un accessoire, deux moyens :
+              - Appuyer sur le Closer, ou la touche de validation.
+              - Quitter l'application en cours (si vous n'ˆtes pas sous
+                MultiTOS), ou changer de r‚solution.
+             Dans le premier cas, c'est votre programme qui gŠre la sortie de
+             l'accessoire, mais dans le second cas, le GEM vous informe poliment
+             qu'il serait bon de disparaŒtre, ou que cela va avoir lieu, et
+             qu'il devient donc inutile de g‚rer l'accessoire puisque celui ci
+             ne sera de toute maniŠre plus pr‚sent … l'‚cran.
+               StraTOS conseille, dans ce cas, de r‚-ouvrir l'accessoire au bout
+             de huit secondes environ (rechargement des diff‚rents accessoires,
+             du bureau, installation du bordel, et surtout si vous avez DeskPic
+             en route avec un chargement d'une image GIF en 256 couleurs).
+               De mon cot‚, je ne peut h‚las vous conseiller mieux, car … ma
+             connaissance, il n'existe aucun moyen de savoir quand exactement le
+             bureau … v‚ritablement fini de s'installer, et donc quand votre
+             accessoire serait le plus propice … se rouvrir.
+               Une indication pour celui qui tiens … chercher : juste … la fin
+             de l'installation du bureau, le disque dur fait un cours accŠs...
+             De l…, les possibilit‚s sont infinies.
+               N‚anmoins, une fois que les accessoires sont charg‚s, la boucle
+             principale est execut‚e, donc en principe c'est … ce moment l…
+             qu'il sagit de v‚rifier si l'accessoire ‚tait d‚j… pr‚sent avant
+             de fermer l'application ou de changer de r‚solution (n'oubliez pas
+             que l'on peut d‚selectionner le votre avec diff‚rents outils, ou
+             en gardant press‚e la touche Control), et s'il ‚tait ouvert. Le
+             TOS ‚tant pseudo-multitache (uniquement pour les accessoires),
+             d'ouvrir le votre alors qu'un accessoire est en train de
+             travailler ne devrait pas poser de probleme (juste un petit
+             retard, le temps que le GEM s'occupe de vous).
+
+> AC_CLOSE (Type 41)
+  Demande … l'accessoire de se la boucler (fermer les fenˆtres qu'il a
+  ouvertes, lib‚rer la m‚moire qu'il squatte, etc...)
+  WORD 3 : Num‚ro obtenu avec MENU_REGISTER (AES 35).
+           Permet de v‚rifier que le GEM s'adresse bien … cet accessoire, et
+           pas … l'autre.
+
+ATTENTION: Ce message peut etre envoy‚ pour fermer un accessoire, sans qu'il y
+           ait pour autant changement de r‚solution..
+
+> AP_TERM (Type 50)
+  Lorsque vous recevez ce message, cela veut dire qu'il serait souhaitable de
+  terminer au plus vite.
+  Fermez vos fenetres, liberez la m‚moire et la ressource, etc...
+  WORD 5 : Les raisons de cet appel
+
+ATTENTION: Les accessoires PEUVENT AUSSI recevoir ce message.
+
+> AP_TFAIL (Type 51)
+  Echec dans la procedure d'exctinction.
+  WORD 1 : Le code d'erreur
+
+  ATTENTION: envoyez ce message avec SHEL_WRITE mode 10.
+
+> AP_RESCHG (Type 57)
+  C'est une sorte de AP_TERM, mais ici, cela veut dire que l'ordinateur ne va
+  pas s'arreter, mais changer de r‚solution.
+  Sous un systeme multitache, c'est utile. Imaginez que votre application ne
+  supporte pas le TrueColor (programme GFA), et que vous receviez ce message,
+  dans ce cas terminez, sinon restez.
+  N'oubliez pas qu'il faudra r‚adapter la taille de toutes les fentres, et
+  surtout modifier la ressource car les dimensions des objets auront ‚t‚
+  calcul‚es par rapport … l'ancienne r‚solution. Le mieux encore est de lib‚rer
+  la ressource, puis de la recharger imm‚diatement. Ni vu ni connu, elle sera
+  automatiquement adapt‚e … la r‚solution courante … son chargement.
+
+> SHUT_COMPLETED (Type 60)
+  Ca y est, tout est pres pour etre eteint.
+  WORD 3 : 0 = La phase d'exctinction n'a pas aboutie.
+               Dans ce cas, cela veut dire qu'une application, ou plusieures,
+               ont refus‚es de s'arreter.
+               WORD 4 : AP_ID de l'application qui refuse de s'arreter
+               WORD 5 : Le code de la raison de son refus.
+           1 = Pas de probleme, tout c'est tres bien d‚roul‚.
+
+> RESCH_COMPLETED (Type 61)
+  Ce message est envoy‚ … l'application qui demande de changer de r‚solution.
+  WORD 3 : 0 = Erreur
+           1 = Pas d'erreur
+               Dans ce cas, il faut sortir pour laisser le systeme
+               d'exploitation changer de r‚solution.
+
+> AP_DRAGDROP (Type 63)
+  Ce message est envoy‚ lorsque surgit un evenement Drag'n Drop.
+  WORD 1 : AP_ID de l'expediteur du message
+           Peut etre le Bureau lui meme (0)
+  WORD 3 : Handle de la fenetre concern‚e
+           -1 si on demande … l'application cible de creer et/ou ouvrir une
+              nouvelle fenetre.
+  WORD 4 : Coordonn‚e X de la souris au relachement
+  WORD 5 : Coordonn‚e Y de la souris au relachement
+  WORD 6 : Etat des touches sp‚ciales
+  WORD 7 : Nom du "Pipe" (?)
+
+ATTENTION: Il sagit de v‚rifier si les coordonn‚es appartiennent … une de vos
+           fenetres, et … laquelle. Faites attention pour les Drag'n Drop
+           d'objet ‚ditable
+           Pour le dialogue, il existe un protocole. C'est sous MultiTOS, et
+           j'ai pas de docs plus fournies.
+
+> SH_WDRAW (Type 72)
+  Ce message est a envoyer au Bureau pour qu'il rafraichisse les fenetres des
+  lecteurs. Votre application copie des fichiers en arriere plan dans la
+  partition E, et … la fin demande au Bureau de bien vouloir faire apparaitre
+  les modification. Si la fenetre concern‚e est ouverte, le Bureau rafraichit,
+  sinon il ne se passe rien.
+  WORD 3 : Num‚ro du lecteur concern‚ (0=A, 1=B, ...)
+           -1 pour rafraichir toutes les fenetres
+
+> CH_EXIT (Type 80)
+  Ce message est envoy‚ … une application pere lorsque son application fille se
+  termine. Si l'application pere est le bureau, ‡a se passe comme un P_TERM. Si
+  l'application pere est une application, c'est … elle d'agir en cons‚quence.
+  WORD 3 : AP_ID de l'application fille
+  WORD 4 : Code de sortie
+
+ATTENTION: Si vous avez utilisez SHEL_WRITE pour lancer l'application, le
+           retour se fera … l'AES. Mais bon joueur, il utilisera sa m‚moire
+           pour se souvenir qui lui … demand‚ de lancer cette application, et
+           fera suivre le message. Donc dans tous les cas, meme si vous n'aviez
+           pas programm‚ en tenant compte d'un quelconque systeme multitache,
+           vous recevrez ce message.
+
+ParamŠtres : LONG : Adresse du tampon du message (un ds.w 8 quelque part dans
+                    votre programme fait trŠs bien l'affaire)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 23
+             WORD : 200
+Retour : Aucun
+Pile : 12
+
+REMARQUE : Il arrive dans certains programme (presque tous en fait), que le
+           programme utilise le message au plus deux fois.
+             En clair, aprŠs avoir ex‚cut‚ une action dont l'ordre provenait
+           d'un message, celui ci se trouvant encore int‚gralement en m‚moire,
+           le programme va l'ex‚cuter une deuxiŠme fois.
+             Dans la pratique, l'exemple le plus stressant, c'est lorsque vous
+           cliquez dans un ascenseur d'une fenˆtre pour descendre d'une page de
+           texte par exemple, et que le programme descende de deux pages, sans
+           que vous puissiez faire quoi que ce soit.
+             En fait, pour stopper le processus, pendant que le programme
+           effectue l'affichage de la page suivante, cliquez sur le bureau, le
+           message change, et le programme est leurr‚.
+
+             Donc, dans le cas g‚n‚ral, le mieux est d'effacer le WORD du type
+           du message aprŠs l'avoir ex‚cut‚, histoire d'‚viter ce problŠme.
+
+/// AES  24 : EVNT_TIMER ///
+
+Pause en millisecondes … effectuer. L'utilit‚ de cette fonction est discutable.
+La pause maximum est de 49 jours, 17 heures, 2 minutes, 47 secondes et 295
+milliŠmes. Bon dodo d'ici l…...
+
+ParamŠtres : LONG : Nombre de millisecondes … attendre.
+                    Normalement les deux WORDs qui composent ce LONG doivent
+                    ˆtres invers‚s, mais ne vous inqui‚tez pas, SSAV s'occupe de
+                    tout (Le WORD de poids faible … la place du WORD de poids
+                    fort, et inversement : devinez pas la faute … qui, Big Blue
+                    ou Bill Gates?)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 24
+             WORD : 200
+Retour : Aucun
+Pile : 12
+
+/// AES  25 : EVNT_MULTI ///
+
+Combinaison de pratiquement tous les appels de gestions vu jusqu'ici. La cerise
+sur le gƒteau (ou l'ananas si vous pr‚f‚rez), c'est qu'il est possible de g‚rer
+deux EVNT_MOUSE diff‚rents (donc … g‚rer deux zones diff‚rentes).
+  De plus, vu que vous g‚rez plusieurs ‚v‚nements en mˆme temps, vous n'ˆtes
+plus obligez de r‚partir le travail en plusieurs fois.
+
+ParamŠtres : WORD : Type d'‚v‚nement
+                    BIT 0 = Clavier (Voir EVNT_KEYBD (AES 20))
+                    BIT 1 = Boutton (Voir EVNT_BUTTON (AES 21))
+                    BIT 2 = (Voir EVNT_MOUSE (AES 22))
+                    BIT 3 = (Voir EVNT_MOUSE (AES 22))
+                    BIT 4 = Message (Voir EVNT_MESAG (AES 23))
+                    BIT 5 = Timer (Voir EVNT_TIMER (AES 24))
+               EVNT_BUTTON
+             WORD : Nombre de clicks
+             WORD : Masque de s‚lection
+             WORD : Etat attendu
+               EVNT_MOUSE(1)
+             WORD : Choix de la premiŠre position
+                    0 = Si la souris est dans le rectangle
+                    1 = Si la souris est hors du rectangle
+             WORD : Coordonn‚e X1 du coin sup‚rieur gauche du rectangle
+             WORD : Coordonn‚e Y1 du coin sup‚rieur gauche du rectangle
+             WORD : Largeur1 du rectangle en points
+             WORD : Hauteur1 du rectangle en points
+               EVNT_MOUSE(2)
+             WORD : Choix de la deuxiŠme position
+                    0 = Si la souris est dans le rectangle
+                    1 = Si la souris est hors du rectangle
+             WORD : Coordonn‚e X2 du coin sup‚rieur gauche du rectangle
+             WORD : Coordonn‚e Y2 du coin sup‚rieur gauche du rectangle
+             WORD : Largeur2 du rectangle en points
+             WORD : Hauteur2 du rectangle en points
+               EVNT_TIMER
+             LONG : Nombre de millisecondes … attendre
+               EVNT_MESAG
+             LONG : Adresse du tampon du message (un ds.w 8, ou plus)
+             LONG : Addresse du buffer des variables (AES_Params)
+             WORD : 25
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau de r‚ponses du GEM
+         Structure du tableau : WORD 0 : Type d'‚v‚nement survenue (parmi ceux
+                                         d‚finis dans le premier paramŠtre de
+                                         EVNT_MULTI)
+                                WORD 1 : Coordonn‚e X de la souris …
+                                         l'apparition de l'‚v‚nement
+                                WORD 2 : Coordonn‚e Y de la souris
+                                WORD 3 : Etat des boutons
+                                WORD 4 : Etat des touches sp‚ciales
+                                WORD 5 : Code Clavier - Code ASCII
+                                WORD 6 : Nombre de clics
+
+Pile : 44
+
+/// AES  26 : EVNT_DCLICK ///
+
+Sert … obtenir ou … fixer la vitesse de double click de la souris.
+
+ParamŠtres : WORD : Vitesse de double click (0 = Lent … 4 = Rapide)
+             WORD : Mode (0 = Lecture de la vitesse, 1 = Ecriture)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 26
+             WORD : 200
+Retour : D0.w = Vitesse lue (Si Mode = 0), sinon vitesse ‚crite
+Pile : 12
+
+--- LIBRAIRIE MENUS ---
+
+/// AES  30 : MENU_BAR ///
+
+Sert … afficher ou … effacer la barre de menu du GEM. A l'affichage du nouveau
+menu, le GEM se charge de remplacer les places r‚serv‚es dans le menu principal
+par les accessoires en m‚moire.
+
+  Je tiens … avertir les d‚butants, car la gestion des menus est assez ardue de
+prime abord. Cependant, j'utilise une "astuce", qui n'est en fait qu'un baguage
+… mon style de programmation. Les bidouilleurs qui se seront d‚j… empress‚ de
+d‚sassembler SSAVCALL auront d‚j… compris mon ... truc. En fait, c'est comme
+l'assembleur, c'est logique. Mais je vous invite … suivre deux minutes fortement
+didactiques.
+  Il se trouve que dans le cas g‚n‚ral, le premier Titre d'un menu porte le
+num‚ro 3. Le suivant le 4, et ainsi de suite. Ainsi, si votre menu comporte 4
+Titres, le dernier se verra attribuer le num‚ro 6 (1ø=3, 2ø=4, 3ø=5 et 4ø=6).
+Mais dans ce mˆme cas g‚n‚ral, il se trouve que la premiŠre Entr‚e soit notre
+inconditionnelle "A Propos De..." dans le premier Titre. Cette entr‚e sert dans
+le cas ... g‚n‚ral vous l'aurez devin‚, … donner des informations sur l'auteur,
+le programme, ou... suivant le gr‚ de notre amis ressourciste (NdC : ‡a
+existe?).
+  Cette premiŠre Entr‚e, en la matiŠre, se voit d‚finir le num‚ro du dernier
+Titre, plus 3. Dans notre exemple donc 9. Cela car l'Objet, et oui, aprŠs le
+dernier Titre est un I-Box. Le suivant ‚tant la boite contenant les Entr‚es du
+premier Titre.
+  Donc, aprŠs notre premiŠre Entr‚e, la 9, se trouve une ligne pour d‚limiter
+votre menu et les accessoires. Celle ci porte le num‚ro 10, et les Entr‚es pour
+les accessoires 1 … 6 respectivement 11 … 16. L'Objet 17 est la boite contenant
+les Entr‚e du deuxiŠme Titre. Ainsi de suite, jusqu'a la fin. Compl‚tons
+l'exemple par une d‚finition exacte de notre menu.
+
+TestSSAV        (Titre 3)
+ I-Box            (num‚ro 7)
+ Box TestSSAV     (num‚ro 8)
+  A Propos De...    (Entr‚e 9)
+  --------------  (num‚ro 10)
+  Acc 1             (Entr‚e 11)
+  Acc 2             (Entr‚e 12)
+  Acc 3             (Entr‚e 13)
+  Acc 4             (Entr‚e 14)
+  Acc 5             (Entr‚e 15)
+  Acc 6             (Entr‚e 16)
+Fichiers        (Titre 4)
+ Box Fichiers     (num‚ro 17)
+  Nouveau           (Entr‚e 18)
+  Ouvrir            (Entr‚e 19)
+  -----------     (num‚ro 20)
+  Sauver            (Entr‚e 21)
+  Sauver sous       (Entr‚e 22)
+  -----------     (num‚ro 23)
+  Quitter           (Entr‚e 24)
+Affichage       (Titre 5)
+ Box Affichage    (num‚ro 25)
+  Fenˆtres          (Entr‚e 26)
+  Formulaires       (Entr‚e 27)
+Graphisme       (Titre 6)
+ Box Graphisme    (num‚ro 28)
+  Ligne             (Entr‚e 29)
+  Rectangle         (Entr‚e 30)
+
+Je suppose que vous avez compris, donc continuons.
+  Dans ce menu vous n'avez pas besoin de g‚rer les lignes, les Titres (car ce
+n'est pas avec un Titre que vous allez ouvrir un formulaire), les diff‚rentes
+boites, et bien sur les accessoires. Mais si vous n'avez pas … les g‚rer, rien
+ne doit vous empˆcher de pr‚voir assez grand pour ne pas avoir … vous prendre le
+melon sur un casse tˆte. Voyons … pr‚sent ma formule magique.
+  Il existe cependant bien d'autre maniŠre de g‚rer un menu, mais je pense que
+dans un but de d‚veloppement en assembleur, cette version offre beaucoup
+d'avantages.
+  Imaginez vous que l'on vient de sortir d'une demande d'‚v‚nement avec
+Evnt_Mesage par exemple, et que l'on attend quelque chose pour le menu. Le Type
+est … 10, donc c'est pour nous, et il s'agit de jouer serr‚.
+
+                ...
+
+                pea             Menu_Return     ; On se pr‚pare au retour
+
+                lea             Messag_Tab,A0
+                move.w          (8,A0),D0       ; Le num‚ro de l'Entr‚e
+                cmpi.w          #31,D0          ; On v‚rifie que l'on est bien
+                                                ; dans une certaine limite,
+                                                ; histoire d'‚viter le gros
+                                                ; m‚chant bug
+                BGE             Menu_Exit       ; Oups...
+                lea             Menu_Jump,A1
+                JMP             (A1,D0.w*4)     ; Warp (un BRA prend 4 octets)
+                RTS                             ; On met un filet, au cas ou
+
+Menu_Jump       BRA             Menu_Exit       ; c'est quoi l'Objet 0?
+                BRA             Menu_Exit       ; Et le 1?
+                BRA             Menu_Exit       ; Et le 2?
+                BRA             Menu_Exit       ; C'est un Titre, et il ne
+                BRA             Menu_Exit       ; peut donc ˆtre s‚lectionn‚
+                BRA             Menu_Exit       ; en tant qu'Entr‚e. Donc, on
+                BRA             Menu_Exit       ; s'en fout
+                BRA             Menu_Exit       ; La fameuse I-Box
+                BRA             Menu_Exit       ; La Box TestSSAV
+                BRA             Infos           ; A Propos De...
+                BRA             Menu_Exit       ; La ligne
+                BRA             Menu_Exit       ; Acc 1
+                BRA             Menu_Exit       ; Acc 2
+                BRA             Menu_Exit       ; Acc 3
+                BRA             Menu_Exit       ; Acc 4
+                BRA             Menu_Exit       ; Acc 5
+                BRA             Menu_Exit       ; Acc 6
+                BRA             Menu_Exit       ; La Box Fichier
+                BRA             New             ; Nouveau
+                BRA             Load            ; Charger
+                BRA             Menu_Exit       ; La ligne
+                BRA             Save            ; Sauver
+                BRA             Save_As         ; Sauver sous
+                BRA             Menu_Exit       ; La ligne
+                BRA             Quit            ; Quitter
+                BRA             Menu_Exit       ; La Box Affichage
+                BRA             Windows         ; Fenetres
+                BRA             Forms           ; Formulaires
+                BRA             Menu_Exit       ; La Box Graphisme
+                BRA             Line            ; Ligne
+                BRA             Rect            ; Rectangle
+
+Menu_Return     move.w          (6,A0),D0       ; On suppose que l'on a pas
+                                                ; touch‚ … A0, que l'on pointe
+                                                ; encore le buffer des
+                                                ; ‚v‚nements, et qu'il nous
+                                                ; suffit de r‚cup‚rer le
+                                                ; num‚ro du Titre … faire
+                                                ; revenir en ‚criture normale
+                BSR             MENU_TNORMAL
+
+Menu_Exit       RTS                             ; On sort de la gestion
+
+Infos           ; Il s'agit d'afficher votre formulaire, et de le g‚rer
+
+                RTS                             ; A cause du pea, qui … simul‚
+                                                ; un BSR en empilant l'adresse
+                                                ; de Menu_Return, on y va.
+
+MENU_TNORMAL    move.l          Menu_Adr,-(SP)  ; Adresse du menu
+                move.w          D0,-(SP)        ; Num‚ro du Titre
+                move.w          #1,-(SP)        ; Normal
+                pea             AES_Params
+                move.w          #33,-(SP)       ; - MENU_TNORMAL -
+                move.w          #200,-(SP)      ; *** AES ***
+                JSR             ([SSAV_Adr])
+                lea             (16,SP),SP
+
+                RTS
+
+Menu_Adr        ds.l            1               ; Adresse du Menu actuel
+Message_Tab     ds.w            8               ; Le buffer pour les ‚v‚nements
+
+  Ainsi, vous disposez d'un exemple de gestion simpliste d'un menu. Si celui ci
+occupe beaucoup de place, que ce n'est pas fin de ma part de proc‚der ainsi, que
+je risque de m'attirer les foudres des Dieux puristes du GEM, il est n‚anmoins
+relativement compr‚hensible, et facilement modifiable (il suffit de rajouter des
+lignes en cas de rajout d'Entr‚es). Sachez tout de mˆme que vu que les Boxs et
+autres lignes ne peuvent ˆtres s‚lectionn‚es, jamais ces sauts ne serviront,
+mais je les mets pour une raison de lisibilit‚, et au cas ou un bug vicieux
+viendrait vous polluer la vie (bweark...).
+  Pour ceux qui veulent g‚rer deux menu (voyez donc TestSSAV), il se trouve un
+problŠme lors du retour au menu pr‚c‚dent. Vu que le message ‚v‚nement
+enregistr‚ est celui du menu que l'on quitte (le deuxiŠme), Menu_Return ne
+trouvera pas dans le message le bon num‚ro du Titre (du premier menu) … changer
+(celui qui vous a envoy‚ dans le second menu). Pourtant ce Titre (du premier
+menu) est en inverse vid‚o en m‚moire.
+  Si vous affichez tel quel le menu, vous aurez la surprise de voir apparaŒtre
+le Titre en inverse (car disons pour TestSSAV, j'utilise la premiŠre Entr‚e du
+premier Titre du deuxiŠme menu pour revenir au premier menu, donc le num‚ro de
+Titre du message sera … 3 (n'oubliez pas que 3 est le num‚ro du premier
+Titre)[inspiration profonde...], donc au retour, se sera le premier Titre du
+premier menu qui reviendra en normal, alors qu'il y est d‚j…)[Expiration
+soulag‚e...].
+  La solution consiste avant de revenir, de placer … la main le num‚ro du Titre
+qui a invoqu‚ le nouveau menu. En principe, vous savez dans quel Titre se trouve
+l'Entr‚e en question, et ne devrais pas changer. De placer le num‚ro du Titre ne
+fait pas planter l'ordinateur, mais placez bien ce num‚ro o— il faut...
+
+ParamŠtres : LONG : Adresse du menu (A obtenir avec RSRC_GADDR (AES 100) si l'on
+                    travail avec des ressources).
+                      Certains finissent avec 0 ici. Allez savoir pourquoi, car
+                    l'application suivante force automatiquement l'apparition de
+                    la barre de menu par l'appel de cette fonction, que cela
+                    soit le Bureau ou autre chose.
+             WORD : Mode
+                    0 = D‚sactive le menu
+                    1= Active la chose
+                    -1= Demande l'AP_ID de l'application … laquelle appartient
+                        la barre de menu affich‚e. Le retour se fait dans D0
+                        dans ce cas.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 30
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK. Peut etre un AP_ID.
+Pile : 14
+
+ATTENTION : Il se peut que vous veniez … rajouter des Entr‚es dans un menu, mais
+            que vous oubliez d'en faire de mˆme avec le programme de gestion. Si
+            cela vous arrivais, vous vous en rendriez compte imm‚diatement, car
+            une boite ne correspondant pas … l'Entr‚e d‚sir‚e s'ouvrira, par
+            exemple.
+              De plus, il se peut qu'en ajoutant des Entr‚e … la fin de votre
+            menu (dernier Titre), et que vous oubliez de modifier le nombre
+            maximum d'Entr‚e, juste avant le saut qui lui mˆme vous enverra dans
+            la routine de gestion ad‚quate, le chiffre de l'Entr‚e sera trop
+            grand, et vous serez renvoyez … Menu_Exit sans autre forme de procŠs
+            (voyez le cmpi avant Menu_Jump).
+              Cependant, vu que le message est correct, le Titre reviendra en
+            ‚criture normal, mais vous n'obtiendrez pas ce que vous attendiez.
+
+Je tiens … vous donner quelques informations plus complŠtes.
+L'Objet 0 du menu est une IBox, qui se trouve ˆtre le bureau en lui mˆme. C'est
+grƒce … cela que DeskPic et compagnie mettent une image dans le fond, en for‡ant
+le GEM … changer d'Objet 0.
+L'Objet 1 est une Box avec un bord. C'est simplement la barre de menu.
+L'Objet 2 est une IBox qui contient les Titres.
+Notre IBox 7 contient toutes les Box r‚unissant les Entr‚es.
+
+Voici donc l'Arborescence de notre menu :
+G_IBox 0 : Bureau
+ G_Box 1 : Barre de menu
+  G_IBox 2 : Boite avec les Titres
+   G_Title 3 : TestSSAV
+   G_Title 4 : Fichier
+   G_Title 5 : Affichage
+   G_Title 6 : Graphisme
+ G_IBox 7 : Espace de travail (assez grand car contient les boites d‚roulantes)
+  G_Box 8 : Boite du titre TestSSAV
+   G_STRING 9 : A Propos De..
+... Le reste est du mˆme acabit, … raison d'un G_String par Entr‚e.
+
+Un appel … l'‚quipe de Double Click SoftWare : Mais comment faites vous donc
+avec DCPOPUP pour transformer n'importe quel menu en Pop-Up hi‚rarchique?
+
+/// AES  31 : MENU_ICHECK ///
+
+Sert … afficher un petit  (CHR$(8)) devant une ligne d'un menu. Par exemple
+pour fixer un paramŠtre (utilisation du ClipBoard dans 7UP).
+
+ParamŠtres : LONG : Adresse du menu (Mˆme remarque que pr‚c‚demment)
+             WORD : Num‚ro de l'‚l‚ment … marquer (Titre ou Entr‚e)
+             WORD : Mode (0 = Efface la marque ou 1 = Affiche la marque)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 31
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES  32 : MENU_IENABLE ///
+
+Sert … rendre une ligne d'un menu inactive. On ne peut plus ensuite s‚lectionner
+cette ligne. Elle devient grise (comme les lignes de s‚parations dans les
+menus).
+
+ParamŠtres : LONG : Adresse du menu (Mˆme remarque que pr‚c‚demment)
+             WORD : Num‚ro de l'‚l‚ment … afficher en clair
+             WORD : Mode (0 = Ecrit en clair ou 1 = Ecrit en normal)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 32
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES  33 : MENU_TNORMAL ///
+
+Sert … afficher une ligne d'un menu en invers‚.
+  Si dans votre menu, vous avez s‚lectionn‚ une ligne, il FAUT utiliser cette
+commande pour lui faire retrouver son aspect original, car le GEM ne s'en occupe
+pas.
+  Si vous ne le faite pas, la prochaine fois que vous d‚roulerez le menu qui
+contient la ligne, celle ci sera en inverse vid‚o. C'est justement ce qu'il
+arrive aux Titres, dont il faut changer l'Ob_State non pas avec OBJC_CHANGE,
+mais avec cette fonction.
+
+ParamŠtres : LONG : Adresse du menu (Mˆme remarque que pr‚c‚demment)
+             WORD : Num‚ro de l'‚l‚ment … afficher en inverse vid‚o
+             WORD : Mode (0 = Ecrit en inverse ou 1 = Ecrit en normal)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 33
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES  34 : MENU_TEXT ///
+
+Sert … changer le texte d'un ligne d'un menu, par exemple pour indiquer le fait
+qu'une fonction est active ou pas (voir MENU_ICHECK (AES 31)). Le nouveau texte
+ne DOIT pas ˆtre plus long que le texte … remplacer, sinon ... BOUM.
+
+ParamŠtres : LONG : Adresse du menu (Mˆme remarque que pr‚c‚demment)
+             WORD : Num‚ro de l'‚l‚ment … changer
+             LONG : Adresse du nouveau texte (Se terminant par 0, et pas plus
+                    long que l'‚l‚ment actuellement affich‚, sinon...)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 34
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 18
+
+/// AES  35 : MENU_REGISTER ///
+
+Sert … installer le titre d'un accessoire dans le menu Bureau.
+  Attention, contrairement … MENU_BAR, il ne s'agit pas ici de faire apparaŒtre
+le nom des accessoires pr‚sents en m‚moire aux emplacements qui leurs sont
+r‚serv‚s, mais belle et bien d'indiquer au GEM que vous voulez installer un
+nouvel accessoire, dans la mesure du possible.
+  Si vous obtenez r‚paration, donc que le GEM vous gratifie de la chance de
+pouvoir figurer … tout moments dans la barre de menu, il vous faudra entrer dans
+une boucle sans fin, et attendre le message d'ouverture AC_OPEN (Type 40). A ce
+moment l…, allez dans une boucle pour g‚rer vos formulaire et fenˆtres.
+  Cependant, ne r‚servez pas de m‚moire, ou alors … titre vraiment temporaire
+car dans ce cas, le GEM n'inscrira pas l'appartenance du bloc m‚moire … vous,
+mais … la tache actuellement en utilisation (le programme en cours, quoi). S'il
+vient … disparaŒtre, les blocs m‚moires r‚serv‚s lors de son existence sont
+rendus, et vous, vous plantez le systŠme, H‚, con... C'est d'ailleurs pour cela
+que RSRC_LOAD ne procŠde pas de cette maniŠre, et dans ce cas, la ressource
+charg‚e vous appartient v‚ritablement.
+
+ParamŠtres : WORD : AP_ID de l'accessoire
+                    -1 = R‚‚crit le nom de l'accessoire, qui peut avoir chang‚.
+             LONG : Adresse du titre de l'accessoire (Se terminant par 0)
+                    N'excedez pas 16 caracteres pour le nom de votre
+                    accessoire.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 35
+             WORD : 200
+Retour : D0.w = Num‚ro de l'accessoire (0 … 5), -1 si il n'y a plus de place
+Pile : 14
+
+ATTENTION : Il existe un "grugeur" qui ‚tend le nombre d'accessoire … 36. Votre
+            accessoire doit donc faire attention … ne pas se limiter de 0 … 5.
+
+/// AES  36 : MENU_POPUP ///
+
+Sert … afficher et … g‚rer un menu du type Pop-Up.
+  Ne fonctionne qu'a partir de l'AES 3.4, inclus dans les TOS 4. Ces menus ont
+une structure arborescente, assez difficile … mettre en oeuvre … la main, mais
+grƒce au nouvel AES, "no problemo" (½ Terminator). Deux nouvelles structures
+viennent ‚toffer un nombre d‚j… consid‚rable de ces tableaux de maŒtres.
+
+> Structure Menu_Pop
+  Cette structure d‚finie un menu du type PopUp.
+  LONG : Adresse de l'arbre contenant le menu
+  WORD : Num‚ro de l'Objet PŠre du menu. Comme vous l'avez vu, les Entr‚es d'un
+         menu sont contenus dans une Box. Ici, les Entr‚e du menu PopUp DOIVENT
+         ˆtres contenus dans une G-Box dont le cadre est de un pixel vers
+         l'ext‚rieur, et dont le BIT Shadowed est mis. Chaque Entr‚e de ce menu
+         doit ˆtre un G_String.
+         En principe, dans un mˆme arbre, on peut mettre plusieurs menu PopUp,
+         mais c'est foireux, alors mettez en un par arbre.
+  WORD : Objet de d‚part du menu. Si c'est un menu de type hi‚rarchique, ce sera
+         l'Entr‚e plac‚e tout en haut, et dans le cas d'un menu PopUp, c'est
+         l'Entr‚e qui devra se trouver en face du bouton d'appel.
+  WORD : Si c'est … 0, le menu est fixe, sinon les Entr‚es situ‚es entre
+         l'Entr‚e dont le num‚ro d'ordre est contenu dans ce WORD, et la fin,
+         peuvent scrooler car le GEM ajoute des flŠches pour pouvoir faire
+         cela sans problŠmes.
+
+> Structure Menu_Set
+  Cette structure d‚finie le comportement d'un menu PopUp.
+  LONG : D‚lai en milliŠme de seconde entre le moment o— la souris arrive (ou
+         passe) sur une Entr‚e li‚e … un sous menu, et le moment o— celui ci
+         doit s'afficher. C'est pratique car si vous passez rapidement sur les
+         Entr‚e, le sous menu ne s'affiche pas imm‚diatement, et ne ralentit pas
+         la gestion de la souris. 200 en une valeur normale.
+  LONG : D‚lai en milliŠme de seconde entre le moment o— le sous menu … ‚t‚
+         ouvert, et le moment o— il doit se fermer si la souris n'est pas pass‚e
+         sur le sous menu. En principe c'est 10000 qu'il faut mettre ici, mais
+         ‡a marche pas de toute maniŠre (bravo Digital Research).
+  LONG : D‚lai toujours en milliŠme de seconde entre le moment o— l'on clique
+         sur une flŠche de scrool, et o— celui ci scroole vraiment. 250 est un
+         bon choix, bien que je pr‚fŠre 150, qui est plus dynamique.
+  LONG : D‚lai, comme d'habitude, entre chaque changement de ligne. Mettez ici
+         100 pour ‚viter un d‚filement trop rapide.
+  WORD : Nombre d'options visualisables dans ce sous menu.
+
+ParamŠtres : LONG : Adresse d'une Structure Menu_Pop
+             WORD : X de la G_Box du menu PopUp … afficher
+             WORD : Y … afficher
+             LONG : Adresse de la boite … afficher
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 36
+             WORD : 200
+Retour : D0.w = 0 si rien n'a ‚t‚ cliqu‚, 1 si il y a eut quelque chose
+Pile : 20
+
+ATTENTION : Un menu Pop-Up peut etre affich‚ n'importe o— … l'‚cran. De plus,
+            c'est … vous de vous occuper de son Clipping.
+            Le retour du num‚ro du menu se fera par un message.
+
+/// AES  37 : MENU_ATTACH ///
+
+Sert … lier un Objet … une Entr‚e d'un menu comme menu hi‚rarchique, ou Pop-Up.
+Celui-ci sera trait‚ avec MENU_PopUp. Vous pouvez cr‚er 4 niveau de menus PopUps
+(un PopUp d'un PopUp d'un PopUp d'un PopUp d'une Entr‚e).
+Ne JAMAIS lier la premiŠre Entr‚e (A Propos De...) … un menu PopUp.
+
+ParamŠtres : WORD : Mode
+                    0 = Informations sur le lien actuel (ne fonctionne pas)
+                    1 = Cr‚e ou modifie un lien
+                    2 = D‚truit un lien
+             LONG : Adresse du de l'arbre contenant le menu
+             WORD : Num‚ro de l'Entr‚e
+             LONG : Adresse d'une Structure Menu_Pop d‚crivant le sous menu
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 37
+             WORD : 200
+Retour : D0.w = 0 si ‚chec, 1 si OK.
+Pile : 22
+
+/// AES  38 : MENU_ISTART ///
+
+Permet de d‚finir dans un menu hi‚rarchique quelle Entr‚e sera la premiŠre du
+scrool.
+
+ParamŠtres : WORD : Mode
+                    0 = Informations sur le num‚ro de l'Entr‚e du sous menu
+                    1 = Fixer ou modifier ce num‚ro
+             LONG : Adresse de l'arbre contenant le sous menu
+             WORD : Num‚ro de l'Objet PŠre du sous menu
+             WORD : Num‚ro de l'Entr‚e du sous menu … fixer au d‚part
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 38
+             WORD : 200
+Retour : D0.w = 0 si echec, sinon OK.
+Pile : 18
+
+/// AES  39 : MENU_SETTING ///
+
+Permet de changer les paramŠtres du comportement d'un sous menu.
+
+ParamŠtres : WORD : Mode
+                    0 = Informations sur les choix actuels
+                    1 = Fixer ou changer ces choix
+             LONG : Adresse d'une Structure Menu_Set
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 39
+             WORD : 200
+Retour : D0.w = Toujours 1
+Pile : 16
+
+--- LIBRAIRIE OBJETS ---
+
+La Librairie Objet permet de travailler avec des Ressources. Celles ci
+contiennent des Objets (un bouton, une boite, un texte, une ic“ne, etc...).
+Voici les diff‚rentes structures des Objets, ainsi qu'une explication :
+
+> Structure d'un Objet
+  Chaque Objet en m‚moire occupe un tableau contenant toutes les informations
+  pouvant le d‚crire. Chaque tableau "Struct Object" occupe 12 WORDs.
+  WORD 0 : Ob_Next : Num‚ro du prochain Objet, au mˆme niveau. Ainsi, un Fils
+                     pointe son FrŠre. Si c'est le dernier, il pointe le PŠre.
+  WORD 1 : Ob_Head : Num‚ro du premier Objet Fils
+  WORD 2 : Ob_Tail : Num‚ro du dernier Objet Fils
+  WORD 3 : Ob_Type : Type de l'Objet. En voici la liste :
+                     - G_BOX (Type 20) : Boite simple, avec cadre et couleur
+                                         int‚rieur
+                         Ob_Spec : Voir Structure Ob_Spec
+                     - G_TEXT (Type 21) : Texte simple
+                         Ob_Spec : Voir Structure TedInfo
+                     - G_BOXTEXT (Type 22) : Texte simple avec boite simple
+                         Ob_Spec : Voir Structure TedInfo
+                     - G_IMAGE (Type 23) : Image, sans masque
+                         Ob_Spec : Voir Structure BitBlk
+                     - G_USERDEF (Type 24) : Objet Custom, … vous d'‚crire la
+                                             routine graphique qui va dessiner
+                                             cet Objet (bouton … la "Mac",
+                                             texte en relief, ...). L'AES saute
+                                             … la routine que vous lui
+                                             pr‚cisez, et trace l'Objet
+                                             (profitez en).
+                         Ob_Spec : Voir UserBlk
+                     - G_IBOX (Type 25) : Boite vide, avec cadre cependant
+                         Ob_Spec : Voir Structure Ob_Spec
+                     - G_BUTTON (Type 26) : Boite simple avec texte centr‚
+                         Ob_Spec : Pointe le texte … afficher
+                     - G_BOXCHAR (Type 27) : Une lettre dans une boite simple
+                         Ob_Spec : Voir Structure Ob_Spec
+                                   BIT 24 … 31 : le code ASCII du caractŠre …
+                                                 afficher
+                     - G_STRING (Type 28) : Texte simple
+                         Ob_Spec : Pointe le texte … afficher
+                     - G_FTEXT (Type 29) : Texte format‚
+                         Ob_Spec : Voir Structure TedInfo
+                     - G_FBOXTEXT (Type 30) : Texte format‚ dans une boite
+                                              simple
+                         Ob_Spec : Voir Structure TedInfo
+                     - G_ICON (Type 31) : Icone avec masque
+                         Ob_Spec : Voir IconBlk
+                     - G_TITLE (Type 32) : Titre de menu
+                         Ob_Spec : Pointe le Titre du menu
+                     - G_CICON (Type 33) : Icone couleur, avec ic“ne
+                                           s‚lectionn‚ et version monochrome
+                         Ob_Spec : Voir Stucture CIconBlk
+  WORD 4 : Ob_Flags : Masque d'Action. D‚finit les caract‚ristiques d'Actions
+                      d'un Objet. Voici la signification de BITs :
+                      BIT 0 : SELECTABLE : L'Objet peut ˆtre s‚lectionn‚
+                      BIT 1 : DEFAULT : S‚lectionne cet Objet si l'on appuie
+                                        sur RETURN
+                      BIT 2 : EXIT : Termine la gestion du formulaire.
+                                     N‚cessite de relƒcher le bouton.
+                      BIT 3 : EDITABLE : On peut ‚diter un Champ Editable
+                                         (entrer une phrase, ou un code, le tout
+                                         au clavier). ATTENTION … ne pas
+                                         affecter un bouton ou quoi que ce soit
+                                         qui ne soit pas r‚ellement ‚ditable
+                                         avec ce BIT, sinon...
+                      BIT 4 : RBUTTON : Radio Button, n‚cessite d'appartenir …
+                                        un PŠre commun, et d'avoir au moins un
+                                        FrŠre. Un seul Radio Button ne peut ˆtre
+                                        s‚lectionn‚ … la fois. Les autres se
+                                        d‚s‚lectionnent automatiquement si l'ont
+                                        s‚lectionne un Radio Button qui ne
+                                        l'‚tait pas. Le PŠre Commun est trŠs
+                                        souvent un G_IBOX (Type 25).
+                      BIT 5 : LASTOB : Dernier Objet de l'Arbre. ATTENTION, sous
+                                       FORM_DO, on passe d'un champ ‚ditable …
+                                       l'autre avec les touches Fleche Haut ou
+                                       Bas. Or FORM_DO ne v‚rifie ce BIT
+                                       qu'aprŠs avoir chang‚ d'Objet. Donc si
+                                       votre dernier Objet est un Champ
+                                       Editable, FORM_DO passe … l'Objet
+                                       suivant, et, Boum...
+                      BIT 6 : TOUCHEXIT : Termine la gestion du formulaire. Il
+                                          suffit que FORM_DO d‚tecte que cet
+                                          Objet est s‚lectionn‚ pour quitter. En
+                                          clair, mˆme pas besoin de relƒcher la
+                                          touche de la souris, comme avec EXIT.
+                      BIT 7 : HIDETREE : Cache un Objet, et tous ses Fils. Ils
+                                         ne seront pas affich‚s avec OBJC_DRAW,
+                                         et pas trouv‚s avec OBJC_FIND. Entre
+                                         nous, ‚vitez ce BIT sur l'objet racine
+                                         (num‚ro 0).
+                      BIT 8 : INDIRECT : Ob_Spec n'est pas utilis‚ directement
+                                         (comme Ob_Spec ou comme pointeur), mais
+                                         pointe un LONG qui est Ob_Spec (avec
+                                         BITs ou pointeur). Utilit‚e : je
+                                         cherche encore...
+                      BIT 9 : FL3D1
+                      BIT A : FL3D2
+                              Ces deux BITs donnent une combinaison, qui
+                              suivant la valeur donne un certain aspect 3D …
+                              l'objet:
+                              FL3D2 | FL3D1 |
+                              ------+-------+----------------------------------
+                                0   |   0   | FL3DNONE : Pas d'effet 3D.
+                                    |       |            Aspect standard,
+                                    |       |            similaire au ST.
+                              ------+-------+----------------------------------
+                                0   |   1   | FL3DIND : Indicator.
+                                    |       |           Donne un aspect bouton
+                                    |       |           enfonc‚ ou non.
+                                    |       | Exemple : Les boutons des boites
+                                    |       |           de dialogues
+                              ------+-------+----------------------------------
+                                1   |   0   | FL3DBAK : BackGround.
+                                    |       |           Donne la couleur de
+                                    |       |           fond … l'objet.
+                                    |       | Utile pour les texte opaques que
+                                    |       | l'on veut de la mˆme couleur que
+                                    |       | la boite. Donc en monochrome, le
+                                    |       | fond du texte sera blanc, gris en
+                                    |       | couleur, au lieu de noir-gris en
+                                    |       | mono-couleur si vous choisissez
+                                    |       | la couleur grise pour le fond du
+                                    |       | texte (en mono, toutes les
+                                    |       | couleurs non blanches passent en
+                                    |       | noir.
+                              ------+-------+----------------------------------
+                                1   |   1   | FL3DACT : Activator.
+                                    |       |           Idem que Indicator,
+                                    |       |           mais la couleur ne
+                                    |       |           change pas une fois
+                                    |       |           s‚lectionn‚.
+                                    |       | Exemple : Les boutons des
+                                    |       |           fenetres
+                              Pour que l'effet 3D apparaisse, il faut que
+                              l'objet ait la couleur blanche, et que sont motif
+                              de remplissage soit vide...
+                      BIT B : SUBMENU : Je sais pas...
+                      BITs C … F : inutilis‚s
+  WORD 5 : Ob_State : Masque de Statut. D‚finit les caract‚ristiques Physique
+                      d'un Objet (la tˆte qu'il aura … l'‚cran). Voici la
+                      signification des BITs:
+                      BIT 0 : SELECTED : Donne l'Aspet s‚lectionn‚ … l'Objet.
+                      BIT 1 : CROSSED : Les boite se retrouvent avec une croix
+                                        qui forme les diagonales de la boite.
+                      BIT 2 : CHECKED : Marque un   dans le coin sup‚rieur
+                                        gauche de l'Objet.
+                      BIT 3 : DISABLED : Affiche l'Objet en gris‚, et ne peut
+                                         plus ˆtre s‚lectionn‚
+                      BIT 4 : OUTLINED : Les boite ont un deuxiŠme cadre
+                      BIT 5 : SHADOWED : Les boites projettent une ombre dans le
+                                         coin inf‚rieur droit. L'‚paisseur de
+                                         cette ombre, ainsi que sont apparente
+                                         distance de la boite d‚pendent de
+                                         l'‚paisseur du cadre de la boite.
+                      BITs 6 … F : Inutilis‚s
+  LONG 6 : Ob_Spec : Sp‚cifications suivant le Type d'Objet (Voir Ob_Type)
+                     Contient un champ de BITs ou un pointeur vers une
+                     Structure.
+  WORD 8 : Ob_X : X du coin sup‚rieur gauche (par rapport au PŠre, sachant que
+                  le PŠre de la Racine n'est autre que le Bureau).
+  WORD 9 : Ob_Y : Y du coin sup‚rieur gauche. Mˆmes remarques que pr‚c‚demment.
+  WORD A : Ob_Width : Largeur de l'Objet
+  WORD B : Ob_Height : Hauteur de l'Objet
+
+Juste un appel … l'‚quipe de CENTEK : Vous qui ˆtes en train de programmer
+Dolmen, pourquoi ne pas ajouter un G_CIMAGE de Type 34, au format IMG par
+exemple? €a m'aiderait beaucoup pour la prochaine version de SSAVCALL (une
+id‚e, comme ‡a...).
+
+> Structure Ob_Spec
+  C'est un champ de BITs sur 32 BITs qui donne la couleur de l'Objet, ainsi que
+  des informations sur son cadre s'il en a un.
+  BIT 0 … 15 : TE_COLOR
+    BIT 0 … 3 : Couleur … l'int‚rieur du cadre
+    BIT 4 … 6 : Motif de remplissage. C'est une trame monochrome. A 0, il n'y
+                en a pas, … 7 elle est au maximum, donc remplie.
+    BIT 7 : 0 = Texte Transparent (la couleur de fond du texte est transparente
+                et laisse voir ce qu'il y a dessous).
+            1 = Texte Opaque (la couleur est opaque et recouvre ce qu'il se
+                trouvait dessous )
+    BIT 8 … 11 : Couleur du Texte
+    BIT 12 … 15 : Couleur du Cadre
+  BIT 16 … 23 : TE_THICKNESS
+    BIT 16 : 0 = Pas de Cadre
+             1 = Un cadre
+    BIT 17 … 23 : Epaisseur du cadre. ATTENTION, ces 7 BITs sont sign‚s.
+                  1 … 127, le cadre va vers l'int‚rieur
+                  -1 … -127, le cadre va vers l'ext‚rieur
+                  Ici, pour avoir un nombre correct, recopiez les 8 BITs de
+                  TE_THICKNESS dans un registre, et faites :
+                    ror.b           #1,Dx
+                    btst.b          #6,Dx
+                    BEQ             NotNeg
+                    bset.b          #7,Dx
+    NotNeg          ...
+                  Avec un ou deux EXT, vous obtiendrez un superbe nombre sign‚.
+
+> Structure TedInfo
+  Contient tous les pointeurs et les informations pour un texte format‚
+  (regardez, vous comprendrez).
+  LONG 0 : TE_PTEXT : Pointeur vers le texte d'entr‚e.
+                      Pour exemple, je prendrais celui du "Livre du d‚veloppeur
+                      Tome 1" qui est trŠs parlant :
+                      En entr‚e, TE_PTEXT pointe vers 8 espaces. TE_TXTLEN
+                      (Voir plus loin) contient 8.
+  LONG 2 : TE_PTMPLT : Pointeur vers le masque du texte.
+                       C'est une chaŒne de caractŠre avec masque (_).
+                       Ici, pour poursuivre l'exemple pr‚c‚dent, TE_PTMPLT
+                       pointe vers "Veuillez entrer la date : __/__/____".
+  LONG 4 : TE_PVALID : Pointeur vers le masque de validation. Suivant les
+                       caractŠres contenus, le GEM interdira ou autorisera la
+                       saisie d'un type ou plusieurs de caractŠres.
+                       Toujours pour compl‚ter l'exemple, TE_PVALID pointe vers
+                       "99999999". Ainsi, lorsque ce champs ‚ditable est
+                       trait‚, l'utilisateur ne peut saisir que des chiffres,
+                       qui composeront la date. A la fin du traitement,
+                       TE_PTEXT pointe vers les 8 chiffres qui ont remplac‚s
+                       les 8 espaces d'origine. Voici les autres masques :
+                       9 = Seuls les chiffres sont pris en compte
+                       A = Seuls l'espace et le lettres majuscules sont pris en
+                           compte
+                       a = Seuls l'espace et toutes les lettres (majuscule et
+                           minuscule) sont pris en compte
+                       N = Seuls l'espace, les majuscules, et les chiffres sont
+                           pris en compte
+                       n = Seule l'espace, les majuscules, les minuscules, et
+                           les chiffres sont pris en compte
+                       F = Uniquement les lettres admises dans un nom de fichier
+                           valide, ainsi que les Jokers (?*). C'est … dire :
+                           ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 ?*
+                           ATTENTION : D'autres caractŠres peuvent etres
+                                       utilis‚s, mais il est pr‚f‚rable de se
+                                       limiter … l'alphabet et aux chiffres.
+                       P = Idem que pr‚c‚demment, mais possibilit‚ d'utiliser
+                           les descripteurs de chemin (Path), sans les Jokers,
+                           soit ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \:
+                       p = Idem, avec les Jokers et les descripteurs de chemins,
+                           ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 \:?*
+                       X = Tout pris en compte.
+                         Dans la plupart des ‚diteurs de ressource, pour choisir
+                       ces attributs, il faut se placer dans la ligne masque, et
+                       ‚crire avec la touche Alternate enfonc‚e, plus Shift au
+                       besoin. Pour les chiffres, utilisez ceux sous les touches
+                       de fonctions, car le pav‚ num‚rique ne marche pas (du
+                       moins sous ORCS).
+  WORD 6 : TE_FONT : Taille du texte
+                     3 = Taille normale
+                     5 = Taille "Icones"
+  WORD 7 : TE_JUNK1 : R‚serv‚
+  WORD 8 : TE_JUST : Justification
+                     0 = Le texte sera plac‚ … gauche
+                     1 = Le texte sera plac‚ … droite
+                     2 = Le texte sera centr‚. TrŠs courant pour les boutons.
+  WORD 9 : TE_COLOR : Couleur de la boite (0 … 15)
+  WORD A : TE_JUNK2 : R‚serv‚
+  WORD B : TE_THICKNESS : Epaisseur du cadre. Sign‚
+                          0 = Pas de cadre
+                          1 … 128 = Cadre vers l'int‚rieur
+                          -1 … -127 = Cadre vers l'ext‚rieur
+  WORD C : TE_TXTLEN : Longueur du texte point‚ par TE_PTEXT
+  WORD D : TE_TMPLEN : Longueur du texte point‚ par TE_PTMPLT
+
+> Structure BitBlk
+  Descripteur d'une image sur 6 WORDs.
+  LONG 0 : BI_PDATA : Pointeur vers l'image monochrome
+  WORD 2 : BI_WB : Largeur en OCTETs de l'image (donc multiple de 8
+                   obligatoirement)
+  WORD 3 : BI_HL : Hauteur de l'image en points cette fois
+  WORD 4 : BI_X : X par rapport au PŠre
+  WORD 5 : BI_Y : Y par rapport au PŠre
+  WORD 6 : BI_COLOR : Couleur de l'image (les BITs … 1). L'image est
+                      transparente, donc les BITs … 0 laissent voir le PŠre
+
+> Structure UserBlk
+  Tableau de 2 LONGs contenant les informations pour l'ex‚cution de votre
+  routine par l'AES.
+  LONG 0 : UB_CODE : Pointeur vers votre routine. Il est hors de question de
+                     s'aider de l'AES pour dessiner. Mais le VDI, le GEMDOS, le
+                     BIOS, l'XBIOS et les autres sont exploitables.
+  LONG 1 : UB_PARM : Votre paramŠtres sur 32 BITs. Celui-ci sera plac‚ dans une
+                     Structure au nom de Param, dont l'adresse sera Empil‚e
+                     avant l'appel de votre routine.
+
+> Structure ParamBlk
+  Descripteur contenant toutes les informations pour que la routine puisse
+  correctement afficher votre dessin … l'‚cran, sur 15 WORDs.
+  LONG 0 : PB_TREE : Adresse de l'arbre contenant l'Objet "Custom"
+  WORD 2 : PB_OBJ : Num‚ro de l'Objet ("Custom") qui … provoqu‚ cette demande
+                    d'affichage
+  WORD 3 : PB_PREVSTATE : Ancien OB_STATE
+  WORD 4 : PB_CURRSTATE : OB_STATE actuel. Si PB_PREVSTATE et PB_CURRSTATE sont
+                          identiques, c'est que l'objet en question doit ˆtre
+                          trac‚, dont l'affichage a ‚t‚ d‚clench‚ par
+                          OBJC_Draw. S'ils sont diff‚rent, c'est qu'il n'y a
+                          qu'une demande de rafraŒchissement avec OBJC_Change.
+  WORD 5 : PB_X : X de l'Objet … l'‚cran (et pas par rapport au PŠre)
+  WORD 6 : PB_Y : Y de l'Objet … l'‚cran
+  WORD 7 : PB_W : Largeur de l'Objet en points
+  WORD 8 : PB_H : Hauteur de l'Objet en points
+  WORD 9 : PB_XC : X du CLIPPING
+  WORD A : PB_YC : Y du CLIPPING
+  WORD B : PB_WC : Largeur du CLIPPING
+  WORD C : PB_HC : Hauteur du CLIPPING
+  LONG E : PB_PARAM : Votre paramŠtre pr‚c‚demment contenu dans UB_PARM.
+
+> Structure IconBlk
+  Descripteur d'un ic“ne monochrome sur 17 WORDs.
+  LONG 0 : IB_PMASK : Pointeur vers le Masque. Celui-ci DOIT ˆtre compos‚ de
+                      WORDs car sa largeur ne peut ˆtre qu'un multiple de 16
+  LONG 2 : IB_PDATA : Idem, mais pour l'image
+  LONG 4 : IB_PTEXT : Pointe vers une chaŒne de caractŠres qui formera le texte
+                      de l'ic“ne
+  WORD 6 : IB_CHAR : CaractŠre de l'ic“ne. Par exemple le Nom de l'unit‚ pour
+                     l'ic“ne d'un lecteur
+  WORD 7 : IB_XCHAR : X du caractŠre par rapport … l'ic“ne
+  WORD 8 : IB_YCHAR : Y du caractŠre par rapport … l'ic“ne
+  WORD 9 : IB_XICON : X de l'ic“ne par rapport au PŠre
+  WORD A : IB_YICON : Y de l'ic“ne par rapport au PŠre
+  WORD B : IB_WICON : Largeur de l'ic“ne en points (mais multiple de 16 car les
+                      donn‚es sont compos‚es de WORDs)
+  WORD C : IB_HICON : Hauteur de l'ic“ne en points
+  WORD D : IB_XTEXT : X du texte par rapport … l'ic“ne
+  WORD E : IB_YTEXT : Y du texte par rapport … l'ic“ne
+  WORD F : IB_WTEXT : Largeur du texte en points
+  WORD 10 : IB_HTEXT : Hauteur du texte en points
+  WORD 11 : IB_RESVD : R‚serv‚
+
+> Structure CIconBlk
+  Descripteur d'un ic“ne couleur. Il comprend le descripteur IconBlk, plus des
+  descripteur pour chaque r‚solutions.
+  IconBlk : Descripteur de l'ic“ne monochrome sur 17 WORDs.
+  CIconPtr : Pointeur vers un premier descripteur CIconBlk :
+
+  CIconBlk : WORD 0 : NUM_PLANES : Nombre de plans de l'ic“ne (2 pour 4
+                                   couleurs, 4 pour 16 couleurs, 8 pour 256
+                                   couleurs)
+             LONG 2 : COL_DATA : Pointeur vers les donn‚es de l'ic“ne … l'‚tat
+                                 Normal, cela au format RASTER (comme l'‚cran,
+                                 avec ce fichus entrelacement de plan vid‚o)
+             LONG 4 : COL_MASK : Pointeur vers le Masque de l'ic“ne Normal. Le
+                                 masque est en monochrome (1 BIT = 1 point)
+             LONG 6 : SEL_DATA : Pointeur vers les donn‚es de l'ic“ne
+                                 S‚lectionn‚. Voir COL_DATA
+             LONG 8 : SEL_MASK : Pointeur vers le Masque de l'ic“ne
+                                 S‚lectionn‚. Voir COL_MASK
+             LONG A : NEXT_RES : Pointeur vers un autre descripteur CIconBlk,
+                                 d‚crivant une autre r‚solution.
+                                 Si ce pointeur est … 0, cela signifie qu'il
+                                 n'y a plus d'autres r‚solutions pour cet
+                                 ic“ne.
+
+/// AES  40 : OBJC_ADD ///
+
+Sert … additionner un Objet … l'arborescence.
+  Pour cr‚er un nouvel objet ne d‚pendant d'aucun autre, il suffit de pr‚ciser
+comme Objet pŠre 0, la base de l'arborescence (en g‚n‚ral la boite de dialogue
+qui contient les diff‚rents Objets). On peut aussi attribuer un nouveau fils …
+un pŠre d‚j… existant.
+
+ParamŠtres : LONG : Adresse de l'arborescence (Voir MENU_BAR (AES 30))
+             WORD : Num‚ro de l'objet pŠre
+             WORD : Num‚ro de l'objet fils
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 40
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES  41 : OBJC_DELETE ///
+
+Sert … effacer un objet de l'arborescence. Comme ‡a, carr‚ment.
+Mais trŠs logiquement, vous devez vous en douter, efface aussi ses fils (si
+l'Objet en a). On tue toute la famille, c'est moins cruel que de laisser des
+orphelins (Gniark gniark...).
+
+ParamŠtres : LONG : Adresse de l'arborescence (Mˆme remarque que pr‚c‚demment)
+             WORD : Num‚ro de l'objet … effacer
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 41
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 14
+
+/// AES  42 : OBJC_DRAW ///
+
+Sert … dessiner un objet et ses fistons … l'‚cran.
+  Un CLIPPING est enregistr‚ (Voir VDI 129). C'est seulement dans ce rectangle
+que l'objet sera dessin‚, et c'est seulement lui qui sera effac‚ de l'‚cran
+aprŠs r‚ception du message ReDraw du GEM (Voir EVNT_MESAG (AES 23), message de
+Type 20 (WM_REDRAW)).
+  Cette fonction d‚clenche aussi l'affichage des Objets "Customs" (pr‚cision …
+pr‚ciser car y'a quelque chose de sp‚cial qui se produit pour les Objets Customs
+suivant la fonction utilis‚e pour les afficher).
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'objet de d‚part (0 pour dessiner toute
+                    l'arborescence)
+             WORD : Niveau maximum dans l'arborescence … dessiner. Peut ˆtre
+                    sup‚rieur au niveau maximum sans que cela ne pose le
+                    moindre problŠme, histoire d'ˆtre certain du bon affichage
+                    du formulaire
+             WORD : Coordonn‚e X du coin sup‚rieur gauche du CLIPPING
+             WORD : Coordonn‚e Y du coin sup‚rieur droit du CLIPPING
+             WORD : Largeur du CLIPPING
+             WORD : Hauteur du CLIPPING
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 42
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 24
+
+/// AES  43 : OBJC_FIND ///
+
+Permet de connaŒtre exactement le num‚ro de l'objet sous la souris.
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'objet de d‚part (0, c'est la racine)
+             WORD : Niveau maximum dans l'arborescence … chercher
+             WORD : Coordonn‚e X d'un point (par exemple les coordonn‚es de la
+                    souris) sous lequel se trouve l'objet … chercher
+             WORD : Coordonn‚e Y de ce point
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 43
+             WORD : 200
+Retour : D0.w = Num‚ro de l'Objet, sinon -1 si l'Object n'existe pas, ou ne se
+                trouve pas dans l'espace de recherche
+Pile : 20
+
+/// AES  44 : OBJC_OFFSET ///
+
+Permet de connaŒtre pr‚cis‚ment la position d'un objet (coin sup‚rieur gauche)
+… l'‚cran.
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'objet dont on cherche les coordonn‚es
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 44
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon Coordonn‚e X.w et Y.w du coin sup‚rieur
+                gauche de l'objet
+Pile : 14
+
+/// AES  45 : OBJC_ORDER ///
+
+Permet de changer l'ordre des fils d'un Objet pŠre. Cette fonction doit parfois
+ˆtre appel‚e plusieurs fois de suite pour obtenir un classement correct.
+Ce serait sympa de m'aider ici, car toutes les documentations que je possŠde ont
+une description diff‚rentes entres elles, et je ne peut h‚las garantir
+l'exactitude de mes propos... (ce serait rageant de vous induire en erreur)
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'Objet dont on veut changer de position dans la
+                    liste des fils appartenant … un Objet pŠre
+             WORD : Nouvelle position (-1 = Premier de la liste
+                                        0 = Dernier de la liste
+                                        1 = Avant dernier de la liste
+                                        2 = Avant avant dernier de la liste)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 45
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES  46 : OBJC_EDIT ///
+
+Sert … changer le texte d'un Objet ayant le type G_TEXT ou G_BOXTEXT, ou …
+saisir un texte dans ce type d'Objet.
+Comme MENU_TEXT (AES 34), il est hors de question que le nouveau texte soit plus
+long que le pr‚c‚dent. Je vous fait pas de dessin s'il vous arrivait ce cas de
+figure, le GEM s'en chargera d‚j… avec zŠle...
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'Objet dont le texte est … modifier
+             WORD : CaractŠre utilisateur
+             WORD : Position de d‚part
+             WORD : Fonction (0 = R‚serv‚
+                              1 = ED_INIT : Affiche TE_PTEXT (Voit TedInfo) via
+                                            TE_PTMPLT, donc en tenant compte du
+                                            masque, et avec le curseur
+                              2 = ED_CHAR : Controle de validit‚ du caractŠre
+                                            d'aprŠs TE_PVALID, le place au bon
+                                            endroit dans TE_PTEXT, puis retrace
+                                            TE_PTEXT avec ce nouveau locataire
+                              3 = ED_END : Efface le curseur)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 46
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon nouvelle position du curseur
+Pile : 20
+
+/// AES  47 : OBJC_CHANGE ///
+
+Sert … changer le statut d'un Objet (OB_STATE). Vous pouvez demander qu'il soit
+r‚affich‚ avec ses nouveau attributs, ou remettre cette op‚ration pour la
+prochaine fois.
+Pour les ‚l‚ments du menu, voyez la section … ce sujet.
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             WORD : Num‚ro de l'Objet … modifier
+             WORD : Coordonn‚e X du CLIPPING
+             WORD : Coordonn‚e Y du CLIPPING
+             WORD : Largeur du CLIPPING
+             WORD : Hauteur du CLIPPING
+             WORD : Nouvel ‚tat
+             WORD : Mode (0 = Ne re dessine pas ou 1 = Redessine l'objet)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 47
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 28
+
+/// AES  48 : OBJC_SYSVAR ///
+
+Sert … changer la couleur et les attributs 3D d'un objet. Je suis pas plus
+document‚ que ‡a, d‚sol‚...
+
+ParamŠtres : WORD : Mode
+                    0 = Information sur les attributs
+                    1 = Fixe les nouveaux attributs
+             WORD : Combinaison
+             WORD : Donn‚es1
+             WORD : Donn‚es2
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 48
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau
+                Structure du tableau : WORD 0 : Retour
+                                                0 = Erreur, sinon OK
+                                       WORD 1 : Donn‚es1
+                                       WORD 2 : Donn‚es2
+Pile : 16
+
+--- LIBRAIRIE FORM ---
+
+/// AES  50 : FORM_DO ///
+
+Sert … g‚rer un formulaire.
+Inconv‚nient majeur, tout autre traitement est rendu impossible (passer … un
+autre formulaire).
+
+ParamŠtres : LONG : Adresse de l'arborescence … g‚rer (...)
+             WORD : Num‚ro de l'Objet "champ ‚ditable" … g‚rer, sinon -1
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 50
+             WORD : 200
+Retour : D0.w = Num‚ro de l'Objet qui … fait quitter le processus de gestion
+Pile : 14
+
+REMARQUE : Vous voyez, y'a que 8 lignes … ‚crire pour demander au GEM de g‚rer
+           son formulaire. Alors o— se trouve la difficult‚?
+
+/// AES  51 : FORM_DIAL ///
+
+C'est une fonction trŠs utile qui permet de faire un CLIPPING (mais ne tremblez
+donc pas, allez lire ce que j'en dis dans le VDI), de restaurer une partie de
+l'‚cran, et de faire des animations inutiles.
+  Cette fonction, en dehors des commandes inutiles, doit jouer (car la simple
+figuration est superflue) dans votre programme, et ˆtre pr‚sente … l'ouverture
+et … la fermeture d'un formulaire ou d'une fenˆtre. Dans le cas d'un formulaire,
+mettez 0 dans les 4 premiers paramŠtres concernant les coordonn‚es (X, Y,
+largeur et hauteur au d‚part).
+  Une derniŠre chose, pensez toujours … effacer tout ce qui se trouve … l'‚cran,
+et que vous y avez mis, car sous MultiTOS, vu que l'on est sous le bureau en
+permanence, celui ci n'est pas rafraŒchit … la sortie de votre programme, et il
+risque de s'y trouver des r‚sidus de formulaire. Regardez au d‚but de TestSSAV,
+le passage par Clr_Before_Quit, pour effacer le premier formulaire. Tachez de ne
+pas oublier... De toute maniŠre, effacez tout ce que vous dessinez, c'est plus
+propre.
+
+ParamŠtres : WORD : Mode (0 = FMD_START : R‚serve une partie de l'‚cran
+                                          (CLIPPING)
+                          1 = FMD_GROW : N'est autre que GRAF_GROWBOX (AES 73)
+                          2 = FMD_SHRINK : N'est autre que GRAF_SHRINKBOX
+                                           (AES 74)
+                          3 = FMD_FINISH : LibŠre le CLIPPING, mais … vous de le
+                                           redessiner)
+             WORD : Coordonn‚e X du CLIPPING ou de la boite de d‚part
+             WORD : Coordonn‚e Y du CLIPPING ou de la boite de d‚part
+             WORD : Largeur du CLIPPING ou de la boite de d‚part
+             WORD : Hauteur du CLIPPING ou de la boite de d‚part
+             WORD : Coordonn‚e X de la boite de fin
+             WORD : Coordonn‚e Y de la boite de fin
+             WORD : Largeur de la boite de fin
+             WORD : Hauteur de la boite de fin
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 51
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 26
+
+/// AES  52 : FORM_ALERT ///
+
+Permet de g‚rer le plus simplement du monde une boite d'alerte, sans passer par
+FORM_DO avec une arborescence sur les bras.
+  TrŠs pratique lorsqu'il s'agit d'avertir notre amis l'utilisateur qu'il serait
+temps d'enregistrer son travail et de s'occuper de ses enfants ou de sont
+chiens, qui attend patiemment devant la porte avec la laisse entre ses crocs.
+
+ParamŠtres : WORD : Num‚ro du bouton par d‚faut (0 = Pas de bouton par d‚faut
+                                                 1 = Premier bouton
+                                                 2 = DeuxiŠme bouton
+                                                 3 = TroisiŠme bouton)
+             LONG : Adresse de la chaŒne de message
+                    Structure du message : Il est compos‚ de trois parties
+                      Partie 1 : L'icone (0 = Pas d'ic“ne
+                                          1 = Point d'exclamation
+                                          2 = Point d'interrogation
+                                          3 = STOP)
+                      Partie 2 : Le texte : 5 lignes de 30 caractŠres
+                      Partie 3 : Le ou les boutons
+                      Chaque partie se situe entre deux crochets, et la barre
+                      verticale CHR$(124) s‚pare les ‚l‚ments d'une mˆme partie
+                      Ex : [3][Ceci est un test|de boite d'Alerte][Oui|Non]
+                           affiche une boite d'alerte avec un ic“ne STOP, deux
+                           lignes de texte, et deux boutons.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 52
+             WORD : 200
+Retour : D0.w = Num‚ro du bouton cliqu‚
+Pile : 14
+
+/// AES  53 : FORM_ERROR ///
+
+Sert … afficher rapidement une boite d'erreur correspondant … un code d'erreur
+du GEM.
+  Ainsi, si vous venez de recevoir ce code, offrez le gracieusement …
+l'utilisateur via cette fonction pour lui signaler sont erreur.
+
+Voici les codes d'erreurs et les textes affich‚s :
+Code 2, 3, 18 : "Cette application ne peut pas trouver l'objet auquel vous
+                 essayez d'acc‚der."
+Code 4 : "Cette application n'a pas suffisamment de place pour ouvrir un autre
+          document. Fermez un document que vous n'utilisez pas."
+Code 5 : "Un objet ayant ce nom existe d‚j…, ou bien il n'autorise pas
+          l'‚criture."
+Code 8, 10, 11 : "M‚moire insuffisante pour l'application en cours."
+Code 15 : "Le lecteur sp‚cifi‚ n'existe pas."
+Les autres Code : "Erreur TOS #n", avec n le code de l'erreur
+
+ParamŠtres : WORD : Num‚ro de l'erreur a simuler
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 53
+             WORD : 200
+Retour : D0.w = Num‚ro du bouton cliqu‚
+Pile : 10
+
+/// AES  54 : FORM_CENTER ///
+
+Permet d'obtenir la position centr‚e d'un arbre.
+A utiliser absolument avant le premier traitement avec FORM_DIAL ou OBJC_DRAW.
+  AprŠs, une fois trac‚ et d‚plac‚, utilisez des variables pour retracer l'arbre
+… des positions d‚finis par l'utilisateur. Les coordonn‚es renvoy‚es sont utiles
+pour le CLIPPING, sans plus, car FORM_CENTER change les coordonn‚es de l'Objet
+PŠre (le premier Objet qu'il trouve en principe), qui sera centr‚ par la suite.
+
+ParamŠtres : LONG : Adresse de l'arborescence (...)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 54
+             WORD : 200
+Retour : D0.l = Pointeur sur un tableau contenant les coordonn‚es de l'objet
+                une fois centr‚ … l'‚cran
+                Structure du tableau : WORD 0 : Coordonn‚e X
+                                       WORD 1 : Coordonn‚e Y
+                                       WORD 2 : Largeur
+                                       WORD 3 : Hauteur
+Pile : 12
+
+/// AES  55 : FORM_KEYBD ///
+
+(Pas document‚, mais implant‚)
+
+ParamŠtres : LONG : Adresse
+             WORD : Objet PŠre
+             WORD : Objet Fils
+             WORD : CaractŠre
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 55
+             WORD : 200
+Retour : D0.w = Int_Out0
+Pile : 18
+
+/// AES  56 : FORM_BUTTON ///
+
+(Pas document‚, mais implant‚)
+
+ParamŠtres : LONG : Adresse
+             WORD : Objet
+             WORD : Nombre
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 56
+             WORD : 200
+Retour : D0.w = Int_Out0
+Pile : 16
+
+--- LIBRAIRIE GRAPHIQUES ---
+
+/// AES  70 : GRAF_RUBBERBOX ///
+
+Sert … afficher et … changer la taille d'une boite avec la souris.
+  Cette fonction se termine si le bouton gauche de la souris n'est pas ou plus
+press‚. Donc si vous appelez cette fonction sans que le bouton gauche soit
+press‚, vous revenez illico … votre programme.
+
+ParamŠtres : WORD : Coordonn‚e X du coin sup‚rieur gauche de la boite
+             WORD : Coordonn‚e Y du coin sup‚rieur gauche de la boite
+             WORD : Largeur de la boite
+             WORD : Hauteur de la boite
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 70
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon Largeur.w et Hauteur.w
+Pile : 16
+
+/// AES  71 : GRAF_DRAGBOX ///
+
+Sert … d‚placer une boite … l'aide de la souris dans un rectangle.
+Comme pr‚cedemment, cette fonction se termine au relƒchement du bouton gauche.
+
+ParamŠtres : WORD : Largeur de la boite en points
+             WORD : Hauteur de la boite en points
+             WORD : X de d‚part de la boite
+             WORD : Y de d‚part de la boite
+             WORD : X du rectangle d'action
+             WORD : Y du rectangle d'action
+             WORD : Largeur du rectangle d'action
+             WORD : Hauteur du rectangle d'action
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 71
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon X.w et Y.w de la boite au relƒchement du
+                bouton gauche
+Pile : 24
+
+/// AES  72 : GRAF_MOVEBOX ///
+
+Sert … faire d‚placer une boite toute seule, comme une grande.
+
+ParamŠtres : WORD : Largeur de la boite en points
+             WORD : Hauteur de la boite en points
+             WORD : X de d‚part de la boite
+             WORD : Y de d‚part de la boite
+             WORD : X de fin de la boite
+             WORD : Y de fin de la boite
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 72
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 20
+
+/// AES  73 : GRAF_GROWBOX ///
+
+Dessine une "boite" qui grandit. Utilit‚ discutable.
+Vous savez, c'est les petites lignes qui s'animent lorsque vous ouvrez un
+lecteur sous le bureau, juste avant l'ouverture de la fenˆtre, par exemple.
+Entre nous, evitez de l'utiliser, ‡a ralenti votre programme, et on a
+rapidement l'impression de p‚daler dans la semoule.
+
+ParamŠtres : WORD : X de d‚part de la boite
+             WORD : Y de d‚part de la boite
+             WORD : Largeur de d‚part de la boite en points
+             WORD : Hauteur de d‚part de la boite en points
+             WORD : X fin de la boite
+             WORD : Y fin de la boite
+             WORD : Largeur finale de la boite en points
+             WORD : Hauteur finale de la boite en points
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 73
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 24
+
+/// AES  74 : GRAF_SHRINKBOX ///
+
+Dessine une "boite" qui r‚tr‚cit. Idem, si vous avez deux secondes devant vous,
+… perdre... (or le temps c'est de l'argent, et tout le monde le sait).
+
+ParamŠtres : WORD : X fin de la boite
+             WORD : Y fin de la boite
+             WORD : Largeur finale de la boite en points
+             WORD : Hauteur finale de la boite en points
+             WORD : X de d‚part de la boite
+             WORD : Y de d‚part de la boite
+             WORD : Largeur de d‚part de la boite en points
+             WORD : Hauteur de d‚part de la boite en points
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 74
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 24
+
+/// AES  75 : GRAF_WATCHBOX ///
+
+Cette fonction change l'aspect d'une boite suivant deux facteurs :
+ - La position de la souris (hors ou sur la boite)
+ - L'‚tat du bouton gauche (enfonc‚ ou pas)
+Sert par exemple si vous s‚lectionn‚ un bouton, mais sans relƒcher le bouton
+gauche, vous sortez de la boite. Vous pouvez donc d‚finir deux ‚tats.
+  Il est trŠs courant … ce niveau de mettre l'‚tat s‚lectionn‚ si la souris se
+trouve au dessus de la boite, et d‚s‚lectionn‚ si la souris ne l'est pas. Permet
+par exemple de revenir sur sa d‚cision si l'on change d'avis alors que l'on …
+s‚lectionn‚ le bouton. Il suffit de sortir de la boite, et de relƒcher.
+  Mais en fait, c'est … vous de g‚rer cela. Cette fonction est l… plut“t … titre
+d'embellissement. FORM_DO utilise d'ailleurs cette fonction. Vous pouvez essayer
+sous un de vos formulaire, ou tout autre programme (TestSSAV).
+
+ParamŠtres : LONG : Adresse de l'arbre
+             WORD : Num‚ro de l'objet
+             WORD : Aspect lorsque la souris est au dessus de la boite
+                    BIT 0 : Normal
+                    BIT 1 : Selected
+                    BIT 2 : Crossed
+                    BIT 3 : Checked
+                    BIT 4 : Disabled
+                    BIT 5 : OutLined
+                    BIT 6 : Shadowed
+             WORD : Aspect lorsque la souris est hors de la boite
+                    Idem que pr‚cedemment
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 75
+             WORD : 200
+Retour : D0.w = Position de la souris au relƒchement du bouton gauche
+                0 = Hors de la boite
+                1 = Au dessus de la boite
+Pile : 18
+
+/// AES  76 : GRAF_SLIDEBOX ///
+
+Permet de faire glisser une boite avec la souris dans sa boite MŠre. Comme
+pr‚cedemment, la fonction se termine au relƒchement du bouton gauche.
+  Lors de la r‚ception du r‚sultat, faite un BCLR sur le bit 15. Vous pourrez
+savoir de quel type de d‚placement il s'agissait, et vous pourrez ainsi utiliser
+le r‚sultat qui sera ainsi compris entre 0 et 1000, comme il doit l'ˆtre.
+
+ParamŠtres : LONG : Adresse de l'arbre
+             WORD : Num‚ro du PŠre (ou de la MŠre dans ce cas)
+             WORD : Num‚ro de l'Objet par rapport … la Racine
+             WORD : Direction de d‚placement
+                    0 = Horizontale
+                    1 = Verticale
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 76
+             WORD : 200
+Retour : D0.w = Postion de l'Objet par rapport … son PŠre. Cette position
+                s'apparente … celle des "Cabines" des ascenseurs.
+                0 = Tout en haut s'il s'agissait d'un d‚placement Vertical
+                    Tout … gauche s'il s'agissait d'un d‚placement Horizontal
+                1000 = Tout en bas s'il s'agissait d'un d‚placement Vertical
+                       Tout … droite s'il s'agissait d'un d‚placement Horizontal
+                BIT 15 = 0 : s'il s'agissait d'un d‚placement Horizontal
+                         1 : s'il s'agissait d'un d‚placement Vertical
+Pile : 18
+
+/// AES  77 : GRAF_HANDLE ///
+
+Permet d'obtenir le Handle VDI du bureau courant, et des informations sur la
+fonte actuelle.
+Avec cela, et un Extended Inquire Function (VDI 102) bien sentit, vous pouvez
+obtenir toutes les informations dont vous avez besoin.
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 77
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau contenant les informations
+                Structure du tableau : WORD 0 : Handle du VDI
+                                       WORD 1 : Largeur d'un caractŠre en
+                                                points
+                                       WORD 2 : Hauteur d'un caractŠre en
+                                                points
+                                       WORD 3 : Largeur d'une cellule en points
+                                       WORD 4 : Hauteur d'une cellule en points
+Pile : 8
+
+/// AES  78 : GRAF_MOUSE ///
+
+Permet de changer la forme de la souris.
+Il est souhaitable d'appeler cette fonction juste aprŠs votre APPL_INIT, car
+sinon la souris reste sur la forme de l'abeille, signe de chargement. Ce n'est
+pas le GEM qui s'en charge, car rien ne vous empˆche au d‚but de votre programme
+de continuer … charger des fichiers compl‚mentaires, et de signaler …
+l'utilisateur que l'ordinateur n'a pas fini son chargement en laissant la souris
+sous forme d'abeille.
+  De plus, tachez d'avoir la forme de la fleche lorsque vous quittez une
+application.
+
+ParamŠtres : WORD : Code du dessin
+                      0 = FlŠche normale
+                      1 = Curseur Texte (Barre verticale)
+                      2 = Abeille
+                      3 = Main ferm‚e avec doigt tendu
+                      4 = Main ouverte
+                      5 = R‚ticule fin
+                      6 = R‚ticule ‚pais (Un grand + noir)
+                      7 = R‚ticule encadr‚ (Un grand + OutLined)
+                    255 = Forme d‚finit par l'utilisateur
+                    256 = Supprime la souris
+                    257 = R‚ussusite la souris
+                          ATTENTION : Vous devez r‚ssusiter la souris autant de
+                                      fois que vous l'avez supprim‚ avant
+                                      qu'elle ne r‚apparaisse. Voyez pourquoi
+                                      dans le chapitre sur la LineA (les
+                                      variables systŠme)
+                    258 = Sauve la forme actuelle
+                    259 = Restaure la derniere forme sauvegard‚e
+                    260 = Restaure la forme pr‚c‚dente
+             LONG : Adresse d'une structure UserMouse
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 78
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 14
+
+> Structure UserMouse
+  Cette structure contient les informations relative au nouveau pointeur de la
+  souris.
+  WORD 0 : MF_XHOT : X du "Point Chaud". C'est le "Point Chaud" qui agit sur
+                     les diff‚rents ‚l‚ments du GEM. Il est compris entre 0 et
+                     15, car la souris fait 16 pixels de haut et de large.
+  WORD 1 : MF_YHOT : Y du "Point Chaud"
+  WORD 2 : MF_NPLANES : Ben... TOUJOURS … 1, car le pointeur est TOUJOURS
+                        monochrome, mais les programmeurs de Digital Research
+                        sont pr‚voyants. Rien ne vous empˆche d'‚crire votre
+                        propre routine de traitement de la souris, et donc
+                        d'utiliser cette donn‚e pour en faire une en couleur.
+  WORD 3 : MF_FG : Couleur du masque. Mettez 0 (Blanc).
+  WORD 4 : MF_BG : Couleur du dessin. Mettez 1 (Noir)
+  WORD 5 : MF_MASK : 16 WORDs repr‚sentant le masque du pointeur
+  WORD 15 : MF_DATA : 16 WORDs repr‚sentant le dessin du pointeur
+
+  Si ATARI a pr‚vus de pouvoir sauvegarder la forme de la souris, c'est pour le
+multitache. En effet, imaginez que l'application actuelle fasse une lecture
+disque, et que la souris soit chang‚e en "Abeille". Pendant ce temps, vous
+ voulez
+faire un Drag'n Drop sur l'application en arriere plan. Il sagit donc de
+changer la souris en "Main Plate", d'effectuer votre transfert, et une fois
+fini, de restaurer la forme pr‚c‚dente, en l'occurence une "Abeille".
+
+/// AES  79 : GRAF_MKSTATE ///
+
+Fournit plein de petites informations sur la souris. Jetez un oeil …
+EVNT_MOUSE (AES 22), mais n'oubliez pas de le reprendre, sinon ‡a fait n‚glig‚.
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 79
+             WORD : 200
+Retour : D0.l = Pointeur vers un tableau resplendissant, tant il contient de
+                chose utile (j'entend d‚j… McGyver japper et piaffer de plaisir)
+                Structure du tableau : WORD 0 : 1 (doze, treize...)
+                                       WORD 1 : X de la souris
+                                       WORD 2 : Y de la souris
+                                       WORD 3 : Etat des boutons
+                                                BIT 0 : Bouton gauche
+                                                BIT 1 : Bouton droit
+                                       WORD 4 : Etat des touches sp‚ciales
+                                                BIT 0 : SHIFT droit
+                                                BIT 1 : SHIFT gauche
+                                                BIT 2 : CONTROL
+                                                BIT 3 : ALTERNATE
+Pile : 8
+
+--- LIBRAIRIE SCRAP ---
+
+/// AES  80 : SCRP_READ ///
+
+Lit le chemin du ClipBoard actuel.
+Encore faut il que celui ci ait ‚t‚ d‚finit par SCRP_WRITE (AES 81). Le tampon,
+faites le assez grand, mais pas trop (24 OCTETs suffisent), car le chemin ne
+doit comporter que le lecteur et le nom du r‚pertoire. Voyez SCRP_WRITE.
+
+ParamŠtres : LONG : Adresse du tampon pour recevoir le chemin du ClipBoard
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 80
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 12
+
+/// AES  81 : SCRP_WRITE ///
+
+Sert … fixer le chemin correct du ClipBoard. Le nom du r‚pertoire DOIT ˆtre
+"CLIPBRD", et rien d'autre, Pig‚? De plus, le chemin du r‚pertoire DOIT se
+terminer par "\" et un OCTET nul.
+Vous me direz : "C'est idiot de red‚finir le chemin d'accŠs au dossier ClipBoard
+… chaque lancement d'un programme", mais bon, vaut mieux deux fois que pas du
+tout.
+
+ParamŠtres : LONG : Adresse du r‚pertoire
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 81
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 12
+
+--- LIBRAIRIE SELECTEURS DE FICHIER ---
+
+/// AES  90 : FSEL_INPUT ///
+
+C'est le s‚lecteur de fichier Standard.
+  Youpi, mais il n‚cessite environ 16 Ko de libre dans la m‚moire pour
+fonctionner, sinon, rien ne se passe, histoire de vous laisser lib‚rer de la
+m‚moire et de le resiffler.
+  De plus, il semble fortement que le s‚lecteur de fichier soit g‚r‚ … la
+ maniŠre
+de FORM_DO, car vous ne pouvez en sortir que par voie l‚gale (les boutons).
+C'est bien dommage d'ailleurs.
+
+ParamŠtres : LONG : Adresse du r‚pertoire de d‚part, avec masque
+             LONG : Adresse du nom du fichier qui apparaŒtra au d‚part, mais
+                    que l'on peut changer par la suite. Le nom de ce fichier
+                    sera remplac‚ par le nouveau si vous appuyez sur "O-KAY"
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 90
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon le WORD de poids fort contient soit :
+                  0 = Bouton "Annul‚"
+                  1 = Bouton "OK"
+Pile : 16
+
+/// AES  91 : FSEL_EXINPUT ///
+
+La grande Star (cris de foule, trompette, choeur d'enfants, ...). Idem que
+pr‚c‚demment (sifflements, ...), mais l'on peut donner le titre que l'on d‚sir
+au s‚lecteur (soupirs de soulagement, ...).
+  Certains n'en verront pas l'utilit‚, mais imaginez que vous avez programmez un
+traitement de texte, et que dans le menu, l'option de chargement et de
+sauvegarde soient juxtapos‚s. Si l'utilisateur ne fait pas attention, il risque
+de choisir l'option "Sauver" au lieu de "Charger", et ainsi, sans le savoir,
+‚craser, avec le texte qu'il est en train d'‚diter, le texte qu'il voulait
+charger.
+  Donc, avec ce s‚lecteur, vous pouvez v‚ritablement indiquer … l'utilisateur
+l'option qu'il a choisit, et en cas d'erreur, il peut revenir en arriŠre avant
+de commettre l'irr‚parable. Cependant, cette fonction ne fonctionne qu'… partir
+du TOS 1.4, Arghh...
+
+ParamŠtres : LONG : Adresse du r‚pertoire de d‚part, avec masque
+             LONG : Adresse du nom du fichier
+             LONG : Adresse du titre du s‚lecteur (pas plus de 30 caractŠres)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 91
+             WORD : 200
+Retour :  D0.l = 0 si erreur, sinon le WORD de poids fort contient soit :
+                   0 = Bouton "Annul‚"
+                   1 = Bouton "OK"
+Pile : 20
+
+--- LIBRAIRIE FENETRES ---
+
+/// AES 100 : WIND_CREATE ///
+
+Sert … cr‚er une fenˆtre pour qu'elle soit g‚r‚e par l'AES.
+  A sa cr‚ation, la fenˆtre n'est pas ouverte, mais existe, et peut l'ˆtre par
+l'appel de la fonction WIND_OPEN (AES 101).
+
+ParamŠtres : WORD : Champ de BITs d‚finissant la tˆte qu'aura la fenˆtre.
+                    BIT 0 : Barre de Titre
+                    BIT 1 : Closer - Bouton au coin sup‚rieur gauche pour
+                            fermer la fenˆtre
+                    BIT 2 : Fuller - Bouton au coin sup‚rieur droit pour
+                            ouvrir la fenˆtre sur tout le bureau
+                    BIT 3 : Barre de d‚placement - En fait, la Barre de Titre,
+                            mais indique … l'AES que l'on d‚sire que cette
+                            fenˆtre soit d‚pla‡able
+                    BIT 4 : Info - La ligne d'informations juste sous la Barre
+                            de Titre
+                    BIT 5 : Sizer - Le bouton au coin inf‚rieur droit pour
+                            modifier la taille de la fenˆtre
+                    BIT 6 : UpArrow - La flŠche vers le haut
+                    BIT 7 : DnArrow - La flŠche vers le bas
+                    BIT 8 : VSlide - La "cabine" verticale, ainsi que
+                            l'ascenseur
+                    BIT 9 : LfArrow - La flŠche vers la gauche
+                    BIT A : RtArrow - La flŠche vers la droite
+                    BIT B : HSlide - La "cabine" horizontale, ainsi que le
+                            couloir
+             WORD : X de la fenˆtre
+             WORD : Y de la fenˆtre
+             WORD : Largeur de la fenˆtre
+             WORD : Hauteur de la fenˆtre
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 100
+             WORD : 200
+Retour : D0.w = Handle de la fenˆtre cr‚e
+Pile : 18
+
+/// AES 101 : WIND_OPEN ///
+
+Sert … faire apparaŒtre la fenˆtre avec la taille d‚finie.
+
+ParamŠtres : WORD : Handle de la fenˆtre que l'on souhaite ouvrir
+             WORD : X de la fenˆtre
+             WORD : Y de la fenˆtre
+             WORD : Largeur de la fenˆtre
+             WORD : Hauteur de la fenˆtre
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 101
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 18
+
+/// AES 102 : WIND_CLOSE ///
+
+Sert … fermer une fenˆtre. N‚anmoins, celle ci existe toujours en m‚moire, et
+peut ˆtre … tout moment r‚ouverte. Attendez vous aprŠs cette fonction … recevoir
+une s‚rie de messages de Redraw, histoire de redessiner ce que la fenˆtre avait
+recouvert.
+
+ParamŠtres : WORD : Handle de la fenˆtre … fermer
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 102
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 10
+
+/// AES 103 : WIND_DELETE ///
+
+Indique … l'AES que l'on d‚sire d‚truire une fenˆtre qui ne nous servira plus.
+Il s'agit aussi de d‚truire toutes les fenˆtres cr‚es avant de quitter le
+programme. Si vous disposez d'un TOS r‚cent, utilisez WIND_NEW (AES 109), il
+fait tout.
+
+ParamŠtres : WORD : Handle de la fenˆtre … d‚truire
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 103
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 10
+
+/// AES 104 : WIND_GET ///
+
+Sert … obtenir un tas d'informations sur une fenˆtre. D‚pend aussi de se que
+vous voulez comme renseignements.
+
+ParamŠtres : WORD : Handle de la fenˆtre
+             WORD : Informations demand‚es
+                    4 = WF_WORKXYWH : Position et dimension de la zone de
+                                      travail de la fenˆtre, c'est … dire o—
+                                      apparaŒt le texte ou le dessin, sans
+                                      compter les ‚l‚ments de la fenˆtre
+                                      WORD 0 : X
+                                      WORD 1 : Y
+                                      WORD 2 : Largeur
+                                      WORD 3 : Hauteur
+                    5 = WF_CURRXYWH : Position et dimensions de la fenˆtre
+                                      WORD 0 : X
+                                      WORD 1 : Y
+                                      WORD 2 : Largeur
+                                      WORD 3 : Hauteur
+                    6 = WF_PREVXYWH : Idem, mais pour sa pr‚c‚dente position et
+                                      taille (utile pour faire revenir la
+                                      fenˆtre dans sa position initiale sans
+                                      utiliser de variables)
+                                      WORD 0 : X
+                                      WORD 1 : Y
+                                      WORD 2 : Largeur
+                                      WORD 3 : Hauteur
+                    7 = WF_FULLXYWH : Idem, mais pour la taille maximale (pour
+                                      un Full sur le bureau)
+                                      WORD 0 : X
+                                      WORD 1 : Y
+                                      WORD 2 : Largeur
+                                      WORD 3 : Hauteur
+                    8 = WF_HSLIDE : Position de la "Cabine" horizontale
+                                    WORD 0 : Position
+                    9 = WF_VSLIDE : Position de la "Cabine" verticale
+                                    WORD 0 : Position
+                    10 = WF_TOP : Handle de la fenˆtre en premier plan
+                                  WORD 0 : Handle
+                    11 = WF_FIRSTXYWH : Position et dimension du premier
+                                        rectangle dans la liste "Intersection".
+                                        C'est grƒce … cette liste que vous allez
+                                        pouvoir demander au GEM de redessiner
+                                        morceaux par morceaux  les ‚l‚ments de
+                                        l'‚cran effac‚s par votre fenˆtre ou
+                                        formulaire.
+                                          Il faut utiliser cette fonction aprŠs
+                                        un message de Redraw pour obtenir une
+                                        liste de rectangles qu'il faudra
+                                        demander de redessiner.
+                                          Ici, on commence par demander le
+                                        premier rectangle (un peu comme F_SFIRST
+                                        et F_SNEXT du GEMDOS). Dans le message
+                                        de Redraw, vous recevez la position et
+                                        la dimension d'une zone rectangulaire.
+                                        C'est celle pr‚c‚demment Clipp‚. Avec
+                                        WF_FIRSTXYWH, vous obtenez de petits
+                                        rectangles, qui correspondent aux
+                                        v‚ritables zones … redessiner. Mais il
+                                        ne s'agit pas d'omettre les coordonn‚es
+                                        et les dimensions envoy‚es par le
+                                        message de Redraw.
+                                          Il ne faut redessiner que les parties
+                                        communes de ce rectangle, et les petits
+                                        rectangles de WF_FIRSTXYWH. Ca peut vous
+                                        paraŒtre abscons … la premiŠre lecture,
+                                        mais je vous invite … vous r‚f‚rer …
+                                        l'article de Mr ATTARD sur ce sujet,
+                                        parus dans le num‚ro 80 d'ST MAGAZINE.
+                                          Je peut fournir des photocopies contre
+                                        5 francs (porc [Gro‹?] compris).
+                                        WORD 0 : X
+                                        WORD 1 : Y
+                                        WORD 2 : Largeur
+                                        WORD 3 : Hauteur
+                    12 = WF_NEXTXYWH : Position et taille des autres rectangles,
+                                       un par appel, jusqu'a obtention d'une
+                                       taille nulle (plus de rectangles …
+                                       redessiner).
+                                       WORD 0 : X
+                                       WORD 1 : Y
+                                       WORD 2 : Largeur
+                                       WORD 3 : Hauteur
+                    15 = WF_HSLSIZE : Taille de la "Cabine" horizontale. -1 est
+                                      la taille minimum, sinon c'est entre 1 et
+                                      1000 pour les raisons que vous connaissez.
+                                      WORD 0 : Taille
+                    16 = WF_VSLSIZE : Taille de la "Cabine" verticale. Idem que
+                                      pr‚cedemment.
+                                      WORD 0 : Taille
+                    17 = WF_SCREEN : J'ai pas de doc explicite, mais d'aprŠs le
+                                     livre du d‚veloppeur, vous obtenez dans
+                                     LONG 0 : Adresse du tampon ALERT
+                                     WORD 2 : Largeur
+                                     WORD 3 : Hauteur
+                                     Il s'agirait d'un buffer qui doit
+                                     normalement avoir la taille d'un quart de
+                                     l'‚cran pour y ranger le fond lors de
+                                     l'ouverture d'un menu d‚roulant ou d'une
+                                     boite d'alerte, histoire que le GEM n'ait
+                                     pas … vous envoyer de message de ReDraw
+                                     aprŠs vous avoir saccag‚ le bureau.
+                                       C'est pas propre, mais ‡a marche. Et pis
+                                     c'est rapide, en plus...
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 104
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon pointeur sur un tableau contenant les
+                informations demand‚es
+                Structure du tableau : Regardez dans les Informations
+                                       sollicit‚es
+Pile : 12
+
+/// AES 105 : WIND_SET ///
+
+Sert … changer les attributs d'une fenˆtre. Il s'agira de la redessiner par la
+suite.
+
+ParamŠtres : WORD : Handle de la fenˆtre … retoucher
+             WORD : Attributs … changer
+                    1 = WF_KIND : Les attributs de la fenˆtre
+                                  In1 : Nouveaux attributs comme WIND_CREATE
+                                  BIT 0 : Barre de Titre
+                                  BIT 1 : Closer - Bouton au coin sup‚rieur
+                                          gauche pour fermer la fenˆtre
+                                  BIT 2 : Fuller - Bouton au coin sup‚rieur
+                                          droit pour ouvrir la fenˆtre sur tout
+                                          le bureau
+                                  BIT 3 : Barre de d‚placement - En fait, la
+                                          Barre de Titre, mais indique … l'AES
+                                          que l'on d‚sire que cette fenˆtre
+                                          soit d‚pla‡able
+                                  BIT 4 : Info - La ligne d'informations juste
+                                          sous la Barre de Titre
+                                  BIT 5 : Sizer - Le bouton au coin inf‚rieur
+                                          droit pour modifier la taille de la
+                                          fenˆtre
+                                  BIT 6 : UpArrow - La flŠche vers le haut
+                                  BIT 7 : DnArrow - La flŠche vers le bas
+                                  BIT 8 : VSlide - La "cabine" verticale, ainsi
+                                          que l'ascenseur
+                                  BIT 9 : LfArrow - La flŠche vers la gauche
+                                  BIT A : RtArrow - La flŠche vers la droite
+                                  BIT B : HSlide - La "cabine" horizontale,
+                                          ainsi que le couloir
+                    2 = WF_NAME : Titre de la fenˆtre
+                                  In1 et In2 : Adresse de la chaŒne de caractŠre
+                                               du Titre de la fenˆtre.
+                                               Cependant, l'AES prend l'adresse,
+                                               et non la chaŒne de caractŠres,
+                                               donc il ne faut surtout pas
+                                               changer cette chaŒne de caractŠre
+                                               tant que la fenˆtre est ouverte
+                    3 = WF_INFO : Ligne d'infos de la fenˆtre
+                                  In1 et In 2 : Adresse de la chaŒne de
+                                                caractŠres de la ligne d'Infos.
+                                                Mˆmes remarques que pr‚c‚demment
+                    5 = WF_CURRXYWH : Fixe la nouvelle position et taille de la
+                                      fenˆtre
+                                      In1 : X
+                                      In2 : Y
+                                      In3 : Largeur
+                                      In4 : Hauteur
+                    8 = WF_HSLIDE : Fixe la position de la "Cabine" horizontale
+                                    In1 : Position
+                                    La position est simple … calculer, 0 ‚tant
+                                    le d‚part et 1000 la fin (attention,
+                                    derniŠre page, donc calculez le nombres de
+                                    lignes dans cette page). La position est
+                                    donc ‚gale … :
+                                    (Num‚ro de la premiŠre ligne affich‚e /
+                                    (Num‚ro de la derniŠre ligne - Nombre de
+                                     lignes par page))*1000
+                    9 = WF_VSLIDE : Idem pour la "Cabine" verticale
+                                    In1 : Position
+                                    Idem que pr‚cedemment.
+                    10 = WF_TOP : Fait venir la fenˆtre au premier plan
+                    14 = WF_NEWDESK : Fixe un nouveau menu (avec nouvelle barre
+                                      de menu). Cependant, avant de quitter,
+                                      appeler cette fonction avec comme
+                                      paramŠtre 0 pour que le menu du GEM s'y
+                                      remette.
+                                        Facultatif cependant, car le GEM, … la
+                                      sortie d'un programme, reprend le bureau).
+                                      Peut ˆtre pour forcer MultiTOS …
+                                      rafraŒchir l'‚cran … la sortie
+                                      In1 et In2 : Adresse de l'arbre
+                                      In3 : Num‚ro du premier Objet … dessiner
+                    15 = WF_HSLSLIDE : Fixe la taille de la "Cabine" horizontale
+                                       In1 : Taille
+                                       Sachant que la taille de la cabine est
+                                       proportionnelle … la taille du document
+                                       affich‚, la longueur du couloir est en
+                                       principe de 1000+Taille de la Cabine.
+                                       Pour calculer cette taille, prenez la
+                                       formule magique de Mr ATTARD, c'est …
+                                       dire :
+                                       (1000* Largeur Affich‚e)/Largeur Totale.
+                                       Ainsi, si le document est entiŠrement
+                                       affich‚, la taille vaut 1000, et la
+                                       moiti‚ si la largeur affich‚e est deux
+                                       fois moindre.
+                    16 = WF_VSLSLIDE : Fixe la taille de la "Cabine" verticale
+                                       In1 : Taille
+                                       Mˆme r‚sonnement que pr‚cedemment.
+             WORD : In1, … 0 si inutilis‚
+             WORD : In2, idem
+             WORD : In3, idem
+             WORD : In4, idem
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 105
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 20
+
+ATTENTION : Lors des calcul pour la position ou la taille en rapport avec les
+            ascenseurs des fenˆtres, de travailler avec le plus de pr‚cision
+            possible, pour ‚viter les pertes, vu que vous travaillez sur des
+            entiers, en g‚n‚ral. €a permet d'‚viter les stupides erreurs
+            d'arrondis (grossiers dans ce cas de figure).
+              D'ordinaire, c'est avec des WORDs que l'on travaille, mais rien ne
+            doit vous empˆcher d'utiliser les services du coprocesseur si vous
+            le trouvez dans la configuration (voyez le Cookie _FPU). Les
+            nouveaux processeurs comme le 68030 peuvent faire des divisions sur
+            des LONGs.
+
+/// AES 106 : WIND_FIND ///
+
+Sert … obtenir le Handle de la fenˆtre qui se trouve sous une position donn‚e.
+  En g‚n‚ral (Oui? Ici DEUG-HOLE en direct de Colombe-hait-les-deux-‚glise), on
+prend celle de la souris, histoire de mettre en avant plan un fenˆtre recouverte
+par d'autres.
+
+ParamŠtres : WORD : X de la position donn‚e
+             WORD : Y de la position donn‚e
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 106
+             WORD : 200
+Retour : D0.w = Handle de la fenˆtre
+Pile : 12
+
+/// AES 107 : WIND_UPDATE ///
+
+Sert … signaler … l'AES que vous allez entreprendre la fastidieuse aventure de
+travailler sur votre fenˆtre, et qu'il serait souhaitable qu'il ne touche plus
+au bureau le temps que vous ayez fini. Permet aussi de prendre le contr“le … la
+main de la souris.
+C'est utile pour une copie raster dans l'Espace de Travail de la fenˆtre (pour
+afficher une image dans une fenˆtre, donc).
+
+ParamŠtres : WORD : Code de commande
+                    0 : END_UPDATE : Vous avez fini de travailler, et vous
+                                     indiquez … l'AES qu'il peut continuer sont
+                                     travail.
+                    1 : BEG_UPDATE : Vous commencez, et vous d‚sirer ne plus
+                                     voir … l'‚cran un menu s'ouvrir
+                                     intempestivement sur votre dessin que vous
+                                     ˆtes en train de recopier directement …
+                                     l'‚cran (ce qui n'est fortement pas
+                                     conseill‚, passez par une fonction du VDI
+                                     comme Copy Raster (VDI 109 ou 121).
+                    2 : END_MCTRL : Vous avez fini de faire joujou avec la
+                                    souris, et vous demandez … l'AES qu'il la
+                                    reprenne dans son ‚levage, pour qu'elle
+                                    arrˆte de vous couiner dans les oreilles
+                    3 : BEG_MCTRL : Vous prennez la souris par la queue, et vous
+                                    pouvez l'assaisonner … la sauce APPL_TPLAY,
+                                    histoire de lui faire faire un parcours
+                                    qu'elle … d‚j… effectu‚e, ou tout autre
+                                    chose.
+                                      Sert surtout … la bloquer pour ‚viter
+                                    qu'elle ne laisse des traces de son passage
+                                    sur votre chef-d'oeuvre. En principe, le
+                                    tampon ALERT n'est plus en fonction vu que
+                                    le GEM est d‚connect‚. Vous pouvez
+                                    l'utiliser comme bon vous semble,
+                                    th‚oriquement (d'aprŠs Le Livre Du
+                                    Developpeur). J'ai jamais tent‚ cet exercice
+                                    de haute voltige sans filet, alors
+                                    attention. D'ailleurs, justement, ...
+                                    ATTENTION : C'est … vous de tout g‚rer, le
+                                                GEM est parti en vacance. Les
+                                                menus ne marchent plus, la
+                                                souris ne r‚pond plus (utilisez
+                                                donc votre super routine de
+                                                gestion de la souris - Voyez la
+                                                LineA).
+                                                  N'essayez donc PAS d'attendre
+                                                certains messages ou boutons,
+                                                vous risqueriez d'attendre
+                                                longtemps.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 107
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 10
+
+/// AES 108 : WIND_CALC ///
+
+Sert … demander les dimension d'une fenˆtre, suivant que l'on d‚sire recevoir sa
+dimension totale, ou l'espace de travail.
+  Peut servir pour recevoir un "devis" sur une nouvelle fenˆtre que l'on
+voudrait cr‚er, mais aussi afficher une image avec une copie raster bien pens‚e
+(n'oubliez pas de g‚rer correctement les ascenseurs dans ce cas, car la
+pr‚cision n'est plus vraiment fiable si vous travaillez avec des images dont la
+r‚solution excŠde 1000, la limite de d‚finition de la position d'une cabine).
+
+ParamŠtres : WORD : Code de commande
+                    0 : Calcul de la taille de la fenˆtre
+                    1 : Calcul de la taille de l'espace de travail
+             WORD : Attribut de la fenˆtre … prendre en compte pour le calcul
+                    BIT 0 : Barre de Titre
+                    BIT 1 : Closer - Bouton au coin sup‚rieur gauche pour
+                            fermer la fenˆtre
+                    BIT 2 : Fuller - Bouton au coin sup‚rieur droit pour ouvrir
+                            la fenˆtre sur tout le bureau
+                    BIT 3 : Barre de d‚placement - En fait, la Barre de Titre,
+                            mais indique … l'AES que l'on d‚sire que cette
+                            fenˆtre soit d‚pla‡able
+                    BIT 4 : Info - La ligne d'informations juste sous la Barre
+                            de Titre
+                    BIT 5 : Sizer - Le bouton au coin inf‚rieur droit pour
+                            modifier la taille de la fenˆtre
+                    BIT 6 : UpArrow - La flŠche vers le haut
+                    BIT 7 : DnArrow - La flŠche vers le bas
+                    BIT 8 : VSlide - La "cabine" verticale, ainsi que
+                            l'ascenseur
+                    BIT 9 : LfArrow - La flŠche vers la gauche
+                    BIT A : RtArrow - La flŠche vers la droite
+                    BIT B : HSlide - La "cabine" horizontale, ainsi que le
+                            couloir
+             WORD : X
+             WORD : Y
+             WORD : Largeur
+             WORD : Hauteur
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 108
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon pointeur vers un tableau contenant les
+                dimensions demand‚es
+                Structure du tableau : WORD 0 : X
+                                       WORD 1 : Y
+                                       WORD 2 : Largeur
+                                       WORD 3 : Hauteur
+Pile : 20
+
+/// AES 109 : WIND_NEW ///
+
+Sert … d‚truire toutes les fenˆtres. TrŠs pratique s'il s'agit de quitter le
+programme, plus besoin de le faire … la main, pour chaque fenˆtre.
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 109
+             WORD : 200
+Retour : Aucun
+Pile : 8
+
+--- LIBRAIRIE RESOURCES ---
+
+/// AES 110 : RSRC_LOAD ///
+
+Sert … charger un fichier ressource pr‚alablement cr‚e avec un ‚diteur de
+ressources. Ce fichier contient toutes les informations pour exploiter les
+Objets qu'il contient. Voici la structure d'une ressource :
+
+> Structure Ressource
+
+> Structure RscHead
+  Le fichier ressource commence par un Header.
+  WORD  0 : RSH_VRSN : Version de la ressource.
+                       0 = Normale
+                       4 = Etendue. Le fichier contient une extension situ‚e …
+                           sa fin, et compos‚e des icones couleurs.
+  WORD  1 :
+  WORD  2 :
+  WORD  3 :
+  WORD  4 :
+  WORD  5 :
+  WORD  6 :
+  WORD  7 :
+  WORD  8 :
+  WORD  9 :
+  WORD  A :
+  WORD  B :
+  WORD  C :
+  WORD  D :
+  WORD  E :
+  WORD  F :
+  WORD 10 :
+  WORD 11 :
+
+> Structure RscData
+  Les donn‚es normales d'un fichier ressource.
+
+> Structure RscExt
+  L'extension d'un fichier ressource contenant des icones couleurs.
+  L'extension est compos‚e de LONGs, chacun etant un "Slot".
+  LONG 0 : FileSize : Longueur du fichier Ressource (permet de v‚rifier, un peu
+                      comme une cl‚ CRC).
+  LONG 1 : ColorIc : OffSet vers la Structure CICON_Table
+  LONG 2 : R‚serv‚s, toujours … -1
+  Les Slots suivant ne sont pas encore utilis‚s. S'il y en a, ils DOIVENT etres
+  … -1.
+  LONG x : Le dernier Slot est TOUJOURS … 0, et marque la fin de la Structure
+           RscExt
+  Une ressource ‚tendue contient juste trois Slots: FileSize, ColorIc, et 0.
+
+> Structure CICON_Table
+  Cette structure est compos‚e de pointeurs vide. Il y … autant de pointeur que
+  de Stucture CICONBLK.
+  Le dernier pointeur est TOUJOURS … -1.
+  LONG 0 : 0
+  LONG 1 : 0
+  ...
+  LONG x : -1, fin de la CICON_Table.
+
+ParamŠtres : LONG : Adresse du nom du fichier
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 110
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 12
+
+/// AES 111 : RSRC_FREE ///
+
+LibŠre la m‚moire contenant la ressource charg‚e avec RSRC_LOAD. Attention
+cependant, car si quitter un programme avec P_TERM(0) libŠre toute la m‚moire
+r‚serv‚e par M_(X)ALLOC, quitter le programme ne libŠre pas la m‚moire r‚serv‚e
+par RSRC_LOAD (quoique par la pratique, c'est pas si sur que ‡a, … moins qu'il
+existe un buffer pour les ressources, car en effet Clogge n'indique pas de
+lib‚ration de m‚moire en rapport avec la lib‚ration de la ressource), donc il
+faut imp‚rativement invoquer
+RSRC_FREE (pas besoin de bougies, de statuettes et de sacrifices pour cela),
+avant de quitter proprement l'application en cours.
+
+ParamŠtres : LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 111
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 8
+
+/// AES 112 : RSRC_GADDR ///
+
+Sert … obtenir l'adresse d'un Objet, d'un arbre, d'une structure, ou de tout
+autre chose ayant une relation (intime) avec les Objets du GEM.
+
+ParamŠtres : WORD : Type d'Objet recherch‚
+                     0 : R_TREE : Adresse d'un Arbre
+                                  Les Boites et les Menus font partis de cette
+                                  grande famille.
+                     1 : R_OBJECT : Adresse d'un Objet
+                     2 : R_TEDINFO : Adresse d'une TedInfo
+                     3 : R_ICONBLK : Adresse d'une IconBlk
+                     4 : R_BITBLK : Adresse d'une BitBlk
+                     5 : R_STRING : Adresse d'une String ou chaŒne Free
+                                    Les boites d'Alertes, par exemple
+                     6 : R_IMAGEDATA : Adresse d'une Image Free
+                     7 : R_OBSPEC : Adresse d'une Ob_Spec
+                     8 : R_TEDTEXT : Adresse de l'adresse de TE_PTEXT
+                     9 : R_TEDTMPLT : Adresse de l'adresse de TE_PTMPLT
+                    10 : R_TEPVALID : Adresse de l'adresse de TE_PVALID
+                    11 : R_IBPMASK : Adresse de l'adresse de IB_PMASK
+                    12 : R_IBPDATA : Adresse de l'adresse de IB_PDATA
+                    13 : R_IBPTEXT : Adresse de l'adresse de IB_PTEXT
+                    14 : R_BIPDATA : Adresse de l'adresse de BI_PDATA
+                    15 : R_FRSTR : Adresse de l'adresse d'une chaŒne Free
+                    16 : R_FRIMG : Adresse de l'adresse d'une image Free
+             WORD : Num‚ro d'ordre de l'Objet dans sa famille. C'est un coup de
+                    force de "finesse" de la part de Digital Research, car il
+                    n'existe pas de fonction pour d‚finir ce num‚ro. En fait, il
+                    s'agit du num‚ro d'apparition de ce type d'Objet dans le
+                    fichier ressource.
+                      A vous donc de savoir combien vous en avez mis dans le
+                    premier arbre, dans le deuxiŠme, etc.. pour vous y
+                    retrouver. Du coup, vous ˆtes largue-z, et pour trouver ce
+                    fichus Objet, vous z'ˆtes perdu...
+                      Disons, vous ne pouvez plus demander au GEM de le faire,
+                    et cet Objet prend une position "absolue", car si l'on
+                    modifie un temps soit peu le fichier ressource, et pas votre
+                    programme, ‡a plante car les positions pr‚alablement
+                    d‚finies ne correspondent plus. Cet Objet devra toujours
+                    ˆtre o— il est, sans que ses attributs ne puissent ˆtres
+                    modifi‚s (pas les graphiques, mais disons parental).
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 112
+             WORD : 200
+Retour : D0.l = 0 si erreur, sinon adresse recherch‚e
+Pile : 12
+
+/// AES 113 : RSRC_SADDR ///
+
+Sert … changer d'adresse une structure. Attention … ne pas faire de bˆtise, car
+l'AES risque de ne pas appr‚cier s'il venait … rencontrer une structure non
+standard, et … faire plein de petites bˆtises, ce qui risque fort de vous
+contrarier. Zut alors...
+  S‚rieusement : Peut, par exemple, changer l'adresse d'un arbre, et le
+rediriger vers un que vous venez de faire … la main. C'est trŠs utile pour les
+cr‚ateur le ressource (vous savez, les "Ressource Construction Set").
+  Faites cependant attention … que les adresses soient relog‚es en absolue, et
+d‚signent v‚ritablement l'adresse d'un objet en m‚moire. Ici, l'adressage
+relatif au PC (quelque chose de similaire, ‚videment) est impossible (ce serait
+vraiment, vraiment trop beau).
+
+ParamŠtres : WORD : Type d'Objet … changer
+                     0 : R_TREE : Arbre d'Objets
+                     1 : R_OBJECT : Objet
+                     2 : R_TEDINFO : TedInfo
+                     3 : R_ICONBLK : IconBlk
+                     4 : R_BITBLK : BitBlk
+                     5 : R_STRING : String ou chaŒne Free
+                     6 : R_IMAGEDATA : Image Free
+                     7 : R_OBSPEC : Ob_Spec
+                     8 : R_TEDTEXT : Adresse de TE_PTEXT
+                     9 : R_TEDTMPLT : Adresse de TE_PTMPLT
+                    10 : R_TEPVALID : Adresse de TE_PVALID
+                    11 : R_IBPMASK : Adresse de IB_PMASK
+                    12 : R_IBPDATA : Adresse de IB_PDATA
+                    13 : R_IBPTEXT : Adresse de IB_PTEXT
+                    14 : R_BIPDATA : Adresse de BI_PDATA
+                    15 : R_FRSTR : Adresse d'une chaŒne Free
+                    16 : R_FRIMG : Adresse d'une image Free
+             WORD : Num‚ro d'ordre de l'Objet dans sa famille.
+             LONG : Adresse … fixer
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 113
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES 114 : RSRC_OBFIX ///
+
+Sert … convertir les coordonn‚es et la taille d'un objet dont elles sont
+exprim‚es en caractŠres, en points. C'est utile, car dans ce cas, les Objets
+changent de taille suivant la r‚solution, et s'y adaptent.
+Lors d'un chargement d'une ressource, RSRC_LOAD s'en charge (c'est le cas de le
+dire) d‚j….
+
+ParamŠtres : LONG : Adresse de l'arbre
+             WORD : Num‚ro de l'Objet … convertir
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 114
+             WORD : 200
+Retour : Aucun
+Pile : 14
+
+/// AES 115 : RSRC_RCFIX ///
+
+  Sert … reloger un fichier ressource charg‚ en m‚moire. Il procede … tout les
+changements necessaires et op‚r‚s par RSRC_LOAD.
+
+ParamŠtres : LONG : Header du fichier ressource en m‚moire.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 115
+             WORD : 200
+Retour : D0.w = Toujours 1
+Pile : 12
+
+ATTENTION : Si une ressource est en train d'etre utilis‚e, n'oubliez pas de
+            l'effacer avec RSRC_FREE avant d'utiliser RSRC_RCFIX.
+--- LIBRAIRIE SHELL ---
+
+  Ici, je vous conseille d'avancer tres prudement car vous travaillez avec
+l'AES. Vous savez que le Bureau permet des choses tres interessantes. Mais dans
+l'ombre, il utilise un fichier NewDesk.INF (ou Gem.INF sous MultiTOS). Il peut
+aussi lancer des applications, ce que l'on peut faire d'ici. OUBLIEZ P_EXEC du
+GEMDOS, c'est beaucoup mieux ici, mais plus compliqu‚ car plus complet...
+
+/// AES 120 : SHEL_READ ///
+
+ParamŠtres : LONG : Adresse de la commande
+             LONG : Adresse des fonctions compl‚mentaires
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 120
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 16
+
+/// AES 121 : SHEL_WRITE ///
+
+Sert … demander … l'AES d'executer une autre application, et o—.
+
+ParamŠtres : WORD : Mode d'action
+                    0 = Lancer une application d'aprŠs son extension
+                    1 = Lancer une application en pr‚cisant son mode graphique
+                    2 = R‚serv‚
+                    3 = Lancer un accessoire
+             WORD : Mode graphique de l'application
+                    0 = Application TOS
+                    1 = Application GEM
+             WORD : Passer des paramŠtres
+                    0 = NON
+                    1 = OUI,
+             LONG : Adresse de la commande
+             LONG : Adresse de la Command-Tail
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 121
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon AP_ID de l'application execut‚e.
+Pile : 22
+
+/// AES 122 : SHEL_GET ///
+
+Sert … lire le buffer interne de l'AES.
+
+ParamŠtres : WORD : Nombre de caractŠres … lire (pas plus de 1024 octets)
+                    -1 = Demande la taille du buffer de l'AES.
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 122
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon le nombre d'octets lus ou la taille du
+                buffer de l'AES
+         D1.l = Adresse du buffer de l'AES
+Pile : 10
+
+/// AES 123 : SHEL_PUT ///
+
+Sert … ‚crire dans le buffer de l'AES.
+
+ParamŠtres : LONG : Adresse du buffer de l'AES
+             WORD : Nombre de caractŠres … ‚crire (pas plus de 1024)
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 123
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 14
+
+/// AES 124 : SHEL_FIND ///
+
+(Pas document‚, mais implant‚)
+
+ParamŠtres : LONG : Adresse du nom du fichier
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 124
+             WORD : 200
+Retour : D0.w = 0 si erreur, sinon OK
+Pile : 12
+
+/// AES 125 : SHEL_ENVRN ///
+
+(Pas document‚, mais implant‚)
+
+ParamŠtres : LONG : Adresse d'un tampon de 4 OCTETs pour recevoir un pointeur
+             LONG : Adresse de la chaŒne du critŠre de recherche
+             LONG : Adresse du buffer des variables (AES_Params)
+             WORD : 125
+             WORD : 200
+Retour : Aucun
+Pile : 16
+

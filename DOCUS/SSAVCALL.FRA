@@ -1,0 +1,10 @@
+/// SSAVCALL - Les Fonctions ... //////////////////////////////////////////////
+
+Ici ne se trouve que les fonctions g‚n‚rales de SSAVCALL. Pour les fgonctions
+sp‚cifiques aux Plug-Ins, que ce soit les externes, ou les internes (les
+Plug-Ins systŠmes), le mieux est de vous reporter … leur documentations.
+Bon, aprŠs cette petite mise au point, on va commencer par voir le
+fonctionnement g‚n‚ral de SSALCALL.
+Je suppose que vous avez lu tout ce qui concerne l'AES/VDI, et que vous savez
+comment fonctionne le bureau. La dessus, j'embraye sur SSAVCALL et ses
+fonctions sp‚cifiques.

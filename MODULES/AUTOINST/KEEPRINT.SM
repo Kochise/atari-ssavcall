@@ -1,0 +1,108 @@
+; /// La ligne d'information sur la m‚moire gard‚e ///
+;
+; Used registers : D7.l - Progiz' Size
+;                  D1.l > TrashCan
+;                  D0.l > TrashCan
+;                  A0.l > TrashCan
+;                  A1.l > TrashCan
+
+	SECTION	TEXT
+
+	BSR	TKR_MemSize
+
+	move.l	#TKR_Buffer,D0
+
+	BSR	C_ConWS
+
+	RTS
+
+TKR_MemSize	lea	TKR_Keep,A0
+	lea	TKR_Buffer,A1
+	
+	BSR	TKR_Copy	; On copie un d‚but
+
+	tst.l	D7	; La m‚moire … garder
+	BNE	TKR_Memory	; Y'a
+	
+	move.b	#"0",(A1)+	; 0
+	
+	lea	TKR_Byte,A0
+	
+	BSR	TKR_Copy	; On complete
+	
+	lea	TKR_MemoTXT,A0
+	
+	BSR	TKR_Copy	; Idem
+	
+	RTS
+	
+TKR_Memory	move.l	D7,D1	; Yops...
+	lea	TKR_Buffer,A0
+	
+TKR_DecDigit	divu.l	#10,D0:D1	; En D0, le Reste (unit‚)
+			; En D1, le Quotient
+	
+	cmpi.l	#10,D1	; On arrive … la fin?
+	BLT	TKR_LastDigit
+	
+	move.b	D0,-(A0)	; On place le Reste
+	clr.l	D0	; On efface pour ne pas influencer
+			; le calcul suivant
+	
+	BRA	TKR_DecDigit
+	
+TKR_LastDigit	move.b	D0,-(A0)	; On place la derniŠre unit‚e
+	move.b	D1,-(A0)	; On place la derniŠre dizaine en d‚but
+
+	move.w	#9,D0	; Nombre maximum de chiffres
+			; significatifs … corriger
+	lea	TKR_NumBuffer,A0
+	
+TKR_ASCII	add.b	#$30,(A0)+	; On corrige la taille
+	DBF	D0,TKR_ASCII
+	
+	move.w	#9,D1	; Idem … propos des chiffres
+	lea	TKR_NumBuffer,A0
+	
+TKR_StartNum	move.b	(A0)+,D0
+	cmpi.b	#"0",D0
+	BNE	TKR_LockNum	; On a trouv‚ le d‚but du nombre,
+			; en se passant des "0" du d‚but
+	
+	DBF	D1,TKR_StartNum
+	
+TKR_LockNum	subq.l	#1,A0	; On se place juste avant
+
+TKR_CopyNum	move.b	(A0)+,(A1)+
+	DBF	D1,TKR_CopyNum	; On utilise le reste du DBF pr‚c‚dent
+	
+	lea	TKR_Byte,A0
+	
+	BSR	TKR_Copy	; On complete
+	
+	move.b	#"s",(A1)+	; On conjugue
+	
+	lea	TKR_MemoTXT,A0
+	
+	BSR	TKR_Copy	; On complete
+
+	RTS
+	
+TKR_Copy	move.b	(A0)+,(A1)+
+	BNE	TKR_Copy
+	
+	subq.l	#1,A1
+	
+	RTS
+
+	SECTION	DATA
+
+TITLE_Text	dc.b	13,10,27,"p"," SSAVCALL $$.$$ - A KOSS Production (**/**/**) ",27,"q",13,10,0
+OK_Text	dc.b	"   Installation correcte...                8-)",13,10,0
+NO_Text	dc.b	"   Installation d‚fectueuse...             8-(",13,10,0
+AR_Text	dc.b	"   D‚j… install‚...                        8-|",13,10,0
+TKR_Keep	dc.b	"TKR: Keep ",0
+TKR_Byte	dc.b	" byte",0
+TKR_MemoTXT	dc.b	" in memory.",13,10,0
+TKR_NumBuffer	ds.b	10
+TKR_Buffer	ds.b	40

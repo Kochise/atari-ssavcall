@@ -1,0 +1,273 @@
+; /// SSAV AutoInstaller v1.63 ///
+;
+; Used registers : D7.l - Progiz' Size
+;                  D0.l > TrashCan
+
+	; On commence par lib‚rer un peu de m‚moire
+	
+	include	MODULES\AUTOINST\STARTER.SM	; <<<
+	
+	tst	D0	; Si D0<>0, problŠme grave
+	BNE	P_Term
+
+	; On installe les tableaux uniquement de l'AES
+	; pour la "Mini Interface" au cas o— l'on
+	; essayerait de lancer SSAVCALL depuis le
+	; bureau
+
+	JSR	Init_Tabs
+	
+	; APPL_INIT, juste pour voir si l'AES est install‚	
+
+	pea	AES_Params
+	move.w	#10,-(SP)	; - APPL_INIT -
+	move.w	#200,-(SP)	; *** AES ***
+	
+	JSR	Start_SSAV
+	
+	addq.l	#8,SP
+	
+	; On v‚rifie si l'on est sous le Bureau : AES<>0
+	; ou en phase de Boot                   : AES==0
+	
+	move.w	(Global),D0	; L'AES est-il install‚?
+	BNE	GEM_Message	; Si OK, on est sous GEM
+	
+	; Si on continu ici, c'est que l'on est en phase de Boot
+	; On lance la modification du Cookie-Jar
+	
+	pea	Cookie_Hacker
+	move.w	#$26,-(SP)	; - SupExec -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+
+	tst.w	D0
+	BEQ	XBRA_Tracker
+
+	cmpi.w	#-2,D0
+	BEQ	AR_Install
+	
+	cmpi.w	#-1,D0
+	BEQ	NO_Install
+	
+	BRA	P_Term	
+	
+	; On installe l'XBRA
+	
+XBRA_Tracker	pea	XBRA_Hacker
+	move.w	#$26,-(SP)	; - SupExec -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+
+	tst.w	D0
+	BEQ	CONF_Initializer
+
+	cmpi.w	#-2,D0
+	BEQ	AR_Install
+	
+	cmpi.w	#-1,D0
+	BEQ	NO_Install
+	
+	BRA	P_Term	
+
+	; On traite le fichier de configuration pour
+	; modifier l'ATARI en cons‚quence
+
+CONF_Initializer	clr.w	-(SP)
+	pea	CONFIG_Name
+	move.w	#$3D,-(SP)	; - F_OPEN -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#8,SP
+	
+	tst.w	D0
+	BMI	NO_Config
+	
+	move.w	D0,D4
+	
+	move.w	#2,-(SP)
+	move.w	D0,-(SP)
+	clr.l	-(SP)
+	move.w	#$42,-(SP)	; - F_SEEK -
+	trap	#1	; *** GEMDOS ***
+	lea	(10,SP),SP
+	
+	move.l	D0,D3
+	
+	clr.w	-(SP)
+	move.w	D4,-(SP)
+	clr.l	-(SP)
+	move.w	#$42,-(SP)	; - F_SEEK -
+	trap	#1	; *** GEMDOS ***
+	lea	(10,SP),SP
+
+	move.w	#3,-(SP)
+	move.l	D3,-(SP)
+	move.w	#$44,-(SP)	; - M_XALLOC -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#8,SP
+	
+	tst.l	D0
+	BEQ	NO_Config_Mem
+	
+	move.l	D0,D5
+	
+	move.l	D0,-(SP)
+	move.l	D3,-(SP)	
+	move.l	D4,-(SP)
+	move.w	#$3F,-(SP)	; - F_READ -
+	trap	#1	; *** GEMDOS ***
+	lea	(12,SP),SP
+	
+	move.w	D4,-(SP)
+	move.w	#$3E,-(SP)	; - F_CLOSE -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#4,SP
+	
+	pea	CONF_Init
+	move.w	#$26,-(SP)	; - SupExec -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+
+	move.w	D0,-(SP)
+	
+	move.l	D5,-(SP)
+	move.w	#$49,-(SP)	; - M_FREE -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	move.w	(SP)+,D0
+
+	tst.w	D0
+	BEQ	OK_Install
+	
+	cmpi.w	#-1,D0
+	BEQ	MINIMUM_Install
+	
+	BRA	P_Term	
+
+	; Si on arrive l…, c'est que tout s'est d‚roul‚
+	; sans problŠmes, et l'on laisse SSAVCALL r‚sident
+
+P_TermRes	clr.w	-(SP)
+	move.l	D7,-(SP)
+	move.w	#$31,-(SP)	; - P_TermRes -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#8,SP
+	
+	; Si on arrive l…, c'est qu'il y a eu une queue...
+
+P_Term	move.w	D0,-(SP)
+	move.w	#$4C,-(SP)	; - P_Term -
+	trap	#1	; *** GEMDOS ***
+
+	; Le cuisto des Cookies.
+	
+Cookie_Hacker	include	MODULES\AUTOINST\COOKHACK.SM	; <<<
+
+	; L'aiguilleur du XBRA (ShortXBRA)
+
+XBRA_Hacker	include	MODULES\AUTOINST\XBRAHACK.SM	; <<<
+
+	; Le fonctionnaire du fichier de configuration
+
+CONF_Init	;include	MODULES\AUTOINST\CONFIGLE.SM	; <<<
+
+; *** Le XBRA de SSAVCALL - on y passe que par un TRAP #2 ***
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+Old_TRAP2	ds.l	1
+
+New_TRAP2	cmpi.l	#"SSAV",D0
+	
+	BNE	Bad_TRAP2
+
+	move.l	#Start_SSAV,D0
+	
+	RTE
+
+Bad_TRAP2	JMP	([Old_TRAP2])
+
+; *** Les routines graphiques ***
+		
+OK_Install	BSR	TITLE_Print	; Titre
+	move.l	#OK_Text,D0	; InstallOK
+	BSR	C_ConWS	; On imprime
+	BSR	TKR_Print	; Taille gard‚e
+	BRA	P_TermRes	; Kassos...
+
+NO_Install	BSR	TITLE_Print	; Titre
+	move.l	#NO_Text,D0	; InstallKO
+	BSR	C_ConWS	; On imprime
+	clr.l	D7	; Pas de m‚moire gard‚e
+	BSR	TKR_Print
+	BRA	P_Term	; Kassos...
+	
+AR_Install	BSR	TITLE_Print	; Titre
+	move.l	#AR_Text,D0	; ARInstall
+	BSR	C_ConWS	; On imprime
+	clr.l	D7	; Pas de m‚moire gard‚e
+	BSR	TKR_Print
+	BRA	P_Term	; Kassos
+
+NO_Config_Mem	move.l	#NO_ConfigMem_Text,D0
+	BSR	C_ConWS
+	
+	BRA	MINIMUM_Install
+
+NO_Config	move.l	#NO_Config_Text,D0
+	BSR	C_ConWS
+MINIMUM_Install	move.l	#MINIMUM_Conf_Text,D0
+	BSR	C_ConWS
+	
+	BRA	OK_Install
+
+TITLE_Print	include	MODULES\AUTOINST\TITLEOUT.SM	; <<<
+
+TKR_Print	include	MODULES\AUTOINST\KEEPRINT.SM	; <<<
+
+C_ConWS	move.l	D0,-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+	EVEN
+
+	; La "Mini Interface" au cas o— l'on est sur le Bureau
+	
+GEM_Message	include	MODULES\AUTOINST\GEMESSAG.SM	; <<<
+
+	; Le pr‚parateur du tableau AES_Params
+
+Init_Tabs	lea	AES_Params,A0	; On pr‚pare … la main les tableaux du GEM
+	move.l	#Control,(A0)+
+	move.l	#Global,(A0)+
+	move.l	#Int_In,(A0)+
+	move.l	#Int_Out,(A0)+
+	move.l	#Addr_In,(A0)+
+	move.l	#Addr_Out,(A0)+
+
+	RTS
+	
+	SECTION	DATA
+	
+NO_Config_Text	dc.b	"  Pas de fichier de Configuration trouv‚...",13,10,0
+NO_ConfMem_Text	dc.b	"  Plus assez de m‚moire pour lire la configuration...",13,10,0
+MINIMUM_Conf_Text	dc.b	"  >>> Installation Minimum <<<",13,10,0
+
+	include	DATAS\SSAVCALL.RSM	; <<< La ressource
+
+	SECTION	BSS
+	
+; /// LES VARIABLES DE L'AES ///
+
+AES_Handle	ds.w	1
+Control	ds.w	5
+Global	ds.w	14
+Int_In	ds.w	16
+Int_Out	ds.w	7
+Addr_In	ds.l	3
+Addr_Out	ds.l	1
+AES_Params	ds.l	6
