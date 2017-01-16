@@ -1,0 +1,36 @@
+	; # ... : 07/01/2000 #
+
+SSAVCALL_Header	dc.b	"ðSEA"	;  0 Valid   SSAVCALL Program
+	dc.b	"SSAV"	;  4 Valid   SSAVCALL Signature
+	dc.w	$301	;  8 Minimal SSAVCALL Version
+	dc.l	-1	; 10 Plug-In List
+	dc.l	SSAV_Boot	; 14 Boot Session Code
+	dc.l	SSAV_Desk	; 18 Desk Session Code
+	dc.w	$301	; 22 Program Version
+	dc.w	ASSEMBLY_DATE	; 24 Program Date
+	dc.l	0	; 26 Program Field
+	dc.b	"SSAVCALL",0	; 30 Program Name
+	dc.b	"KOSS",0	; .. Program Author
+
+	; Voir pour le systŠme de configuration
+
+	; > " SSAVCALL $$.$$ - KOSS Prod (**/**/**) "
+
+; ---
+
+SSAV_Boot
+
+; > Charger fichier de configuration
+; > Charger SOD
+; > Charger SPI
+; > Charger SEA en Auto (pour ce qui est du Bureau, modifier 'NewDesk.Inf')
+; > En VBL, v‚rification ACC, et installer dŠs que possible SSAV-Manager
+
+
+
+
+
+
+; ---
+
+SSAV_Desk	; > Boot_Only

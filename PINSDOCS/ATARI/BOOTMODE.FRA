@@ -1,0 +1,41 @@
+/// Etat de l'ATARI suivant le mode BOOT, ACC ou GEM //////// SSAVCALL 3.01 ///
+
+L'ATARI se trouve typiquement dans deux ‚tat distincts suivants qu'il se trouve
+en mode BOOT/GEM ou en mode ACC
+
+Mode BOOT/GEM :
+  Registres de Donn‚es            Registres d'Adresses
+    D0 = 0                          A0 = 0
+    D1 = 0                          A1 = 0
+    D2 = 0                          A2 = 0
+    D3 = 0                          A3 = 0
+    D4 = 0                          A4 -> SECTION BSS
+    D5 = 0                          A5 -> SECTION DATA
+    D6 = 0                          A6 -> TPA END-58 (?)
+    D7 = 0                          SP -> TPA END-8
+
+    ATTENTION : Pour SP, … TPA END-8, on trouve :
+                0 LONG : 0
+                4 LONG : Pointer -> BasePage
+                - TPA END -
+
+  La M‚moire TPA est la M‚moire Utilisateur qu'il reste … l'execution de votre
+  programme. C'est toute la M‚moire priv‚e des Registres SystŠme, des Buffers
+  SystŠme, des programmes charg‚s au Boot, de la zone Cartouche, du TOS, ...
+
+Mode ACC :
+  Registres de Donn‚es            Registres d'Adresses
+    D0 = 0                          A0 -> BasePage
+    D1 = 0                          A1 = 0
+    D2 = 0                          A2 = 0
+    D3 = 0                          A3 = 0
+    D4 = 0                          A4 = 0
+    D5 = 0                          A5 = 0
+    D6 = 0                          A6 = 0
+    D7 = 0                          SP = 0
+
+    ATTENTION : Notez ici que SP est … 0!
+                N'essayez donc pas d'emPiler quoi que ce soit...
+                Toute tentative de ce genre se soldera par une "Erreur Bus".
+
+Pour les informations relatives … la BasePage, lisez le fichier BASEPAGE.FRA.

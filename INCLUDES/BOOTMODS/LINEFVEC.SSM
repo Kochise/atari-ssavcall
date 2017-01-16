@@ -1,0 +1,94 @@
+; /// SSAVCALL 3.01 - Line F Vector / General Pupose - KOSS 2000 //////////////
+
+; Author   : Kochise
+; Date     : 05/06/07/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : Line F Vector / General Purpose Tool-Box
+
+; Machina  : Motorola 68030 based Computer
+; O.S.     : SSAVCALL 3
+
+; *****************************************************************************
+; *** LINE F : Les Nouveaux Vecteurs SSAVCALL *********************************
+; *****************************************************************************
+
+	; # ... : 07/01/2000 #
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+OldLINEF	ds.l	1
+
+SSAVCALL_LINEF	;> SP   = Inchang‚ (derniŠre valeur emPil‚e)
+	; SSP   = SR
+	; SSP+2 = PC
+	; SSP+6 = $2C (Pour LineF)
+
+	; C'est un 'Header' (ðSEA, ðSOD ou ðSPI) qui nous a fait
+	; venir ici. Il faut donc v‚rifier si 'SSAV' est juste
+	; derriŠre...
+	
+	cmpi.l	#"ðSEA",([2,SP])	; SSP
+	BEQ	LINEF_VerifSSAV
+	
+	cmpi.l	#"ðSOD",([2,SP])	; SSP
+	BEQ	LINEF_VerifSSAV
+	
+	cmpi.l	#"ðSPI",([2,SP])	; SSP
+	BEQ	LINEF_VerifSSAV
+	
+	; C'est pas bon, on continue … l'ancienne routine LineF
+
+	JMP	([OldLINEF])	; Zou...
+
+; ** OK ***********************************************************************
+
+	; # OK : 07/01/2000 #
+
+LINEF_VerifSSAV	cmpi.l	#"SSAV",([2,SP],4)	; SSP
+	BEQ	LINEF_GoodRequest
+
+	JMP	([OldLINEF])	; Zou...
+	
+; *** New LineF for SSAVCALL **************************************************
+
+	; # ... : 07/01/2000 #
+
+LINEF_GoodRequest	; V‚rification du Program_Field
+	; C'est le tableau principal
+
+	tst.l	([2,SP],26)
+	BEQ	LINEF_InSStallProg
+
+	; Si le Program_Field existe d‚j…,
+	; c'est pas la peine de le refaire...
+	; >> A revoir, car je vais pr‚installer SSAV.
+	;    De plus, permet de r‚initialiser rapidement le
+	;    logiciel
+
+	RTE
+
+	; Tester si ðSEA, ðSOD ou ðSPI
+	; InSStaller et chainer en cons‚quence
+
+LINEF_InSStallProg	; C'est parti...
+	; > Travailler sur 'Program_Field'
+	
+	; SSAVCALL_ProgField
+	
+		
+	; Adresse du Program_Field
+	
+	move.l	D0,([2,SP],26)	; ProgramField
+	
+	move.l	USP,A0
+	move.l	D0,A1	; ProgramField
+	move.l	(4,A0),([A1])	; D‚but de la BasePage
+	
+	
+	
+	; > En fonction du 'Header', executer
+	; Changer la gestion d'exception
+	
+	RTE

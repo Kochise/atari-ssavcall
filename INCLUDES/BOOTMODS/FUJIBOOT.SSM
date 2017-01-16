@@ -1,0 +1,347 @@
+; /// SSAVCALL 3.01 - FUJI Booter - KOSS 2000 /////////////////////////////////
+
+; Author   : Kochise
+; Date     : 05/29/06/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : BOOTSTRAP for 68030 based ATARI Computers
+
+; Machina  : ATARI Falcon030
+; O.S.     : TOS 4.0x or compatible -> SSAVCALL 3
+
+; *****************************************************************************
+; *** L'inSStalleur ***********************************************************
+; ** OK ***********************************************************************
+
+; Un programme sur ATARI peut D‚marrer de trois fa‡ons diff‚rentes :
+;
+; - BOOT : A l'Allumage de l'Ordinateur
+; - ACC  : A l'Initialisation du Bureau
+; - GEM  : Depuis le Bureau en lui-mˆme
+;
+;       +-----------------+-----------------+-----------------+
+;       | BOOT            | ACC             | GEM             |
+; +-----+-----------------+-----------------+-----------------+
+; | GEM | INACTIF         | ACTIF           | ACTIF           |
+; +-----+-----------------+-----------------+-----------------+
+; |  D0 | 0               | 0               | 0               |
+; |  D1 | 0               | 0               | 0               |
+; |  D2 | 0               | 0               | 0               |
+; |  D3 | 0               | 0               | 0               |
+; |  D4 | 0               | 0               | 0               |
+; |  D5 | 0               | 0               | 0               |
+; |  D6 | 0               | 0               | 0               |
+; |  D7 | 0               | 0               | 0               |
+; +-----+-----------------+-----------------+-----------------+
+; |  A0 | 0               | -> BasePage     | 0               |
+; |  A1 | 0               | 0               | 0               |
+; |  A2 | 0               | 0               | 0               |
+; |  A3 | 0               | 0               | 0               |
+; |  A4 | -> SECTION BSS  | 0               | -> SECTION BSS  |
+; |  A5 | -> SECTION DATA | 0               | -> SECTION DATA |
+; |  A6 | -> TPA_END -58  | 0               | -> TPA_END -58  |
+; |  SP | -> TPA_END -8   | 0               | -> TPA_END -8   |
+; +-----+-----------------+-----------------+-----------------+
+; 
+; TPA_END -8 Descriptor :
+;   OffSet Size Content
+;       -8 LONG 0.l
+;       -4 LONG -> BasePage
+;        0 TPA_END
+;
+ 
+; ###########################################################
+; # V‚rification du Mode de D‚marrage -> BOOT/GEM SEULEMENT #
+; # OK : 05/29/06/2000                                      #
+; ###########################################################
+
+	; ###########################################################
+	; # V‚rification du Mode de D‚marrage -> BOOT/GEM SEULEMENT #
+	; ###########################################################
+
+	; On v‚rifie que l'on fonctionne en Mode BOOT/GEM ou ACC
+	
+	move.l	SP,D0
+	BNE	FUJIBOOT_InSStall	; SP!=0 : BOOT
+	
+	; SP==0, d‚marrage en ACC, on ne peut PAS emPiler
+	; A0->BasePage
+	
+	lea	SSAVBOOT_ACCStack,SP	; On inSStalle une Pile !
+	move.l	A0,(4,SP)	; Correction de la BasePage
+
+	; Et p'is enfin l'on se casse car c'est pas en ACC que ‡a se passe...
+	; De toute fa‡on, mˆme si j'inSStalle par la suite SSAV-Manager,
+	; ce n'est plus maintenant que l'on BOOT les diff‚rents ‚l‚ments
+	; de SSAVCALL !
+	
+	move.w	#5,D0	; "Bad Request"
+	
+	BRA	FUJIBOOT_GEMDOS_PTerm0	; Adios !
+	
+; ** OK ***********************************************************************
+	
+; ########################################################
+; # BOOTSTRAP de Gestion de l'InSStallation de SSAVCALL  #
+; # - Cr‚ation du PROG_FIELD                             #
+; # - V‚rification du Mode de D‚marrage -> GEM SEULEMENT #
+; # - InSStallation des Routines de SSAVCALL             #
+; # + Lancement de SSAVCALL ou Sortie                    #
+; # OK : 05/29/06/2000                                   #
+; ########################################################
+	
+FUJIBOOT_InSStall	; L… il faut v‚rifier si SSAVCALL est execut‚ depuis le GEM...
+	; Il faut l'AES, et le VDI plus tard pour SSAV-Manager.
+
+	; ########################################################
+	; # - Cr‚ation du PROG_FIELD                             #
+	; ########################################################
+
+	; Pour cela, cr‚ation automatique des variables n‚cessaires
+	; grƒce … l'interpr‚teur...
+
+	pea	SSAVCALL_PROG_HEADER
+	JSR	SSAVCALL_CreatePrgField
+	addq.l	#4,SP
+	
+	; ########################################################
+	; # - V‚rification du Mode de D‚marrage -> GEM SEULEMENT #
+	; ########################################################
+
+	; APPL_INIT, juste pour voir si l'AES est install‚	
+
+	move.l	#$A000100,D0	; - APPL_INIT -
+	BSR	FUJIBOOT_GEM_FuncCall
+	BSR	FUJIBOOT_GEM_AESCall
+	
+	; On v‚rifie si l'on est sous le Bureau : AES!=0
+	; ou en phase de Boot                   : AES==0
+	
+	lea	SSAVCALL_PROG_HEADER,A0
+	movea.l	(26,A0),A0	; ProgramField
+	
+	movea.l	([A0],12),A1	; AES_Params
+	movea.l	([4,A1]),D0	; Global0
+	BNE	FUJIBOOT_GEM_Interface	; Si OK -> GEM
+
+	; ########################################################
+	; # - InSStallation des Routines de SSAVCALL             #
+	; ########################################################
+
+	; On s'en va inSStaller tout le Bintz
+	; Routine Superviseur : INSSTALL_SSAV
+	; Retourne -1 ou -2 en D0.w si erreur
+
+	pea	SSAVCALL_INSSTALL_SSAV
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	TRAP	#14	; *** XBIOS ***
+	addq.l	#6,SP
+
+	; ########################################################
+	; # + Lancement de SSAVCALL ou Sortie                    #
+	; ########################################################
+
+	; On teste s'il y'a eu une erreur. Dans ce cas,
+	; tout est d‚j… comme avant...
+
+	tst.w	D0
+	BMI	FUJIBOOT_InSStallError
+
+	; Ben oui, j'ai d‚j… tout en m‚moire, j'vais quand mˆme
+	; pas manquer l'occasion d'utiliser mes superbes
+	; routines d'initialisation... BANZAI !!!
+	
+	BRA	SSAVCALL_PROG_HEADER	; On plante tout !
+
+; ** OK ***********************************************************************
+
+; ################################################################
+; # Affichage d'une Interface en Mode GEM                        #
+; # - GRAF_MOUSE, pour rendre l'aspect normal … la souris        #
+; # - RSRC_OBFIX, on reloge la ressource et on corrige les infos #
+; # - FORM_CENTER, pour centrer                                  #
+; # - FORM_DIAL, pour r‚server                                   #
+; # - OBJC_DRAW, pour tracer                                     #
+; # - FORM_DO, pour gerer                                        #
+; # - FORM_DIAL, pour effacer                                    #
+; # - APPL_EXIT, pour Quitter                                    #
+; # OK : 05/29/06/2000                                           #
+; ################################################################
+
+FUJIBOOT_GEM_Interface	; ################################################################
+	; # - GRAF_MOUSE, pour rendre l'aspect normal … la souris        #
+	; ################################################################
+
+	move.l	#$4E010101,D0	; - GRAF_MOUSE -
+	BSR	FUJIBOOT_GEM_FuncCall
+	
+	clr.w	([8,A1])	; Int_In0
+	clr.l	([16,A1])	; Addr_In0
+
+	BSR	FUJIBOOT_GEM_AESCall
+
+	; ################################################################
+	; # - RSRC_OBFIX, on reloge la ressource et on corrige les infos #
+	; ################################################################
+	
+	move.w	#6,D7	; 7 objets
+	clr.w	D6
+	
+BOOTGEM_RelocRSC	move.l	#$72010101,D0	; - RSRC_OBFIX -
+	BSR	FUJIBOOT_GEM_FuncCall
+	
+	move.w	D6,([8,A1])	; Int_In0
+	move.l	BOOTGEM_TreeIndex,([16,A1]) ; Addr_In0
+
+	BSR	FUJIBOOT_GEM_AESCall
+	
+	addq.w	#1,D6
+	DBF	D7,BOOTGEM_RelocRSC
+		
+	; ################################################################
+	; # - FORM_CENTER, pour centrer                                  #
+	; ################################################################
+
+	move.l	#$36000501,D0	; - FORM_CENTER -
+	BSR	FUJIBOOT_GEM_FuncCall
+
+	move.l	BOOTONLY_TreeIndex,([16,A1]) ; Addr_In0
+
+	BSR	FUJIBOOT_GEM_AESCall
+	
+	; ################################################################
+	; # - FORM_DIAL, pour r‚server                                   #
+	; ################################################################
+
+	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
+	
+	move.l	#$33090100,D0	; - FORM_DIAL -
+	BSR	FUJIBOOT_GEM_FuncCall
+
+	; On sauve les coordonn‚es du centrage
+
+	movea.l	(12,A1),A0	; Int_Out
+	move.w	(8,A0),-(SP)	; Int_Out4 : H
+	move.w	(6,A0),-(SP)	; Int_Out3 : W
+	move.w	(4,A0),-(SP)	; Int_Out2 : Y
+	move.w	(2,A0),-(SP)	; Int_Out1 : X
+
+	clr.w	([8,A1])	; Int_In0
+	move.l	(SP),([8,A1],2)	; Int_In1-2
+	move.l	(4,SP),([8,A1],6)	; Int_In3-4
+	move.l	(SP),([8,A1],10)	; Int_In5-6
+	move.l	(4,SP),([8,A1],14)	; Int_In7-8
+
+	BSR	FUJIBOOT_GEM_AESCall
+
+	; ################################################################
+	; # - OBJC_DRAW, pour tracer                                     #
+	; ################################################################
+	
+	move.l	#$2A060101,D0	; - OBJC_DRAW -
+	BSR	FUJIBOOT_GEM_FuncCall
+
+	clr.w	([8,A1])	; Int_In0
+	move.l	(SP),([8,A1],2)	; Int_In1-2
+	move.l	(4,SP),([8,A1],6)	; Int_In3-4
+	move.l	BOOTGEM_TreeIndex,([16,A1]) ; Addr_In0
+
+	BSR	FUJIBOOT_GEM_AESCall
+	
+	; ################################################################
+	; # - FORM_DO, pour gerer                                        #
+	; ################################################################
+	
+	move.l	#$32010101,D0	; - FORM_DO -
+	BSR	FUJIBOOT_GEM_FuncCall
+	
+	move.w	#-1,([8,A1])	; Int_In0
+	move.l	BOOTGEM_TreeIndex,([16,A1]) ; Addr_In0
+
+	BSR	FUJIBOOT_GEM_AESCall
+	
+	; On s'en fiche du num‚ro du bouton...
+	
+	; ################################################################
+	; # - FORM_DIAL, pour effacer                                    #
+	; ################################################################
+
+	move.l	#$33090100,D0	; - FORM_DIAL -
+	BSR	FUJIBOOT_GEM_FuncCall
+
+	moveq.w	#3,([8,A1])	; Int_In0
+	move.l	(SP),([8,A1],2)	; Int_In1-2
+	move.l	(4,SP),([8,A1],6)	; Int_In3-4
+	move.l	(SP),([8,A1],10)	; Int_In5-6
+	move.l	(4,SP),([8,A1],14)	; Int_In7-8
+
+	BSR	FUJIBOOT_GEM_AESCall
+
+	addq.l	#8,SP	; On restaure vu que l'on … plus besoin des valeurs
+
+	; ################################################################
+	; # - APPL_EXIT, pour Quitter                                    #
+	; ################################################################
+	
+	move.l	#$13000100,D0	; - APPL_EXIT -
+	BSR	FUJIBOOT_GEM_FuncCall
+	BSR	FUJIBOOT_GEM_AESCall
+
+	BRA	FUJIBOOT_GEMDOS_PTerm0	; Adios !
+
+FUJIBOOT_GEM_FuncCall	lea	SSAVCALL_PROG_HEADER,A0
+	movea.l	(26,A0),A0	; ProgramField
+	
+	movea.l	([A0],12),A1	; AES_Params
+	movep.l	D0,([A1],1)	; Control
+
+	RTS
+	
+FUJIBOOT_GEM_AESCall	move.l	#200,D0	; AES
+	move.l	A1,D1	; AES_Params
+	TRAP	#2	; *** AES/VDI ***
+
+	RTS
+
+	include	INCLUDES\BOOTMODS\BOOTONLY.RSM
+	
+; ** OK ***********************************************************************
+
+; ######################################################
+; # Affiche un Texte en Mode BOOT si Erreur, et Quitte #
+; # - Affiche le Texte                                 #
+; # - Quitte                                           #
+; # OK : 05/29/06/2000                                 #
+; ######################################################
+
+FUJIBOOT_InSStallError	; ######################################################
+	; # - Affiche le Texte                                 #
+	; ######################################################
+
+	; si -1, FAILURE -> 0
+	; si -2, ALREADY -> 1
+	
+	ori.w	#-2,D0	; -1 ou -2 forc‚
+	not.w	D0	;  0 ou  1 forc‚
+
+	lea	FUJIBOOT_TxtField,A0
+	move.l	(A0,D0.w*4),-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	TRAP	#1	; *** GEMDOS ***
+	addq.l	#6,SP	
+
+	; Zwou‹n, let's warp (just a little...)
+
+FUJIBOOT_GEMDOS_PTerm0	; ######################################################
+	; # - Quitte                                           #
+	; ######################################################
+
+	clr.w	-(SP)	; - P_TERM0 -
+	TRAP	#1	; *** GEMDOS ***
+	
+FUJIBOOT_FailureTxt	dc.b	7,27,"p SSAV FAILURE InSStalled... ",27,"q",13,10,13,10,0
+FUJIBOOT_AlReadyTxt	dc.b	7,27,"p SSAV ALREADY InSStalled... ",27,"q",13,10,13,10,0
+
+FUJIBOOT_TxtField	dc.l	FUJIBOOT_FailureTxt
+	dc.l	FUJIBOOT_AlReadyTxt

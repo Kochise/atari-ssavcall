@@ -1,0 +1,54 @@
+; /// SSAVCALL Project 3.xx - >Plug-In< - KOSS 1999 ///
+
+	comment	HEAD=7
+
+; *****************************************************************************
+	SECTION	TEXT
+; *****************************************************************************
+
+	dc.b	"ðSPI"	; Plug-In Signature
+	dc.b	"SSAV"	; Plug-In Valid
+	dc.b	"PIN-NAME"	; Plug-In Name
+	ds.w	1	; Plug-In Number	
+	ds.l	1	; Plug-In Next
+	ds.l	1	; Plug-In FuncList
+	dc.l	-1	; Plug-In Boot
+	dc.l	-1	; Plug-In Code
+	dc.l	YOURTABLE_Jump	; Plug-In JumpTable
+	dc.w	0	; Plug-In Minimal
+	dc.w	0	; Plug-In Maximal
+	dc.l	-1	; Plug-In Public
+	dc.l	-1	; Plug-In Private
+	dc.w	$100	; Plug-In Version
+	; Date Format :	 AAAAAmmmmJJJJJ
+	dc.w	%0	; Plug-In Date
+	dc.l	"Your Name, Coder",0	; Plug-In Author
+
+; > How it works : Stallion's Plug-In (ðSPI)
+; Plug-In Signature : 'ðSPI' Header
+; Plug-In Valid     : 'SSAV' Header
+; Plug-In Name      : Name of the PlugIn, 8 Chars MAX !!!
+; Plug-In Number    : Number of this PlugIn in the PlugIn-Queue
+;                     * Used by SSAVCALL, leave this space blank *
+; Plug-In Next      : Address of the next PlugIn in the PlugIn-Queue
+;                     * Used by SSAVCALL, leave this space blank *
+; Plug-In FuncList  : Address of a Field of PlugIn-Command
+; Plug-In Boot      : Address of a routine run just once at PlugIn-BOOT
+; Plug-In Code      : Address of a routine run at each PlugIn's Invocation 
+; Plug-In JumpTable : Address of an Array of Address -> PlugIn-Commands
+; Plug-In Minimal   : Minimal PlugIn-Command Number (may be Negative -> -32768)
+; Plug-In Maximal   : Maximal PlugIn-Command Number (may be Positive ->  32767)
+; Plug-In Public    : Public Encryption Key (DSE-CRC)
+; Plug-In Private   : Private Encryption Key (RSA)
+; Plug-In Version   : Version of the PlugIn in BDC Format ($xxyy / $0123 -> v1.23)
+; Plug-In Date      : Date of Assembly (Date Format : %AAAAAAAmmmmJJJJJ)
+; Plug-In Author    : "Your Name, Coder",0 (not TOO long, please...)
+
+; *****************************************************************************
+	SECTION	DATA
+; *****************************************************************************
+
+; *****************************************************************************
+; For Memory, SECTION BSS is STRICTLY FORBIDDEN in a Plug-In.
+; If ever there is one, it wouldn't be kept in Memory, you've been warned !
+; *****************************************************************************

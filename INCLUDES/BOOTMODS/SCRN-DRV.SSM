@@ -1,0 +1,17 @@
+; /// SSAVCALL 3.01 - VidelDRIVER - KOSS 2000 /////////////////////////////////
+
+; Author   : Kochise
+; Date     : 05/06/07/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : VidelDRIVER / ATARI Falcon030 ScreenDRIVER
+
+; Machina  : ATARI Falcon030
+; O.S.     : SSAVCALL 3
+
+; ###############################################################
+; # #
+; # #
+; # #
+; ###############################################################

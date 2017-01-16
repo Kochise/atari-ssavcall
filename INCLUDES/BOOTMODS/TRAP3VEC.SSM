@@ -1,0 +1,45 @@
+; /// SSAVCALL 3.01 - TRAP 3 Vector / SSAVCALL Functions - KOSS 2000 //////////
+
+; Author   : Kochise
+; Date     : 06/30/06/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : TRAP 3 Vector / SSAVCALL Functions
+
+; Machina  : ATARI Falcon030
+; O.S.     : TOS or compatible
+
+; *****************************************************************************
+; *** TRAP #3 : SSAVCALL ******************************************************
+; *****************************************************************************
+
+	; # ... : 07/01/2000 #
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+OldTRAP3	ds.l	1
+
+SSAVCALL_TRAP3	;> SP   = Inchang‚ (derniŠre valeur emPil‚e)
+	; SSP   = SR
+	; SSP+2 = PC
+	; SSP+6 = $8C (Pour Trap3) 
+
+	; Tester existance du ðSPI, sinon erreur
+
+	movem.l	D2-D7/A0-A6,-(SP)	; SSP
+
+	move.l	USP,A0
+
+	; > V‚rification du ðSPI, et execution de la
+	; routine (D‚part depuis le 'ProgHeader' de
+	; SSAVCALL)
+	
+	
+
+	movem.l	D2-D7/A0-A6,(SP)+
+
+	JMP	([OldTRAP3])	; Zou...
+	
+SSAV_SPI_Check	; L…, v‚rif
+
