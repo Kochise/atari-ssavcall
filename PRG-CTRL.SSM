@@ -1,0 +1,684 @@
+; /// SSAVCALL Project - PROG Control - KOSS 1999 ///
+
+	dc.b	"ðSPI"	; Plug-In Signature
+	dc.b	"SSAV"	; Plug-In Valid
+	dc.b	"PRG-CTRL"	; Plug-In Name
+	dc.w	6	; Plug-In Number	
+	dc.l	VDI_Control	; Plug-In Next
+	ds.l	1	; Plug-In FuncList
+	dc.l	-1	; Plug-In Boot
+	dc.l	-1	; Plug-In Code
+	dc.l	PRG_Jump	; Plug-In JumpTable
+	dc.w	0	; Plug-In Minimal
+	dc.w	9	; Plug-In Maximal
+	dc.l	-1	; Plug-In Public
+	dc.l	-1	; Plug-In Private
+	dc.w	$102	; Plug-In Version
+	dc.w	$0	; Plug-In Date
+	dc.l	"KOSS",0	; Plug-In Author
+
+PRG_Jump	dc.l	Prog_Init,0	; PROG  0
+	dc.l	Prog_Terminate,0	; PROG  1
+	dc.l	Prog_Booter,0	; PROG  2
+	dc.l	Prog_Accessory,0	; PROG  3
+	dc.l	Prog_GlarinGem	; PROG  4
+	dc.l	UnDefPROG5,0
+	dc.l	UnDefPROG6,0
+	dc.l	UnDefPROG7,0
+	dc.l	UnDefPROG8,0
+	dc.l	UnDefPROG9,0
+
+; /// PROG  0 : PROG_INIT ///
+; WORD : Lenght in LongWord of the NewStackFrame
+; WORD : Mode
+;        BIT 0 : MEMORY_SHINKER
+;                0 = SHRINK MEMORY
+;                1 = Doesn't SHRINK MEMORY, but also calculate MEMORY USAGE
+; LONG : START_Tab
+; LONG : AES_Params
+; LONG : GEM_Mode routine
+;        -1 if should display a "Only BOOT program" under DeskTop
+; LONG : ACC_Mode
+;        -1 if should display a "Only BOOT program" under Desktop
+; LONG : BOOT_Mode routine
+;        -1 if should be bypassed during BOOT session
+;        WARNING : In this case, the PROG_INIT function is really exited
+;                  You have to do something if ever it happen
+; WORD : - PROG_INIT - (0)
+; WORD : *** SYS *** (0)
+;
+; START_Tab structure : 0 WORD : AP_ID
+;                               -1 if BOOT_Mode, else the AP_ID given by AES if GEM_Mode
+;                       2 LONG : Size of the program in memory
+;                               WARNING : Ready to be used with P_TERMRES
+;                                BasePage  
+;                               +SECTION TEXT
+;                               +SECTION DATA (if any)
+;                               +SECTION BSS  (if any)
+;                               +NewStackFrame
+;                       6 LONG : End of program AREA (include the NewStackFrame)
+;                       8 LONG : Address of the Memory_DynamicDescriptor
+;
+; Used Registers : D0-2/A0/A6
+
+Prog_Init	; 36 LONG : BasePage Address
+	; 32 LONG : 0
+	; 30 WORD : Lenght
+	; 28 WORD : Mode
+	; 24 LONG : START_Tab
+	; 20 LONG : AES_Params
+	; 16 LONG : GEM_Mode
+	; 12 LONG : ACC_Mode
+	;  8 LONG : BOOT_Mode
+	;  6 LONG : - PROG_INIT - (0)
+	;  4 LONG : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_INIT -)
+
+	; ATTENTION : NE JAMAIS FAIRE DE - M_SHRINK - POUR
+	;             UN ACCESSOIRE
+	
+	bclr.b	#1,(29,SP)	; NoACC
+	
+	; Une Application utilise SSAVCALL
+	
+	addq.w	#1,SSAV_Info+4
+	
+	move.l	A0,D0	; A0<>0, ACC
+	BEQ	Prog0_NoAcc
+
+	move.l	A0,(36,SP)	; ACC's BasePage
+	bset.b	#0,(29,SP)	; DON'T SAVE MEMORY
+	bset.b	#1,(29,SP)	; ACC
+
+Prog0_NoAcc	; APPL_INIT, juste pour voir si l'AES est install‚	
+	
+	move.l	(20,SP),-(SP)	; AES_Params
+	move.w	#10,-(SP)	; - APPL_INIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+	
+	move.w	D0,([24,SP])	; AP_ID
+	
+	; On v‚rifie si l'on est sous le Bureau : AES<>0
+	; ou en phase de Boot                   : AES==0
+	
+	move.l	([20,SP],4),A0	; Global	
+	move.w	(A0),D0	; L'AES est-il install‚?
+	BNE	Prog0_GEM_Mode	; Si OK, on est sous GEM
+
+	cmpi.l	#-1,(8,SP)
+	BNE	Prog0_BOOT_Jump
+	
+	RTS		; Arg...
+	
+Prog0_BOOT_Jump	BSR	Prog0_MemoShrinker
+
+	move.w	#-1,([24,SP])	; -1 : BOOT
+	
+	lea	(32,SP),SP
+	
+	JMP	([-24,SP])	; BOOT_Mode
+
+Prog0_GEM_Mode	; GRAF_MOUSE, pour rendre l'aspect normal … la souris
+
+	clr.w	-(SP)
+	clr.l	-(SP)
+	move.l	(26,SP),-(SP)	; AES_Params
+	move.w	#78,-(SP)	; - GRAF_MOUSE -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+
+	BSR	Prog0_MemoShrinker
+	
+	btst.b	#1,(29,SP)	; Mode
+	BNE	Prog0_ACC_Mode
+
+	cmpi.l	#-1,(16,SP)
+	BEQ	Prog0_BootInterface
+	
+	lea	(32,SP),SP
+
+	JMP	([-16,SP])	; GEM_Mode
+
+Prog0_ACC_Mode	cmpi.l	#-1,(12,SP)
+	BEQ	Prog0_BootInterface
+	
+	lea	(32,SP),SP
+
+	JMP	([-20,SP])	; ACC_Mode
+
+Prog0_MemoShrinker	; 40 LONG : BasePage Address
+	; 36 LONG : 0
+	; 34 WORD : Lenght
+	; 32 WORD : Mode
+	; 28 LONG : START_Tab
+	; 24 LONG : AES_Params
+	; 20 LONG : GEM_Mode
+	; 16 LONG : ACC_Mode
+	; 12 LONG : BOOT_Mode
+	; 10 WORD : - PROG_INIT - (0)
+	;  8 WORD : *** SYS *** (0)
+	;  4 LONG : RTS (- PROG_INIT -)
+	;  0 LONG : (RTS)
+
+	movea.l	(40,SP),A6	; Adresse de la BASEPAGE
+	move.l	($C,A6),D0	; Taille du SEGMENT TEXT
+	add.l	($14,A6),D0	; Additionne la taille du SEGMENT DATA … D0
+	add.l	($1C,A6),D0	; Additionne la taille du SEGMENT BSS … D0
+	addi.l	#$100,D0	; Additionne la taille de la BASEPAGE … D0
+	
+	btst.b	#1,(33,SP)	; Mode
+	BNE	Prog0_MemoSize	; Si Acc, pas de StackFrame
+	
+	clr.l	D1	; Sinon BOUM...
+	move.w	(34,SP),D1	; Taille de la NewStackFrame en LongWord
+	mulu.l	#4,D1	; Taille en octets
+	add.l	D1,D0	; Additionne la taille de la future PILE
+	
+Prog0_MemoSize	move.l	D0,([28,SP],2)	; Taille … r‚server
+	move.l	D0,D1
+	
+	add.l	A6,D1	; Additionne l'adresse du d‚but du programme avec D1 (La taille … r‚server)
+	andi.l	#-2,D1	; Rend D1 pair (Au cas o— il ne l'‚tait pas)
+	move.l	D1,([28,SP],6)	; Fin du programme
+
+	btst.b	#1,(33,SP)	; Mode
+	BNE	Prog0_SkipShrink
+
+	subq.l	#8,D1	; Garde de la place pour l'adresse de la BASEPAGE
+	move.l	(40,SP),D2	; Sauvegarde l'adresse de la BASEPAGE
+	lea	(36,SP),A5	; Pour recopier les infos
+	movea.l	D1,SP	; Installe l'adresse de fin du programme+place nouvelle PILE dans la PILE
+	move.l	D2,(4,SP)	; R‚installe l'adresse de la BASEPAGE
+
+	moveq.w	#8,D2
+	
+Prog0_CopyStackFrame	move.l	-(A5),-(SP)	; 34 WORD : Lenght
+			; 32 WORD : Mode
+			; 28 LONG : START_Tab
+			; 24 LONG : AES_Params
+			; 20 LONG : GEM_Mode
+			; 16 LONG : ACC_Mode
+			; 12 LONG : BOOT_Mode
+			; 10 WORD : - PROG_INIT -
+			;  8 WORD : *** SYS ***
+			;  4 LONG : (RTS)
+			;  0 LONG : (RTS)
+	DBF	D2,Prog0_CopyStackFrame
+	
+	movea.l	([40,SP],16),A5	; DATA Pointer	
+
+	move.l	D0,-(SP)	; EmPILE la taille … r‚server
+	move.l	A6,-(SP)	; EmPILE l'adresse du programme
+	clr.w	-(SP)	; R‚serv‚
+	move.w	#$4A,-(SP)	; - M_SHRINK -
+	trap	#1	; *** GEMDOS ***
+	lea	(12,SP),SP
+
+Prog0_SkipShrink	RTS
+
+Prog0_BootInterface	; 20 LONG : AES_Params
+
+	tst.w	Prog0_ARReloc
+	BNE	Prog0_RelocNext
+
+	; RSRC_OBFIX, on reloge la ressource,
+	; et on corrige les infos
+	
+	move.w	#6,D7	; 7 objets
+	clr.w	D6
+	
+Prog0_RelocRSC	move.l	Prog0_RS_TrIndex,-(SP)
+	move.w	D6,-(SP)
+	move.l	(26,SP),-(SP)	; AES_Params
+	move.w	#114,-(SP)	; - RSRC_OBFIX -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+	
+	addq.w	#1,D6
+	DBF	D7,Prog0_RelocRSC
+	
+	move.w	#-1,Prog0_ARReloc
+	
+	; FORM_CENTER, pour centrer
+	
+Prog0_RelocNext	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	move.l	(24,SP),-(SP)	; AES_Params
+	move.w	#54,-(SP)	; - FORM_CENTER -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(12,SP),SP
+	
+	movea.l	D0,A0
+	move.w	(A0),-(SP)
+	move.w	(2,A0),-(SP)
+	move.w	(4,A0),-(SP)
+	move.w	(6,A0),-(SP)
+	
+	; FORM_DIAL, pour r‚server
+	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
+	
+	clr.w	-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	move.l	(46,SP),-(SP)	; AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV	
+	lea	(26,SP),SP
+
+	; OBJC_DRAW, pour tracer
+	
+	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	clr.w	-(SP)
+	move.w	#4,-(SP)
+	move.l	(12,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(12,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(44,SP),-(SP)	; AES_Params
+	move.w	#42,-(SP)	; - OBJC_DRAW -
+	move.w	#200,-(SP)	; *** AES ***	
+	JSR	Start_SSAV
+	lea	(24,SP),SP
+	
+	; FORM_DO, pour gerer
+	
+	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	move.w	#-1,-(SP)	; Pas de champs ‚ditables
+	move.l	(34,SP),-(SP)	; AES_Params
+	move.w	#50,-(SP)	; - FORM_DO -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+	
+	; On s'en fiche du num‚ro du bouton...
+	
+	; FORM_DIAL, pour effacer
+	
+	move.w	#3,-(SP)
+	move.l	(6,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(6,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(46,SP),-(SP)	; AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(26,SP),SP
+
+	addq.l	#8,SP	; On restaure vu que l'on … plus besoin des valeurs
+
+	; APPL_EXIT
+
+	move.l	(20,SP),-(SP)	; AES_Params
+	move.w	#19,-(SP)	; - APPL_EXIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+
+	; P_TERM0
+
+	clr.w	-(SP)
+	trap	#1
+
+	include	LIBRARY\BOOTONLY.RSM
+	
+Prog0_ARReloc	ds.w	1
+	
+	EVEN		; Au cas o—...
+
+; /// PROG  1 : PROG_TERMINATE ///
+; WORD : Mode
+;        BIT 0 : MEMORY_SAVER
+;                0 = Save memory
+;                1 = DON'T save memory
+; LONG : START_Tab
+; LONG : AES_Params
+; LONG : TKR_Buffer
+; WORD : - PROG_TERMINATE - (1)
+; WORD : *** SYS *** (0)
+;
+; Used Registers : N/A 
+
+Prog_Terminate	; 20 WORD : Mode
+	; 16 LONG : START_Tab
+	; 12 LONG : AES_Params
+	;  8 LONG : TKR_Buffer
+	;  6 WORD : - PROG_TERMINATE - (1)
+	;  4 WORD : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_TERMINATE -)
+	
+	; Une Application va se passer des services de SSAVCALL
+	
+	subq.w	#1,SSAV_Info+4
+
+	; Si BOOT_Mode, on ‚crit la ligne TKR
+
+	move.w	([16,SP]),D0
+	cmpi.w	#-1,D0	; BOOT_Mode
+	BEQ	Prog1_BootExit
+	
+	move.l	(12,SP),-(SP)	; AES_Params
+	move.w	#19,-(SP)	; - APPL_EXIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+
+	btst.b	#0,(21,SP)	; Mode
+	BNE	Prog1_NoSave
+	
+	BRA	Prog1_Save
+	
+Prog1_BootExit	lea	Prog1_KeepTxt,A0
+	move.l	(8,SP),A1
+	
+	BSR	Prog1_TKRCopy	; On copie un d‚but
+
+	move.l	([16,SP],2),D1	; La m‚moire … garder
+	BNE	Prog1_TKRMemory	; Y'a
+	
+	move.b	#"0",(A1)+	; 0
+	
+	lea	Prog1_ByteTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+	
+	lea	Prog1_MemoTxt,A0
+	
+	BSR	Prog1_TKRCopy	; Idem
+	
+	BRA	Prog1_TKRPrint
+	
+Prog1_TKRMemory	move.l	(8,SP),A0	
+	adda.l	#50,A0	; End of NumBuffer
+	
+Prog1_TKRDecDigit	clr.l	D0	; On efface pour ne pas influencer
+			; le calcul suivant
+	divu.l	#10,D0:D1	; En D0, le Reste (unit‚)
+			; En D1, le Quotient
+	
+	cmpi.l	#10,D1	; On arrive … la fin?
+	BLT	Prog1_TKRLastDigit
+	
+	move.b	D0,-(A0)	; On place le Reste
+	
+	BRA	Prog1_TKRDecDigit
+	
+Prog1_TKRLastDigit	move.b	D0,-(A0)	; On place la derniŠre unit‚e
+	move.b	D1,-(A0)	; On place la derniŠre dizaine en d‚but
+
+	move.w	#9,D0	; Nombre maximum de chiffres
+			; significatifs … corriger
+	
+	move.l	(8,SP),A0	
+	adda.l	#40,A0	; NumBuffer
+	
+Prog1_TKRASCII	add.b	#$30,(A0)+	; On corrige la taille
+	DBF	D0,Prog1_TKRASCII
+	
+	move.w	#9,D1	; Idem … propos des chiffres
+	lea	(-10,A0),A0
+	
+Prog1_TKRStartNum	move.b	(A0)+,D0
+	cmpi.b	#"0",D0
+	BNE	Prog1_TKRLockNum	; On a trouv‚ le d‚but du nombre,
+			; en se passant des "0" du d‚but
+	
+	DBF	D1,Prog1_TKRStartNum
+	
+Prog1_TKRLockNum	subq.l	#1,A0	; On se place juste avant
+
+Prog1_TKRCopyNum	move.b	(A0)+,(A1)+
+	DBF	D1,Prog1_TKRCopyNum	; On utilise le reste du DBF pr‚c‚dent
+	
+	lea	Prog1_ByteTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+	
+	move.b	#"s",(A1)+	; On conjugue
+	
+	lea	Prog1_MemoTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+
+Prog1_TKRPrint	move.l	(8,SP),-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+	
+Prog1_Save	move.l	([16,SP],2),D0
+	BEQ	Prog1_NoSave
+	
+	clr.w	-(SP)
+	move.l	D0,-(SP)
+	move.w	#$31,-(SP)	; - P_TERMRES -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#8,SP	
+		
+Prog1_NoSave	move.w	D0,-(SP)
+	move.w	#$4C,-(SP)	; - P_TERM -
+	trap	#1	; *** GEMDOS ***	
+	
+Prog1_TKRCopy	move.b	(A0)+,(A1)+
+	BNE	Prog1_TKRCopy
+	
+	subq.l	#1,A1
+
+	RTS
+
+Prog1_KeepTxt	dc.b	"TKR: Keep ",0
+Prog1_ByteTxt	dc.b	" byte",0
+Prog1_MemoTxt	dc.b	" in memory.",13,10,0
+
+	EVEN	
+	
+; /// PROG  2 : PROG_BOOTER ///
+; WORD : Mode
+;        BIT 0 : MEMORY_SAVER
+;                0 = Save memory
+;                1 = DON'T save memory
+; LONG : START_Tab
+; LONG : TITLE_String
+; LONG : TKR_Buffer
+; LONG : PROG_Info
+; LONG : BOOT_Rout
+; WORD : - PROG_BOOTER - (2)
+; WORD : *** SYS *** (0)
+;
+; Used Registers : D0-5/A0
+
+Prog_Booter	; 28 WORD : Mode
+	; 24 LONG : START_Tab
+	; 20 LONG : TITLE_String
+	; 16 LONG : TKR_Buffer
+	; 12 LONG : PROG_Info
+	;  8 LONG : BOOT_Rout
+	;  6 WORD : - PROG_BOOTER - (2)
+	;  4 WORD : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_BOOTER -) 
+
+	move.w	([12,SP]),D0
+	
+	unpk	D0,D1,#$3030	; Version ".xx"
+	ror.w	#8,D0
+	unpk	D0,D2,#$3030	; Version "xx."
+	
+	cmpi.w	#$3039,D2	; Version "0x."
+	BGT	Prog2_Version	; Sup‚rieur … "09."
+	
+	andi.w	#255,D2	; On transforme "0x." en
+	ori.w	#$2000,D2	; " x."
+	
+Prog2_Version	movea.l	(20,SP),A0	; On s‚lectionne le Titre
+		
+	BSR	Prog2_FindVD
+		
+	move.w	D2,(A0,D3.w)	; On place "xx."
+	move.w	D1,(3,A0,D3.w)	; et ".xx"
+	
+	swap	D3
+	
+	move.w	([12,SP],2),D0	; On charge la date
+	
+	move.w	D0,D1	; Correct_Day
+	andi.w	#%11111,D1
+	
+	BSR	Prog2_Date
+
+	move.w	D2,(A0,D3.w)	; On place le Jour
+	
+	move.w	D0,D1	; Correct_Month
+	andi.w	#%111100000,D1
+	lsr.w	#5,D1
+	
+	BSR	Prog2_Date
+	
+	move.w	D2,(3,A0,D3.w)	; On place le Mois
+	
+	move.w	D0,D1	; Correct_Year
+	andi.w	#%1111111000000000,D1
+	rol.w	#7,D1	; On pousse sur la gauche ;-)
+	addi.w	#80,D1	; Correction … partir de 1980
+	
+	BSR	Prog2_Date
+	
+	move.w	D2,(6,A0,D3.w)	; On place l'Ann‚e
+	
+	pea	Prog2_BeforeTitle
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+	
+	move.l	(20,SP),-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	pea	Prog2_AfterTitle
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	move.w	#-1,-(SP)
+	move.w	#11,-(SP)	; - KBSHIFT -
+	trap	#13	; *** BIOS ***
+	addq.l	#4,SP
+	
+	btst.l	#1,D0
+	BEQ	Prog2_BootRout
+	
+	clr.l	([24,SP],2)	; No Saving Memory
+
+	pea	Prog2_NoInstTxt
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	BRA	Prog2_Terminate
+
+Prog2_BootRout	JSR	([8,SP])	; BOOT_Rout
+
+Prog2_Terminate	clr.l	(20,SP)	; No AES_Params
+	move.w	#1,(14,SP)	; - PROG_TERMINATE -
+	clr.w	(12,SP)	; *** SYS ***
+	move.l	(SP),(8,SP)	; (RTS)
+	
+	addq.l	#8,SP	; Simulate JSR Process
+
+	BRA	Prog_Terminate
+
+Prog2_Date	move.w	D1,D4
+	divu.w	#10,D4	; Dizaine de la date
+	move.w	D4,D2
+	
+Prog2_U100	cmpi.w	#10,D2	; Sup‚rieur … cent (10*10)
+	BLT	Prog2_D100	; En de‡a, Let's Go...
+	
+	subi.w	#10,D2	; On retranche cent
+	
+	BRA	Prog2_U100	; On v‚rifie
+	
+Prog2_D100	lsl.w	#8,D2	; On place les dizaines en BCD
+	mulu.w	#10,D4	; On obtient les dizaines
+			; (les unit‚es en reste ne sont pas utilis‚es)
+	sub.w	D4,D1	; Unit‚
+	or.w	D1,D2	; On place les unit‚es en BCD
+	add.w	#$3030,D2	; Correction ASCII … la main
+	
+	RTS
+	
+Prog2_FindVD	clr.l	D3
+
+	move.w	#"*$",D4
+	
+	moveq.w	#1,D5
+
+Prog2_VDLoop	move.b	(A0,D3.w),D0
+	
+	cmp.b	D4,D0
+	BEQ	Prog2_VDEnd
+	
+	addq.w	#1,D3
+	BRA	Prog2_VDLoop
+	
+Prog2_VDEnd	swap	D3
+	ror.w	#8,D4
+	
+	DBF	D5,Prog2_VDLoop
+
+	RTS
+
+Prog2_BeforeTitle	dc.b	13,10,27,"p",0
+Prog2_AfterTitle	dc.b	27,"q",13,10,0
+Prog2_NoInstTxt	dc.b	"  Not Installed...",13,10,0
+
+	EVEN
+	
+; /// PROG  3 : PROG_ACCESSORY ///
+;
+; Used Registers : 
+
+Prog_Accessory
+
+	RTS
+
+; /// PROG  4 : PROG_GLARINGEM ///
+
+Prog_GlarinGem
+
+	RTS
+
+; /// PROG  5 : Non D‚finit ///
+
+UnDefPROG5
+
+	RTS
+
+; /// PROG  6 : Non D‚finit ///
+
+UnDefPROG6
+
+	RTS
+
+; /// PROG  7 : Non D‚finit ///
+
+UnDefPROG7
+
+	RTS
+
+; /// PROG  8 : Non D‚finit ///
+
+UnDefPROG8
+
+	RTS
+
+; /// PROG  9 : Non D‚finit ///
+
+UnDefPROG9
+
+	RTS
+

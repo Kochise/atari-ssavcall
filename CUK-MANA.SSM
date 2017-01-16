@@ -1,0 +1,341 @@
+; /// SSAVCALL Project - COOKIE Manager - KOSS 1999 ///
+
+	dc.b	"ðSPI"	; Plug-In Signature
+	dc.b	"SSAV"	; Plug-In Valid
+	dc.b	"CUK-MANA"	; Plug-In Name
+	dc.w	2	; Plug-In Number	
+	dc.l	FILE_Manager	; Plug-In Next
+	ds.l	1	; Plug-In FuncList
+	dc.l	-1	; Plug-In Boot
+	dc.l	-1	; Plug-In Code
+	dc.l	COOK_Jump	; Plug-In JumpTable
+	dc.w	0	; Plug-In Minimal
+	dc.w	4	; Plug-In Maximal
+	dc.l	-1	; Plug-In Public
+	dc.l	-1	; Plug-In Private
+	dc.w	$102	; Plug-In Version
+	dc.w	$0	; Plug-In Date
+	dc.l	"KOSS",0	; Plug-In Author
+
+COOK_Jump	dc.l	Cook_Null,0	; COOK  0
+	dc.l	Cook_JarCheck,0	; COOK  1
+	dc.l	Cook_Find,0	; COOK  2
+	dc.l	Cook_Add,0	; COOK  3
+	dc.l	Cook_Change,0	; COOK  4
+	dc.l	UnDefCOOK5,0
+	dc.l	UnDefCOOK6,0
+	dc.l	UnDefCOOK7,0
+	dc.l	UnDefCOOK8,0
+	dc.l	UnDefCOOK9,0
+
+; /// COOK  0 : COOK_NULL ///
+; Return : D0.w = Result of "NULL" installation
+;                 0 : OK, "NULL" Cookie installed in first position
+;                -1 : No more place
+;                -2 : No Jar Found
+;
+; Used Registers : D0-2/A0
+
+Cook_Null	;  8 WORD : - COOK_NULL - (0)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+	
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook0_NoJar	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BEQ	Cook0_NullDone	; "NULL" est l…, en premiŠre position
+
+	clr.l	D1
+
+Cook0_NullLookFor	move.l	(A0,D1*8),D0	; D3.l car travail avec la taille de la Jar,
+			; donc j'‚vite des CLR inutile
+	BEQ	Cook0_NullMatch	; "" (NULL) trouv‚
+	
+	addq.l	#1,D1	; Le compteur de Cookies
+	BRA	Cook0_NullLookFor
+	
+Cook0_NullMatch	move.l	(4,A0,D1*8),D0	; Le nombre de Cookies
+	
+	move.l	D1,D2	; On modifie le nombre de Cookies
+	addq.l	#1,D2
+		
+	cmp.l	D0,D2	; On v‚rifie si on peut encore
+			; ajouter "NULL" et "SSAV"
+	BGT	Cook0_NoMorePlace	; Plus de place, donc erreur
+	
+	clr.l	(8,A0,D1*8)	; On reporte le Cookie "" (NULL)
+	move.l	D0,(12,A0,D1*8)
+
+Cook0_NullMove	move.l	(-8,A0,D1*8),(A0,D1*8)
+	move.l	(-4,A0,D1*8),(4,A0,D1*8)
+	
+	subq.l	#1,D1
+	BPL	Cook0_NullMove
+	
+	move.l	#"NULL",(A0)	; On place le Cookie "NULL" en d‚but de Jar
+	move.l	D0,(4,A0)
+
+Cook0_NullDone	clr.w	D0	; C'est bon
+	RTS
+	
+Cook0_NoMorePlace	move.w	#-1,D0
+	RTS
+	
+Cook0_NoJar	move.w	#-2,D0
+	RTS
+		
+; /// COOK  1 : COOK_JARCHECK ///
+; Return : D0.l = 0 if "NULL" Cookie not installed
+;                -1 if No Jar Found
+;                 else [Size.w][Free.w]
+;
+; Used Registers : D0-2/A0
+
+Cook_JarCheck	;  8 WORD : - COOK_JARCHECK - (1)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook11_NoJar	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook1_NoNull	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+	
+Cook1_LastLookFor	move.l	(A0,D2*8),D0
+	BEQ	Cook1_LastFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook1_LastLookFor
+	
+	BRA	Cook1_NoJar
+	
+Cook1_LastFound	addq.l	#1,D1	; Free
+	
+	move.l	(4,A0),D0	; Size
+	swap	D0
+	move.w	D1,D0	; Free
+
+	RTS
+
+Cook1_NoNull	clr.l	D0
+	RTS
+	
+Cook1_NoJar	move.l	#-1,D0
+	RTS
+
+; /// COOK  2 : COOK_FIND ///
+; LONG : CookieName
+; Return : D0.l = Result of CookieLookup
+;                -1 : Not Found, No Jar or "NULL" Cookie not installed
+;                else the CookieParam
+;
+; Used Registers : D0-2/A0
+
+Cook_Find	; 10 LONG : CookieName
+	;  8 WORD : - COOK_FIND - (2)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook2_Error	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook2_Error	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	
+	move.l	(10,SP),D0	; CookieName
+	clr.l	D2
+	
+Cook2_CookieLookFor	cmp.l	(A0,D2*8),D0
+	BEQ	Cook2_CookieFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook2_CookieLookFor	; BPL car LONG
+	
+Cook2_Error	move.l	#-1,D0
+	RTS
+
+Cook2_CookieFound	move.l	(4,A0,D2*8),D0
+	RTS
+
+; /// COOK  3 : COOK_ADD ///
+; LONG : CookieName
+; LONG : CookieParam
+; Return : D0.w = Result of Cookie Installation
+;                 0 : Well Done
+;                -1 : No more place, or "NULL" Cookie not installed
+;                -2 : Already Done
+;
+; Used Registers : D0-2/A0
+
+Cook_Add	; 14 LONG : CookieName
+	; 10 LONG : CookieParam
+	;  8 WORD : - COOK_ADD - (3)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+	
+	move.w	#1,-(SP)	; - COOK_JARCHECK -
+	move.w	(8,SP),-(SP)	; *** COOKFACT ***
+	trap	#3
+	addq.l	#4,SP
+	
+	tst.l	D0	; No "NULL"
+	BEQ	Cook3_NoMorePlace
+	
+	cmpi.l	#-1,D0	; No Jar
+	BEQ	Cook3_NoMorePlace
+	
+	tst.w	D0	; Any Free
+	BEQ	Cook3_NoMorePlace
+	
+	move.l	(14,SP),-(SP)	; CookieName
+	move.w	#2,-(SP)	; - COOK_FIND -
+	move.w	(12,SP),-(SP)	; *** COOKFACT ***
+	trap	#3
+	addq.l	#8,SP
+	
+	cmpi.l	#-1,D0	; Not Found, No Jar, nor "NULL"
+	BNE	Cook3_AlreadyDone
+	
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook3_NoMorePlace	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook3_NoMorePlace	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+
+Cook3_LastLookFor	move.l	(A0,D2*8),D0
+	BEQ	Cook3_LastFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook3_LastLookFor
+	
+	BRA	Cook3_NoMorePlace
+	
+Cook3_LastFound	clr.l	(8,A0,D2*8)	; "" (Null)
+	move.l	(4,A0),(12,A0,D2*8)	; JarSize
+	move.l	(20,SP),(A0,D2*8)	; CookieName
+	move.l	(16,SP),(4,A0,D2*8)	; CookieParam
+	
+	clr.w	D0
+	RTS
+
+Cook3_NoMorePlace	move.w	#-1,D0
+	RTS
+	
+Cook3_AlreadyDone	move.w	#-2,D0
+	RTS
+
+; /// COOK  4 : COOK_CHANGE ///
+; LONG : CookieName
+; LONG : NewCookieParam
+; Return : D0.w = Result of CookieParamChange
+;                 0 : Well Done
+;                -1 : Not Found
+;
+; Used Registers : D0-2/A0
+
+Cook_Change	; 14 LONG : CookieName
+	; 10 LONG : NewCookieParam
+	;  8 WORD : - COOK_CHANGE - (4)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook4_NotFound	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+	
+	move.l	(14,SP),D0	; CookieName
+	
+Cook4_CookieLookFor	cmp.l	(A0,D2*8),D0
+	BEQ	Cook4_CookieFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook4_CookieLookFor	; BPL car LONG
+	
+Cook4_NotFound	move.w	#-1,D0
+	RTS
+	
+Cook4_CookieFound	move.l	(10,SP),(4,A0,D2*8)	; CookieParam
+
+	clr.w	D0
+	RTS
+
+; /// COOK  5 : Non D‚finit ///
+
+UnDefCOOK5	;  8 WORD : - COOK_ - (5)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// COOK  6 : Non D‚finit ///
+
+UnDefCOOK6	;  8 WORD : - COOK_ - (6)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// COOK  7 : Non D‚finit ///
+
+UnDefCOOK7	;  8 WORD : - COOK_ - (7)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+
+	RTS
+
+; /// COOK  8 : Non D‚finit ///
+
+UnDefCOOK8	;  8 WORD : - COOK_ - (8)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// COOK  9 : Non D‚finit ///
+
+UnDefCOOK9	;  8 WORD : - COOK_ - (9)
+	;  6 WORD : *** COOKFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+

@@ -1,0 +1,29 @@
+/// Regles de pr‚sentation pour un programme en AUTO //////////////////////////
+
+Afin d'avoir quelque chose de propre … l'‚cran lors du Boot, il sagit de:
+
+1- Passez … la ligne 1x pour s‚parer votre Titre du programme pr‚c‚dent
+2- Ecrire sur la premiere ligne, en vid‚o inverse:
+   "Le Titre du Logiciel - Sa Version - Son Programmeur - Sa Date d'Assemblage"
+   Par exemple, pour SSAVCALL: SSAVCALL  2.54 - KOSS Prod  (06/01/99)
+   Limitez le titre … 40 caractŠres pour les boot en basse r‚solution.
+3- Ecrire les informations utiles au logiciel
+   Utilisez le nombre de lignes dont vous avez besoin, pas de limitation
+   > Il est de regle, si l'on veut avoir une Configuration par d‚faut, ou si
+     l'on veut controler l'Initialisation de son programme, de v‚rifier si la
+     touche [Control] est enfonc‚e ou non.
+4- Terminer par une ligne "TKR" avec:
+   - 0 si l'on ne garde rien en m‚moire
+   - La taille du code gard‚ en m‚moire le cas ‚ch‚ant
+   Par exemple "TKR: Keep 0 byte in memory."
+            ou "TKR: Keep 21865 bytes in memory."
+   Notez la mise au pluriel de "byte" si la taille n'est pas nulle...
+   > Il est de regle de v‚rifier l'‚tat de la touche [L-Shift] pour savoir si
+     l'on garde le programme en m‚moire, ou si l'on abandonne toute tentative
+     d'installation si la touche est enfonc‚e.
+     Il faut donc v‚rifier cela avant la phase 3-.
+
+La fonction - PROG_BOOTER - fait tout cela. Voyez le fichier PRG-CTRL.FRA. Pour
+l'utiliser dans vos programmes Boot, il est donc souhaitable de placer SSAVCALL
+le plus haut possible dans la liste des programmes en AUTO. Utilisez AUTOSORT
+(inclus) pour cela...

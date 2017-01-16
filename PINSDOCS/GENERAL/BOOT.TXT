@@ -1,0 +1,3 @@
+Au Boot :
+[Control] - Configuration Minimale
+[L-Shift] - Annuler Installation

@@ -1,0 +1,113 @@
+/// SSAVINIT.SS - SSAVCALL User's Init ////////////////////////////////////////
+
+  SSAVINIT.SS est un d‚but de programme tel qu'ils devraient etre ‚crit pour
+utiliser SSAVCALL de fa‡on optimale. Voici donc ce qu'il se passe
+
+       D‚but : *** SECTION TEXT ***
+
+               Ne modifiez JAMAIS les premiŠres lignes. C'est trŠs important
+               car la fonction - PROG_INIT - d‚termine comment est d‚marr‚ le
+               programme suivant l'‚tat de certains registres. Les modifier
+               ferait invariablement planter SSAVCALL...
+
+               Passage par - PROG_INIT -
+
+               L…, il se passe plusieures choses...
+               - Soit l'ATARI est en Phase de BOOT :
+,------------------La routine CONTINUE … l'adresse BOOT_Start.
+|                  La routine n'est pas execut‚e si vous avez mis -1 … la
+|                    place de l'adresse de la routine BOOT_Start.
+|                    > ATTENTION … ce moment l… <
+|
+|              - Soit l'ATARI charge les Accessoires :
+| ,----------------La routine CONTINUE … l'adresse ACC_Start.
+| |                La routine affiche un formulaire "Boot Only" avant mˆme que
+| |                  le Bureau ne soit affich‚, puis termine le chargement des
+| |                  Accessoires et l'initialisation du Bureau...
+| |                  > ATTENTION : A ce moment, seul le Bureau est actif; … la
+| |                    moindre tentative d'execution de programme l'ATARI
+| |                    plantera... <
+| |
+| |            - Soit l'ATARI est sous le Bureau :
+| | ,--------------La routine CONTINUE … l'adresse GEM_Start.
+| | |              La routine affiche un formulaire "Boot Only", puis quitte
+| | |              proprement et retourne au Bureau...
+| | |
+| | |          Il est conseill‚ qu'en cas de Phase de BOOT non execut‚e, de
+| | |          sortir imm‚diatement pour que les autres programmes puissent
+| | |          s'installer.
+| | |
+| | |    Fin : - P_TERM0 -
+| | |
+| | | -------------------------------------------------------------------------
+| | |
+'-+-+-> BOOT_Start       Si vous d‚cidez d'installer des Routines lors de la
+  | |                  Phase de BOOT, je vous conseille tout particuliŠrement
+  | |                  la recette du Chef, la Fonction - PROG_BOOTER -,
+  | |                  particuliŠrement adapt‚e.
+  | |                    Elle affiche votre Titre en vid‚o inverse en ayant
+  | |                  pris le soin d'y placer la Version de votre programme,
+  | |                  ainsi que sa Date.
+  | |                    Ensuite, elle saute … une Sous-Routine o— vous
+  | |                  installerez (grace encore … l'aide de SSAVCALL) ce qui
+  | |                  doit l'ˆtre (Prog_Booting, voyez plus bas).
+  | |                    Enfin, au retour de cette Sous-Routine la fonction
+  | |                  terminera en affichant une ligne TKR sur la taille de
+  | |                  m‚moire (‚ventuellement) r‚serv‚e, et la r‚servera avant
+  | |                  de continuer la Phase de BOOT.
+  | |
+  '-+-> ACC_Start        Si votre programme doit se comporter en Accessoire,
+    |                  utilisez accessoirement la fonction - PROG_ACCESSORY -
+    |                  qui s'occupera entiŠrement de gerer votre programme en
+    |                  Accessoire. A partir de ce moment, jamais il ne se
+    |                  terminera, et pourra ˆtre appel‚ … tout moment.
+    |                    Vous pouvez r‚utiliser la mˆme Ressource que si votre
+    |                  programme avait ‚t‚ execut‚ depuis le Bureau, … la seule
+    |                  grande diff‚rence que les Menus ‚ventuellement cr‚es
+    |                  pour une utilisation depuis le Bureau ne seront JAMAIS
+    |                  utilis‚s.
+    |
+    '-> GEM_Start        Si votre programme doit se comporter convenablement
+                       sur le Bureau, je vous recommande la fonction
+                       - PROG_GLARINGEM - qui s'occupera entiŠrement de votre
+                       Interface.
+
+Prog_Booting           Sous-Routine de l'installation de vos Routines...
+                       - Utilisez les Fonctions - COOK_ - pour installer des
+                         Cookies dans la CookieJar.
+                       - Utilisez les Fonctions - XBRA_ - pour installer des
+                         d‚tournements de Vecteurs (Prog_XBRA, voyez plus bas).
+                       - Utilisez les Fonctions - CONF_ - si vous avez besoin
+                         d'un Fichier de Configuration.
+
+Prog_XBRA              Un XBRA tout prŠs … l'emploi. N'utilisez JAMAIS de
+                       LongXBRA...
+
+SSAV_NotInstalled        Si SSAVCALL n'est pas en m‚moire, cette Routine est
+                       execut‚e. Voici ce qu'elle fait :
+                       - Elle affiche un petit Message
+                       - Attend une touche quelconque
+                       - Sort proprement (fonctionne en BOOT, ACC et GEM)
+
+               *** SECTION DATA ***
+
+PROG_Info      Des informations sur la Version et la Date de votre programme.
+
+PROG_Title     Le Titre de votre programme. ATTENTION … ne pas d‚passer 40
+               caractŠres, le NULL (0) compris.
+               N'est utile qu'… la Fonction - PROG_BOOTER -...
+
+SSAV_InitError Au Cas o— SSAVCALL n'est pas en m‚moire, voici le Message
+               affich‚ par la Routine SSAV_NotInstalled (voir juste plus haut).
+
+               *** SECTION BSS ***
+
+SSAV_Adr       L'adresse de SSAVCALL. Sera utilis‚ … CHAQUE APPEL … une
+               Fonction de SSAVCALL. PAS TOUCHE !
+
+AccStack       La Pile par d‚faut au cas o— votre programme soit execut‚ en
+               temps qu'Accessoire. Si BOOT ou GEM, sera en plus de la Pile
+               r‚serv‚e par - PROG_INIT - . DOIT TOUJOURS etre en DERNIER, et
+               TOUJOURS LA, alors PAS TOUCHE !
+
+Voil…, vous savez … pr‚sent ce qu'il se passe lorsque vous utilisez SSAVINIT.SS

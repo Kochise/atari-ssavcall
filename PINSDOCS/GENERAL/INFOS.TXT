@@ -1,0 +1,8 @@
+ATTENTION : Comme vous devriez tous le faire, c'est utiliser les registres
+            hauts (comme D7-D4/A6-A3) en priorit‚, car le systŠme
+            d'exploitation utilise et ‚crase les registres bas (comme D0 pour
+            les r‚ponses, ainsi que A0-A2).
+            A l'image du systeme d'exploitation, cette partie de SSAVCALL
+            utilise les registres bas D0-D2/A0-A2. Evitez donc de les utiliser
+            lors de vos programmes avant d'utiliser SSAVCALL, car vos donn‚es
+            seront ‚cras‚es par celle de SSAV.

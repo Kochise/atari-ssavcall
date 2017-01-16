@@ -1,0 +1,18 @@
+; /// SSAVCALL Project - Sort Manager - KOSS 1999 ///
+
+	dc.b	"ðSPI"	; Plug-In Signature
+	dc.b	"SSAV"	; Plug-In Valid
+	dc.b	"SRT-MANA"	; Plug-In Name
+	ds.w	1	; Plug-In Number	
+	ds.l	1	; Plug-In Next
+	ds.l	1	; Plug-In FuncList
+	dc.l	-1	; Plug-In Boot
+	dc.l	-1	; Plug-In Code
+	dc.l	SORT_Jump	; Plug-In JumpTable
+	dc.w	0	; Plug-In Minimal
+	dc.w	9	; Plug-In Maximal
+	dc.l	-1	; Plug-In Public
+	dc.l	-1	; Plug-In Private
+	dc.w	$100	; Plug-In Version
+	dc.w	$0	; Plug-In Date
+	dc.l	"KOSS",0	; Plug-In Author
