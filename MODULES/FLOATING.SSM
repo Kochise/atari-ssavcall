@@ -1,0 +1,4783 @@
+; /// AES  60 X : CONV_DISPNUM (Routine brute, ne fonctionne pas sans SSAVCALL) ///
+
+	move.w	(24,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1		; Au dessus de NUM 31, y'a rien
+	lea	NUM_JUMP(PC),A2		; Zouh...
+	JMP	(A2,D0.w*4)		; Un BRA prend 4 OCTETs
+	RTS
+
+NUM_JUMP	BRA	SB_BUS
+	BRA	SB_BS
+	BRA	SB_WUS
+	BRA	SB_WS
+	BRA	UnDefS4
+	BRA	UnDefS5
+	BRA	SB_LUS
+	BRA	SB_LS
+	BRA	UnDefS8
+	BRA	UnDefS9
+	BRA	SF_Single
+	BRA	SF_Double
+	BRA	SF_Extended
+	BRA	SF_Packed
+	BRA	UnDefS14
+	BRA	UnDefS15
+	BRA	UnDefS16
+	BRA	UnDefS17
+	BRA	SA_DUS
+	BRA	SA_DS
+	BRA	SA_OUS
+	BRA	SA_OS
+	BRA	SA_HUS
+	BRA	SA_HS
+	BRA	SA_B
+	BRA	UnDefS25
+	BRA	SA_FMin
+	BRA	SA_FMaj
+	BRA	SU_BUS
+	BRA	SU_BS
+	BRA	UnDefS30
+	BRA	UnDefS31
+	
+; /// NUM  0 : Source Binaire, BYTE non sign‚ ///
+
+SB_BUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM0_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM0_JUMP	BRA	NUMError1
+	BRA	NUM0_DB_BS
+	BRA	NUM0_DB_WUS
+	BRA	NUM0_DB_WS
+	BRA	NUM0_UnDefD4
+	BRA	NUM0_UnDefD5
+	BRA	NUM0_DB_LUS
+	BRA	NUM0_DB_LS
+	BRA	NUM0_UnDefD8
+	BRA	NUM0_UnDefD9
+	BRA	NUM0_DF_S
+	BRA	NUM0_DF_D
+	BRA	NUM0_DF_E
+	BRA	NUM0_DF_P
+	BRA	NUM0_UnDefD14
+	BRA	NUM0_UnDefD15
+	BRA	NUM0_UnDefD16
+	BRA	NUM0_UnDefD17
+	BRA	NUM0_DA_DUS
+	BRA	NUM0_DA_DS
+	BRA	NUM0_DA_OUS
+	BRA	NUM0_DA_OS
+	BRA	NUM0_DA_HUS
+	BRA	NUM0_DA_HS
+	BRA	NUM0_DA_B
+	BRA	NUM0_UnDefD25
+	BRA	NUM0_DA_FMin
+	BRA	NUM0_DA_FMaj
+	BRA	NUM0_DU_BUS
+	BRA	NUM0_DU_BS
+	BRA	NUM0_UnDefD30
+	BRA	NUM0_UnDefD31
+
+; /// NUM  0 : Destination Binaire, BYTE sign‚ ///
+
+NUM0_DB_BS	
+	RTS
+
+; /// NUM  0 : Destination Binaire, WORD non sign‚ ///
+
+NUM0_DB_WUS	
+	RTS
+
+; /// NUM  0 : Destination Binaire, WORD sign‚ ///
+
+NUM0_DB_WS	
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD4
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD5
+	RTS
+
+; /// NUM  0 : Destination Binaire, LONG non sign‚ ///
+
+NUM0_DB_LUS	
+	RTS
+
+; /// NUM  0 : Destination Binaire, LONG sign‚ ///
+
+NUM0_DB_LS	
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD8
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD9
+	RTS
+
+; /// NUM  0 : Destination Flottante, Single ///
+
+NUM0_DF_S
+	RTS
+
+; /// NUM  0 : Destination Flottante, Double ///
+
+NUM0_DF_D
+	RTS
+
+; /// NUM  0 : Destination Flottante, Extended ///
+
+NUM0_DF_E
+	RTS
+
+; /// NUM  0 : Destination Flottante, Packed ///
+
+NUM0_DF_P
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD14
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD15
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD16
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD17
+	RTS
+
+; /// NUM  0 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM0_DA_DUS
+	RTS
+
+; /// NUM  0 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM0_DA_DS
+	RTS
+
+; /// NUM  0 : Destination ASCII, Octal non sign‚ ///
+
+NUM0_DA_OUS
+	RTS
+
+; /// NUM  0 : Destination ASCII, Octal sign‚ ///
+
+NUM0_DA_OS
+	RTS
+
+; /// NUM  0 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM0_DA_HUS	
+	RTS
+
+; /// NUM  0 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM0_DA_HS	
+	RTS
+
+; /// NUM  0 : Destination ASCII, Binaire ///
+
+NUM0_DA_B	
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD25
+	RTS
+
+; /// NUM  0 : Destination ASCII, Flottant Minuscule ///
+
+NUM0_DA_FMin
+	RTS
+
+; /// NUM  0 : Destination ASCII, Flottant Majuscule ///
+
+NUM0_DA_FMaj
+	RTS
+
+; /// NUM  0 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM0_DU_BUS	
+	RTS
+
+; /// NUM  0 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM0_DU_BS	
+	RTS
+
+; /// NUM  0 : Non d‚finit ///
+
+NUM0_UnDefD30
+	RTS
+
+; /// NUM  0 : Non d‚finit
+
+NUM0_UnDefD31
+	RTS	
+
+; /// NUM  1 : Source Binaire, BYTE sign‚ ///
+
+SB_BS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM1_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM1_JUMP	BRA	NUM1_DB_BUS
+	BRA	NUMError1
+	BRA	NUM1_DB_WUS
+	BRA	NUM1_DB_WS
+	BRA	NUM1_UnDefD4
+	BRA	NUM1_UnDefD5
+	BRA	NUM1_DB_LUS
+	BRA	NUM1_DB_LS
+	BRA	NUM1_UnDefD8
+	BRA	NUM1_UnDefD9
+	BRA	NUM1_DF_S
+	BRA	NUM1_DF_D
+	BRA	NUM1_DF_E
+	BRA	NUM1_DF_P
+	BRA	NUM1_UnDefD14
+	BRA	NUM1_UnDefD15
+	BRA	NUM1_UnDefD16
+	BRA	NUM1_UnDefD17
+	BRA	NUM1_DA_DUS
+	BRA	NUM1_DA_DS
+	BRA	NUM1_DA_OUS
+	BRA	NUM1_DA_OS
+	BRA	NUM1_DA_HUS
+	BRA	NUM1_DA_HS
+	BRA	NUM1_DA_B
+	BRA	NUM1_UnDefD25
+	BRA	NUM1_DA_FMin
+	BRA	NUM1_DA_FMaj
+	BRA	NUM1_DU_BUS
+	BRA	NUM1_DU_BS
+	BRA	NUM1_UnDefD30
+	BRA	NUM1_UnDefD31
+
+; /// NUM  1 : Destination Binaire, BYTE non sign‚ ///
+
+NUM1_DB_BUS	
+	RTS
+
+; /// NUM  1 : Destination Binaire, WORD non sign‚ ///
+
+NUM1_DB_WUS	
+	RTS
+
+; /// NUM  1 : Destination Binaire, WORD sign‚ ///
+
+NUM1_DB_WS	
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD4
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD5
+	RTS
+
+; /// NUM  1 : Destination Binaire, LONG non sign‚ ///
+
+NUM1_DB_LUS	
+	RTS
+
+; /// NUM  1 : Destination Binaire, LONG sign‚ ///
+
+NUM1_DB_LS	
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD8
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD9
+	RTS
+
+; /// NUM  1 : Destination Flottante, Single ///
+
+NUM1_DF_S
+	RTS
+
+; /// NUM  1 : Destination Flottante, Double ///
+
+NUM1_DF_D
+	RTS
+
+; /// NUM  1 : Destination Flottante, Extended ///
+
+NUM1_DF_E
+	RTS
+
+; /// NUM  1 : Destination Flottante, Packed ///
+
+NUM1_DF_P
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD14
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD15
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD16
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD17
+	RTS
+
+; /// NUM  1 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM1_DA_DUS
+	RTS
+
+; /// NUM  1 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM1_DA_DS
+	RTS
+
+; /// NUM  1 : Destination ASCII, Octal non sign‚ ///
+
+NUM1_DA_OUS
+	RTS
+
+; /// NUM  1 : Destination ASCII, Octal sign‚ ///
+
+NUM1_DA_OS
+	RTS
+
+; /// NUM  1 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM1_DA_HUS	
+	RTS
+
+; /// NUM  1 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM1_DA_HS	
+	RTS
+
+; /// NUM  1 : Destination ASCII, Binaire ///
+
+NUM1_DA_B
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD25
+	RTS
+
+; /// NUM  1 : Destination ASCII, Flottant Minuscule ///
+
+NUM1_DA_FMin
+	RTS
+
+; /// NUM  1 : Destination ASCII, Flottant Majuscule ///
+
+NUM1_DA_FMaj
+	RTS
+
+; /// NUM  1 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM1_DU_BUS	
+	RTS
+
+; /// NUM  1 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM1_DU_BS	
+	RTS
+
+; /// NUM  1 : Non d‚finit ///
+
+NUM1_UnDefD30
+	RTS
+
+; /// NUM  1 : Non d‚finit
+
+NUM1_UnDefD31
+	RTS	
+
+; /// NUM  2 : Source Binaire, WORD non sign‚ ///
+
+SB_WUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM2_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM2_JUMP	BRA	NUM2_DB_BUS
+	BRA	NUM2_DB_BS
+	BRA	NUMError1
+	BRA	NUM2_DB_WS
+	BRA	NUM2_UnDefD4
+	BRA	NUM2_UnDefD5
+	BRA	NUM2_DB_LUS
+	BRA	NUM2_DB_LS
+	BRA	NUM2_UnDefD8
+	BRA	NUM2_UnDefD9
+	BRA	NUM2_DF_S
+	BRA	NUM2_DF_D
+	BRA	NUM2_DF_E
+	BRA	NUM2_DF_P
+	BRA	NUM2_UnDefD14
+	BRA	NUM2_UnDefD15
+	BRA	NUM2_UnDefD16
+	BRA	NUM2_UnDefD17
+	BRA	NUM2_DA_DUS
+	BRA	NUM2_DA_DS
+	BRA	NUM2_DA_OUS
+	BRA	NUM2_DA_OS
+	BRA	NUM2_DA_HUS
+	BRA	NUM2_DA_HS
+	BRA	NUM2_DA_B
+	BRA	NUM2_UnDefD25
+	BRA	NUM2_DA_FMin
+	BRA	NUM2_DA_FMaj
+	BRA	NUM2_DU_BUS
+	BRA	NUM2_DU_BS
+	BRA	NUM2_UnDefD30
+	BRA	NUM2_UnDefD31
+
+; /// NUM  2 : Destination Binaire, BYTE non sign‚
+
+NUM2_DB_BUS	
+	RTS
+
+; /// NUM  2 : Destination Binaire, BYTE sign‚ ///
+
+NUM2_DB_BS	
+	RTS
+
+; /// NUM  2 : Destination Binaire, WORD sign‚ ///
+
+NUM2_DB_WS	
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD4
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD5
+	RTS
+
+; /// NUM  2 : Destination Binaire, LONG non sign‚ ///
+
+NUM2_DB_LUS	
+	RTS
+
+; /// NUM  2 : Destination Binaire, LONG sign‚ ///
+
+NUM2_DB_LS	
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD8
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD9
+	RTS
+
+; /// NUM  2 : Destination Flottante, Single ///
+
+NUM2_DF_S
+	RTS
+
+; /// NUM  2 : Destination Flottante, Double ///
+
+NUM2_DF_D
+	RTS
+
+; /// NUM  2 : Destination Flottante, Extended ///
+
+NUM2_DF_E
+	RTS
+
+; /// NUM  2 : Destination Flottante, Packed ///
+
+NUM2_DF_P
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD14
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD15
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD16
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD17
+	RTS
+
+; /// NUM  2 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM2_DA_DUS
+	RTS
+
+; /// NUM  2 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM2_DA_DS
+	RTS
+
+; /// NUM  2 : Destination ASCII, Octal non sign‚ ///
+
+NUM2_DA_OUS
+	RTS
+
+; /// NUM  2 : Destination ASCII, Octal sign‚ ///
+
+NUM2_DA_OS
+	RTS
+
+; /// NUM  2 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM2_DA_HUS	
+	RTS
+
+; /// NUM  2 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM2_DA_HS	
+	RTS
+
+; /// NUM  2 : Destination ASCII, Binaire ///
+
+NUM2_DA_B	
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD25
+	RTS
+
+; /// NUM  2 : Destination ASCII, Flottant Minuscule ///
+
+NUM2_DA_FMin
+	RTS
+
+; /// NUM  2 : Destination ASCII, Flottant Majuscule ///
+
+NUM2_DA_FMaj
+	RTS
+
+; /// NUM  2 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM2_DU_BUS	
+	RTS
+
+; /// NUM  2 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM2_DU_BS	
+	RTS
+
+; /// NUM  2 : Non d‚finit ///
+
+NUM2_UnDefD30
+	RTS
+
+; /// NUM  2 : Non d‚finit
+
+NUM2_UnDefD31
+	RTS	
+
+; /// NUM  3 : Source Binaire, WORD sign‚ ///
+
+SB_WS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM3_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM3_JUMP	BRA	NUM3_DB_BUS
+	BRA	NUM3_DB_BS
+	BRA	NUM3_DB_WUS
+	BRA	NUMError1
+	BRA	NUM3_UnDefD4
+	BRA	NUM3_UnDefD5
+	BRA	NUM3_DB_LUS
+	BRA	NUM3_DB_LS
+	BRA	NUM3_UnDefD8
+	BRA	NUM3_UnDefD9
+	BRA	NUM3_DF_S
+	BRA	NUM3_DF_D
+	BRA	NUM3_DF_E
+	BRA	NUM3_DF_P
+	BRA	NUM3_UnDefD14
+	BRA	NUM3_UnDefD15
+	BRA	NUM3_UnDefD16
+	BRA	NUM3_UnDefD17
+	BRA	NUM3_DA_DUS
+	BRA	NUM3_DA_DS
+	BRA	NUM3_DA_OUS
+	BRA	NUM3_DA_OS
+	BRA	NUM3_DA_HUS
+	BRA	NUM3_DA_HS
+	BRA	NUM3_DA_B
+	BRA	NUM3_UnDefD25
+	BRA	NUM3_DA_FMin
+	BRA	NUM3_DA_FMaj
+	BRA	NUM3_DU_BUS
+	BRA	NUM3_DU_BS
+	BRA	NUM3_UnDefD30
+	BRA	NUM3_UnDefD31
+
+; /// NUM  3 : Destination Binaire, BYTE non sign‚
+
+NUM3_DB_BUS	
+	RTS
+
+; /// NUM  3 : Destination Binaire, BYTE sign‚ ///
+
+NUM3_DB_BS	
+	RTS
+
+; /// NUM  3 : Destination Binaire, WORD non sign‚ ///
+
+NUM3_DB_WUS	
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD4
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD5
+	RTS
+
+; /// NUM  3 : Destination Binaire, LONG non sign‚ ///
+
+NUM3_DB_LUS	
+	RTS
+
+; /// NUM  3 : Destination Binaire, LONG sign‚ ///
+
+NUM3_DB_LS	
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD8
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD9
+	RTS
+
+; /// NUM  3 : Destination Flottante, Single ///
+
+NUM3_DF_S
+	RTS
+
+; /// NUM  3 : Destination Flottante, Double ///
+
+NUM3_DF_D
+	RTS
+
+; /// NUM  3 : Destination Flottante, Extended ///
+
+NUM3_DF_E
+	RTS
+
+; /// NUM  3 : Destination Flottante, Packed ///
+
+NUM3_DF_P
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD14
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD15
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD16
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD17
+	RTS
+
+; /// NUM  3 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM3_DA_DUS
+	RTS
+
+; /// NUM  3 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM3_DA_DS
+	RTS
+
+; /// NUM  3 : Destination ASCII, Octal non sign‚ ///
+
+NUM3_DA_OUS
+	RTS
+
+; /// NUM  3 : Destination ASCII, Octal sign‚ ///
+
+NUM3_DA_OS
+	RTS
+
+; /// NUM  3 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM3_DA_HUS	
+	RTS
+
+; /// NUM  3 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM3_DA_HS	
+	RTS
+
+; /// NUM  3 : Destination ASCII, Binaire ///
+
+NUM3_DA_B	
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD25
+	RTS
+
+; /// NUM  3 : Destination ASCII, Flottant Minuscule ///
+
+NUM3_DA_FMin
+	RTS
+
+; /// NUM  3 : Destination ASCII, Flottant Majuscule ///
+
+NUM3_DA_FMaj
+	RTS
+
+; /// NUM  3 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM3_DU_BUS	
+	RTS
+
+; /// NUM  3 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM3_DU_BS	
+	RTS
+
+; /// NUM  3 : Non d‚finit ///
+
+NUM3_UnDefD30
+	RTS
+
+; /// NUM  3 : Non d‚finit
+
+NUM3_UnDefD31
+	RTS	
+
+; /// NUM  4 : Non d‚finit ///
+
+UnDefS4	
+	RTS
+
+; /// NUM  5 : Non d‚finit ///
+
+UnDefS5	
+	RTS
+
+; /// NUM  6 : Source Binaire, LONG non sign‚ ///
+
+SB_LUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM6_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM6_JUMP	BRA	NUM6_DB_BUS
+	BRA	NUM6_DB_BS
+	BRA	NUM6_DB_WUS
+	BRA	NUM6_DB_WS
+	BRA	NUM6_UnDefD4
+	BRA	NUM6_UnDefD5
+	BRA	NUMError1
+	BRA	NUM6_DB_LS
+	BRA	NUM6_UnDefD8
+	BRA	NUM6_UnDefD9
+	BRA	NUM6_DF_S
+	BRA	NUM6_DF_D
+	BRA	NUM6_DF_E
+	BRA	NUM6_DF_P
+	BRA	NUM6_UnDefD14
+	BRA	NUM6_UnDefD15
+	BRA	NUM6_UnDefD16
+	BRA	NUM6_UnDefD17
+	BRA	NUM6_DA_DUS
+	BRA	NUM6_DA_DS
+	BRA	NUM6_DA_OUS
+	BRA	NUM6_DA_OS
+	BRA	NUM6_DA_HUS
+	BRA	NUM6_DA_HS
+	BRA	NUM6_DA_B
+	BRA	NUM6_UnDefD25
+	BRA	NUM6_DA_FMin
+	BRA	NUM6_DA_FMaj
+	BRA	NUM6_DU_BUS
+	BRA	NUM6_DU_BS
+	BRA	NUM6_UnDefD30
+	BRA	NUM6_UnDefD31
+
+; /// NUM  6 : Destination Binaire, BYTE non sign‚
+
+NUM6_DB_BUS	
+	RTS
+
+; /// NUM  6 : Destination Binaire, BYTE sign‚ ///
+
+NUM6_DB_BS	
+	RTS
+
+; /// NUM  6 : Destination Binaire, WORD non sign‚ ///
+
+NUM6_DB_WUS	
+	RTS
+
+; /// NUM  6 : Destination Binaire, WORD sign‚ ///
+
+NUM6_DB_WS	
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD4	
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD5
+	RTS
+
+; /// NUM  6 : Destination Binaire, LONG sign‚ ///
+
+NUM6_DB_LS	
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD8
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD9
+	RTS
+
+; /// NUM  6 : Destination Flottante, Single ///
+
+NUM6_DF_S
+	RTS
+
+; /// NUM  6 : Destination Flottante, Double ///
+
+NUM6_DF_D
+	RTS
+
+; /// NUM  6 : Destination Flottante, Extended ///
+
+NUM6_DF_E
+	RTS
+
+; /// NUM  6 : Destination Flottante, Packed ///
+
+NUM6_DF_P
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD14
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD15
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD16
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD17
+	RTS
+
+; /// NUM  6 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM6_DA_DUS
+	RTS
+
+; /// NUM  6 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM6_DA_DS
+	RTS
+
+; /// NUM  6 : Destination ASCII, Octal non sign‚ ///
+
+NUM6_DA_OUS
+	RTS
+
+; /// NUM  6 : Destination ASCII, Octal sign‚ ///
+
+NUM6_DA_OS
+	RTS
+
+; /// NUM  6 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM6_DA_HUS	
+	RTS
+
+; /// NUM  6 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM6_DA_HS	
+	RTS
+
+; /// NUM  6 : Destination ASCII, Binaire ///
+
+NUM6_DA_B	
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD25
+	RTS
+
+; /// NUM  6 : Destination ASCII, Flottant Minuscule ///
+
+NUM6_DA_FMin
+	RTS
+
+; /// NUM  6 : Destination ASCII, Flottant Majuscule ///
+
+NUM6_DA_FMaj
+	RTS
+
+; /// NUM  6 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM6_DU_BUS	
+	RTS
+
+; /// NUM  6 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM6_DU_BS	
+	RTS
+
+; /// NUM  6 : Non d‚finit ///
+
+NUM6_UnDefD30
+	RTS
+
+; /// NUM  6 : Non d‚finit
+
+NUM6_UnDefD31
+	RTS	
+
+; /// NUM  7 : Source Binaire, LONG sign‚ ///
+
+SB_LS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM7_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM7_JUMP	BRA	NUM7_DB_BUS
+	BRA	NUM7_DB_BS
+	BRA	NUM7_DB_WUS
+	BRA	NUM7_DB_WS
+	BRA	NUM7_UnDefD4
+	BRA	NUM7_UnDefD5
+	BRA	NUM7_DB_LUS
+	BRA	NUMError1
+	BRA	NUM7_UnDefD8
+	BRA	NUM7_UnDefD9
+	BRA	NUM7_DF_S
+	BRA	NUM7_DF_D
+	BRA	NUM7_DF_E
+	BRA	NUM7_DF_P
+	BRA	NUM7_UnDefD14
+	BRA	NUM7_UnDefD15
+	BRA	NUM7_UnDefD16
+	BRA	NUM7_UnDefD17
+	BRA	NUM7_DA_DUS
+	BRA	NUM7_DA_DS
+	BRA	NUM7_DA_OUS
+	BRA	NUM7_DA_OS
+	BRA	NUM7_DA_HUS
+	BRA	NUM7_DA_HS
+	BRA	NUM7_DA_B
+	BRA	NUM7_UnDefD25
+	BRA	NUM7_DA_FMin
+	BRA	NUM7_DA_FMaj
+	BRA	NUM7_DU_BUS
+	BRA	NUM7_DU_BS
+	BRA	NUM7_UnDefD30
+	BRA	NUM7_UnDefD31
+
+; /// NUM  7 : Destination Binaire, BYTE non sign‚
+
+NUM7_DB_BUS	
+	RTS
+
+; /// NUM  7 : Destination Binaire, BYTE sign‚ ///
+
+NUM7_DB_BS	
+	RTS
+
+; /// NUM  7 : Destination Binaire, WORD non sign‚ ///
+
+NUM7_DB_WUS	
+	RTS
+
+; /// NUM  7 : Destination Binaire, WORD sign‚ ///
+
+NUM7_DB_WS	
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD4
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD5
+	RTS
+
+; /// NUM  7 : Destination Binaire, LONG non sign‚ ///
+
+NUM7_DB_LUS	
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD8
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD9
+	RTS
+
+; /// NUM  7 : Destination Flottante, Single ///
+
+NUM7_DF_S
+	RTS
+
+; /// NUM  7 : Destination Flottante, Double ///
+
+NUM7_DF_D
+	RTS
+
+; /// NUM  7 : Destination Flottante, Extended ///
+
+NUM7_DF_E
+	RTS
+
+; /// NUM  7 : Destination Flottante, Packed ///
+
+NUM7_DF_P
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD14
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD15
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD16
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD17
+	RTS
+
+; /// NUM  7 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM7_DA_DUS
+	RTS
+
+; /// NUM  7 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM7_DA_DS
+	RTS
+
+; /// NUM  7 : Destination ASCII, Octal non sign‚ ///
+
+NUM7_DA_OUS
+	RTS
+
+; /// NUM  7 : Destination ASCII, Octal sign‚ ///
+
+NUM7_DA_OS
+	RTS
+
+; /// NUM  7 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM7_DA_HUS	
+	RTS
+
+; /// NUM  7 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM7_DA_HS	
+	RTS
+
+; /// NUM  7 : Destination ASCII, Binaire ///
+
+NUM7_DA_B	
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD25
+	RTS
+
+; /// NUM  7 : Destination ASCII, Flottant Minuscule ///
+
+NUM7_DA_FMin
+	RTS
+
+; /// NUM  7 : Destination ASCII, Flottant Majuscule ///
+
+NUM7_DA_FMaj
+	RTS
+
+; /// NUM  7 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM7_DU_BUS	
+	RTS
+
+; /// NUM  7 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM7_DU_BS	
+	RTS
+
+; /// NUM  7 : Non d‚finit ///
+
+NUM7_UnDefD30
+	RTS
+
+; /// NUM  7 : Non d‚finit
+
+NUM7_UnDefD31
+	RTS	
+
+; /// NUM  8 : Non d‚finit ///
+
+UnDefS8	
+	RTS
+
+; /// NUM  9 : Non d‚finit ///
+
+UnDefS9	
+	RTS
+
+; /// NUM 10 : Source Flottante, Single ///
+
+SF_Single	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM10_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM10_JUMP	BRA	NUM10_DB_BUS
+	BRA	NUM10_DB_BS
+	BRA	NUM10_DB_WUS
+	BRA	NUM10_DB_WS
+	BRA	NUM10_UnDefD4
+	BRA	NUM10_UnDefD5
+	BRA	NUM10_DB_LUS
+	BRA	NUM10_DB_LS
+	BRA	NUM10_UnDefD8
+	BRA	NUM10_UnDefD9
+	BRA	NUMError1
+	BRA	NUM10_DF_D
+	BRA	NUM10_DF_E
+	BRA	NUM10_DF_P
+	BRA	NUM10_UnDefD14
+	BRA	NUM10_UnDefD15
+	BRA	NUM10_UnDefD16
+	BRA	NUM10_UnDefD17
+	BRA	NUM10_DA_DUS
+	BRA	NUM10_DA_DS
+	BRA	NUM10_DA_OUS
+	BRA	NUM10_DA_OS
+	BRA	NUM10_DA_HUS
+	BRA	NUM10_DA_HS
+	BRA	NUM10_DA_B
+	BRA	NUM10_UnDefD25
+	BRA	NUM10_DA_FMin
+	BRA	NUM10_DA_FMaj
+	BRA	NUM10_DU_BUS
+	BRA	NUM10_DU_BS
+	BRA	NUM10_UnDefD30
+	BRA	NUM10_UnDefD31
+
+; /// NUM 10 : Destination Binaire, BYTE non sign‚
+
+NUM10_DB_BUS
+	RTS
+
+; /// NUM 10 : Destination Binaire, BYTE sign‚ ///
+
+NUM10_DB_BS
+	RTS
+
+; /// NUM 10 : Destination Binaire, WORD non sign‚ ///
+
+NUM10_DB_WUS
+	RTS
+
+; /// NUM 10 : Destination Binaire, WORD sign‚ ///
+
+NUM10_DB_WS
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD4
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD5
+	RTS
+
+; /// NUM 10 : Destination Binaire, LONG non sign‚ ///
+
+NUM10_DB_LUS
+	RTS
+
+; /// NUM 10 : Destination Binaire, LONG sign‚ ///
+
+NUM10_DB_LS
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD8
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD9
+	RTS
+
+; /// NUM 10 : Destination Flottante, Double ///
+
+NUM10_DF_D
+	RTS
+
+; /// NUM 10 : Destination Flottante, Extended ///
+
+NUM10_DF_E
+	RTS
+
+; /// NUM 10 : Destination Flottante, Packed ///
+
+NUM10_DF_P
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD14
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD15
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD16
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD17
+	RTS
+
+; /// NUM 10 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM10_DA_DUS
+	RTS
+
+; /// NUM 10 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM10_DA_DS
+	RTS
+
+; /// NUM 10 : Destination ASCII, Octal non sign‚ ///
+
+NUM10_DA_OUS
+	RTS
+
+; /// NUM 10 : Destination ASCII, Octal sign‚ ///
+
+NUM10_DA_OS
+	RTS
+
+; /// NUM 10 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM10_DA_HUS
+	RTS
+
+; /// NUM 10 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM10_DA_HS
+	RTS
+
+; /// NUM 10 : Destination ASCII, Binaire ///
+
+NUM10_DA_B
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD25
+	RTS
+
+; /// NUM 10 : Destination ASCII, Flottant Minuscule ///
+
+NUM10_DA_FMin
+	RTS
+
+; /// NUM 10 : Destination ASCII, Flottant Majuscule ///
+
+NUM10_DA_FMaj
+	RTS
+
+; /// NUM 10 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM10_DU_BUS
+	RTS
+
+; /// NUM 10 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM10_DU_BS
+	RTS
+
+; /// NUM 10 : Non d‚finit ///
+
+NUM10_UnDefD30
+	RTS
+
+; /// NUM 10 : Non d‚finit
+
+NUM10_UnDefD31
+	RTS	
+
+; /// NUM 11 : Source Flottante, Double ///
+
+SF_Double	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM11_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM11_JUMP	BRA	NUM11_DB_BUS
+	BRA	NUM11_DB_BS
+	BRA	NUM11_DB_WUS
+	BRA	NUM11_DB_WS
+	BRA	NUM11_UnDefD4
+	BRA	NUM11_UnDefD5
+	BRA	NUM11_DB_LUS
+	BRA	NUM11_DB_LS
+	BRA	NUM11_UnDefD8
+	BRA	NUM11_UnDefD9
+	BRA	NUM11_DF_S
+	BRA	NUMError1
+	BRA	NUM11_DF_E
+	BRA	NUM11_DF_P
+	BRA	NUM11_UnDefD14
+	BRA	NUM11_UnDefD15
+	BRA	NUM11_UnDefD16
+	BRA	NUM11_UnDefD17
+	BRA	NUM11_DA_DUS
+	BRA	NUM11_DA_DS
+	BRA	NUM11_DA_OUS
+	BRA	NUM11_DA_OS
+	BRA	NUM11_DA_HUS
+	BRA	NUM11_DA_HS
+	BRA	NUM11_DA_B
+	BRA	NUM11_UnDefD25
+	BRA	NUM11_DA_FMin
+	BRA	NUM11_DA_FMaj
+	BRA	NUM11_DU_BUS
+	BRA	NUM11_DU_BS
+	BRA	NUM11_UnDefD30
+	BRA	NUM11_UnDefD31
+
+; /// NUM 11 : Destination Binaire, BYTE non sign‚
+
+NUM11_DB_BUS
+	RTS
+
+; /// NUM 11 : Destination Binaire, BYTE sign‚ ///
+
+NUM11_DB_BS
+	RTS
+
+; /// NUM 11 : Destination Binaire, WORD non sign‚ ///
+
+NUM11_DB_WUS
+	RTS
+
+; /// NUM 11 : Destination Binaire, WORD sign‚ ///
+
+NUM11_DB_WS
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD4
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD5
+	RTS
+
+; /// NUM 11 : Destination Binaire, LONG non sign‚ ///
+
+NUM11_DB_LUS
+	RTS
+
+; /// NUM 11 : Destination Binaire, LONG sign‚ ///
+
+NUM11_DB_LS
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD8
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD9
+	RTS
+
+; /// NUM 11 : Destination Flottante, Single ///
+
+NUM11_DF_S
+	RTS
+
+; /// NUM 11 : Destination Flottante, Extended ///
+
+NUM11_DF_E
+	RTS
+
+; /// NUM 11 : Destination Flottante, Packed ///
+
+NUM11_DF_P
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD14
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD15
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD16
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD17
+	RTS
+
+; /// NUM 11 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM11_DA_DUS
+	RTS
+
+; /// NUM 11 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM11_DA_DS
+	RTS
+
+; /// NUM 11 : Destination ASCII, Octal non sign‚ ///
+
+NUM11_DA_OUS
+	RTS
+
+; /// NUM 11 : Destination ASCII, Octal sign‚ ///
+
+NUM11_DA_OS
+	RTS
+
+; /// NUM 11 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM11_DA_HUS
+	RTS
+
+; /// NUM 11 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM11_DA_HS
+	RTS
+
+; /// NUM 11 : Destination ASCII, Binaire ///
+
+NUM11_DA_B
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD25
+	RTS
+
+; /// NUM 11 : Destination ASCII, Flottant Minuscule ///
+
+NUM11_DA_FMin
+	RTS
+
+; /// NUM 11 : Destination ASCII, Flottant Majuscule ///
+
+NUM11_DA_FMaj
+	RTS
+
+; /// NUM 11 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM11_DU_BUS
+	RTS
+
+; /// NUM 11 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM11_DU_BS
+	RTS
+
+; /// NUM 11 : Non d‚finit ///
+
+NUM11_UnDefD30
+	RTS
+
+; /// NUM 11 : Non d‚finit
+
+NUM11_UnDefD31
+	RTS	
+
+; /// NUM 12 : Source Flottante, Extended ///
+
+SF_Extended	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM12_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM12_JUMP	BRA	NUM12_DB_BUS
+	BRA	NUM12_DB_BS
+	BRA	NUM12_DB_WUS
+	BRA	NUM12_DB_WS
+	BRA	NUM12_UnDefD4
+	BRA	NUM12_UnDefD5
+	BRA	NUM12_DB_LUS
+	BRA	NUM12_DB_LS
+	BRA	NUM12_UnDefD8
+	BRA	NUM12_UnDefD9
+	BRA	NUM12_DF_S
+	BRA	NUM12_DF_D
+	BRA	NUMError1
+	BRA	NUM12_DF_P
+	BRA	NUM12_UnDefD14
+	BRA	NUM12_UnDefD15
+	BRA	NUM12_UnDefD16
+	BRA	NUM12_UnDefD17
+	BRA	NUM12_DA_DUS
+	BRA	NUM12_DA_DS
+	BRA	NUM12_DA_OUS
+	BRA	NUM12_DA_OS
+	BRA	NUM12_DA_HUS
+	BRA	NUM12_DA_HS
+	BRA	NUM12_DA_B
+	BRA	NUM12_UnDefD25
+	BRA	NUM12_DA_FMin
+	BRA	NUM12_DA_FMaj
+	BRA	NUM12_DU_BUS
+	BRA	NUM12_DU_BS
+	BRA	NUM12_UnDefD30
+	BRA	NUM12_UnDefD31
+
+; /// NUM 12 : Destination Binaire, BYTE non sign‚
+
+NUM12_DB_BUS
+	RTS
+
+; /// NUM 12 : Destination Binaire, BYTE sign‚ ///
+
+NUM12_DB_BS
+	RTS
+
+; /// NUM 12 : Destination Binaire, WORD non sign‚ ///
+
+NUM12_DB_WUS
+	RTS
+
+; /// NUM 12 : Destination Binaire, WORD sign‚ ///
+
+NUM12_DB_WS
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD4
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD5
+	RTS
+
+; /// NUM 12 : Destination Binaire, LONG non sign‚ ///
+
+NUM12_DB_LUS
+	RTS
+
+; /// NUM 12 : Destination Binaire, LONG sign‚ ///
+
+NUM12_DB_LS
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD8
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD9
+	RTS
+
+; /// NUM 12 : Destination Flottante, Single ///
+
+NUM12_DF_S
+	RTS
+
+; /// NUM 12 : Destination Flottante, Double ///
+
+NUM12_DF_D
+	RTS
+
+; /// NUM 12 : Destination Flottante, Packed ///
+
+NUM12_DF_P
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD14
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD15
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD16
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD17
+	RTS
+
+; /// NUM 12 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM12_DA_DUS
+	RTS
+
+; /// NUM 12 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM12_DA_DS
+	RTS
+
+; /// NUM 12 : Destination ASCII, Octal non sign‚ ///
+
+NUM12_DA_OUS
+	RTS
+
+; /// NUM 12 : Destination ASCII, Octal sign‚ ///
+
+NUM12_DA_OS
+	RTS
+
+; /// NUM 12 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM12_DA_HUS
+	RTS
+
+; /// NUM 12 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM12_DA_HS
+	RTS
+
+; /// NUM 12 : Destination ASCII, Binaire ///
+
+NUM12_DA_B
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD25
+	RTS
+
+; /// NUM 12 : Destination ASCII, Flottant Minuscule ///
+
+NUM12_DA_FMin
+	RTS
+
+; /// NUM 12 : Destination ASCII, Flottant Majuscule ///
+
+NUM12_DA_FMaj
+	RTS
+
+; /// NUM 12 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM12_DU_BUS
+	RTS
+
+; /// NUM 12 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM12_DU_BS
+	RTS
+
+; /// NUM 12 : Non d‚finit ///
+
+NUM12_UnDefD30
+	RTS
+
+; /// NUM 12 : Non d‚finit
+
+NUM12_UnDefD31
+	RTS	
+
+; /// NUM 13 : Source Flottante, Packed ///
+
+SF_Packed	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM13_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM13_JUMP	BRA	NUM13_DB_BUS
+	BRA	NUM13_DB_BS
+	BRA	NUM13_DB_WUS
+	BRA	NUM13_DB_WS
+	BRA	NUM13_UnDefD4
+	BRA	NUM13_UnDefD5
+	BRA	NUM13_DB_LUS
+	BRA	NUM13_DB_LS
+	BRA	NUM13_UnDefD8
+	BRA	NUM13_UnDefD9
+	BRA	NUM13_DF_S
+	BRA	NUM13_DF_D
+	BRA	NUM13_DF_E
+	BRA	NUMError1
+	BRA	NUM13_UnDefD14
+	BRA	NUM13_UnDefD15
+	BRA	NUM13_UnDefD16
+	BRA	NUM13_UnDefD17
+	BRA	NUM13_DA_DUS
+	BRA	NUM13_DA_DS
+	BRA	NUM13_DA_OUS
+	BRA	NUM13_DA_OS
+	BRA	NUM13_DA_HUS
+	BRA	NUM13_DA_HS
+	BRA	NUM13_DA_B
+	BRA	NUM13_UnDefD25
+	BRA	NUM13_DA_FMin
+	BRA	NUM13_DA_FMaj
+	BRA	NUM13_DU_BUS
+	BRA	NUM13_DU_BS
+	BRA	NUM13_UnDefD30
+	BRA	NUM13_UnDefD31
+
+; /// NUM 13 : Destination Binaire, BYTE non sign‚
+
+NUM13_DB_BUS
+	RTS
+
+; /// NUM 13 : Destination Binaire, BYTE sign‚ ///
+
+NUM13_DB_BS
+	RTS
+
+; /// NUM 13 : Destination Binaire, WORD non sign‚ ///
+
+NUM13_DB_WUS
+	RTS
+
+; /// NUM 13 : Destination Binaire, WORD sign‚ ///
+
+NUM13_DB_WS
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD4
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD5
+	RTS
+
+; /// NUM 13 : Destination Binaire, LONG non sign‚ ///
+
+NUM13_DB_LUS
+	RTS
+
+; /// NUM 13 : Destination Binaire, LONG sign‚ ///
+
+NUM13_DB_LS
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD8
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD9
+	RTS
+
+; /// NUM 13 : Destination Flottante, Single ///
+
+NUM13_DF_S
+	RTS
+
+; /// NUM 13 : Destination Flottante, Double ///
+
+NUM13_DF_D
+	RTS
+
+; /// NUM 13 : Destination Flottante, Extended ///
+
+NUM13_DF_E
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD14
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD15
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD16
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD17
+	RTS
+
+; /// NUM 13 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM13_DA_DUS
+	RTS
+
+; /// NUM 13 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM13_DA_DS
+	RTS
+
+; /// NUM 13 : Destination ASCII, Octal non sign‚ ///
+
+NUM13_DA_OUS
+	RTS
+
+; /// NUM 13 : Destination ASCII, Octal sign‚ ///
+
+NUM13_DA_OS
+	RTS
+
+; /// NUM 13 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM13_DA_HUS
+	RTS
+
+; /// NUM 13 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM13_DA_HS
+	RTS
+
+; /// NUM 13 : Destination ASCII, Binaire ///
+
+NUM13_DA_B
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD25
+	RTS
+
+; /// NUM 13 : Destination ASCII, Flottant Minuscule ///
+
+NUM13_DA_FMin
+	RTS
+
+; /// NUM 13 : Destination ASCII, Flottant Majuscule ///
+
+NUM13_DA_FMaj
+	RTS
+
+; /// NUM 13 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM13_DU_BUS
+	RTS
+
+; /// NUM 13 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM13_DU_BS
+	RTS
+
+; /// NUM 13 : Non d‚finit ///
+
+NUM13_UnDefD30
+	RTS
+
+; /// NUM 13 : Non d‚finit
+
+NUM13_UnDefD31
+	RTS	
+
+; /// NUM 14 : Non d‚finit ///
+
+UnDefS14	
+	RTS
+
+; /// NUM 15 : Non d‚finit ///
+
+UnDefS15	
+	RTS
+
+; /// NUM 16 : Non d‚finit ///
+
+UnDefS16	
+	RTS
+
+; /// NUM 17 : Non d‚finit ///
+
+UnDefS17	
+	RTS
+
+; /// NUM 18 : Source ASCII, D‚cimal non sign‚ ///
+
+SA_DUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM18_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM18_JUMP	BRA	NUM18_DB_BUS
+	BRA	NUM18_DB_BS
+	BRA	NUM18_DB_WUS
+	BRA	NUM18_DB_WS
+	BRA	NUM18_UnDefD4
+	BRA	NUM18_UnDefD5
+	BRA	NUM18_DB_LUS
+	BRA	NUM18_DB_LS
+	BRA	NUM18_UnDefD8
+	BRA	NUM18_UnDefD9
+	BRA	NUM18_DF_S
+	BRA	NUM18_DF_D
+	BRA	NUM18_DF_E
+	BRA	NUM18_DF_P
+	BRA	NUM18_UnDefD14
+	BRA	NUM18_UnDefD15
+	BRA	NUM18_UnDefD16
+	BRA	NUM18_UnDefD17
+	BRA	NUMError1
+	BRA	NUM18_DA_DS
+	BRA	NUM18_DA_OUS
+	BRA	NUM18_DA_OS
+	BRA	NUM18_DA_HUS
+	BRA	NUM18_DA_HS
+	BRA	NUM18_DA_B
+	BRA	NUM18_UnDefD25
+	BRA	NUM18_DA_FMin
+	BRA	NUM18_DA_FMaj
+	BRA	NUM18_DU_BUS
+	BRA	NUM18_DU_BS
+	BRA	NUM18_UnDefD30
+	BRA	NUM18_UnDefD31
+
+; /// NUM 18 : Destination Binaire, BYTE non sign‚
+
+NUM18_DB_BUS
+	RTS
+
+; /// NUM 18 : Destination Binaire, BYTE sign‚ ///
+
+NUM18_DB_BS
+	RTS
+
+; /// NUM 18 : Destination Binaire, WORD non sign‚ ///
+
+NUM18_DB_WUS
+	RTS
+
+; /// NUM 18 : Destination Binaire, WORD sign‚ ///
+
+NUM18_DB_WS
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD4
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD5
+	RTS
+
+; /// NUM 18 : Destination Binaire, LONG non sign‚ ///
+
+NUM18_DB_LUS
+	RTS
+
+; /// NUM 18 : Destination Binaire, LONG sign‚ ///
+
+NUM18_DB_LS
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD8
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD9
+	RTS
+
+; /// NUM 18 : Destination Flottante, Single ///
+
+NUM18_DF_S
+	RTS
+
+; /// NUM 18 : Destination Flottante, Double ///
+
+NUM18_DF_D
+	RTS
+
+; /// NUM 18 : Destination Flottante, Extended ///
+
+NUM18_DF_E
+	RTS
+
+; /// NUM 18 : Destination Flottante, Packed ///
+
+NUM18_DF_P
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD14
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD15
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD16
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD17
+	RTS
+
+; /// NUM 18 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM18_DA_DS
+	RTS
+
+; /// NUM 18 : Destination ASCII, Octal non sign‚ ///
+
+NUM18_DA_OUS
+	RTS
+
+; /// NUM 18 : Destination ASCII, Octal sign‚ ///
+
+NUM18_DA_OS
+	RTS
+
+; /// NUM 18 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM18_DA_HUS
+	RTS
+
+; /// NUM 18 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM18_DA_HS
+	RTS
+
+; /// NUM 18 : Destination ASCII, Binaire ///
+
+NUM18_DA_B
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD25
+	RTS
+
+; /// NUM 18 : Destination ASCII, Flottant Minuscule ///
+
+NUM18_DA_FMin
+	RTS
+
+; /// NUM 18 : Destination ASCII, Flottant Majuscule ///
+
+NUM18_DA_FMaj
+	RTS
+
+; /// NUM 18 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM18_DU_BUS
+	RTS
+
+; /// NUM 18 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM18_DU_BS
+	RTS
+
+; /// NUM 18 : Non d‚finit ///
+
+NUM18_UnDefD30
+	RTS
+
+; /// NUM 18 : Non d‚finit
+
+NUM18_UnDefD31
+	RTS	
+
+; /// NUM 19 : Source ASCII, D‚cimal sign‚ ///
+
+SA_DS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM19_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM19_JUMP	BRA	NUM19_DB_BUS
+	BRA	NUM19_DB_BS
+	BRA	NUM19_DB_WUS
+	BRA	NUM19_DB_WS
+	BRA	NUM19_UnDefD4
+	BRA	NUM19_UnDefD5
+	BRA	NUM19_DB_LUS
+	BRA	NUM19_DB_LS
+	BRA	NUM19_UnDefD8
+	BRA	NUM19_UnDefD9
+	BRA	NUM19_DF_S
+	BRA	NUM19_DF_D
+	BRA	NUM19_DF_E
+	BRA	NUM19_DF_P
+	BRA	NUM19_UnDefD14
+	BRA	NUM19_UnDefD15
+	BRA	NUM19_UnDefD16
+	BRA	NUM19_UnDefD17
+	BRA	NUM19_DA_DUS
+	BRA	NUMError1
+	BRA	NUM19_DA_OUS
+	BRA	NUM19_DA_OS
+	BRA	NUM19_DA_HUS
+	BRA	NUM19_DA_HS
+	BRA	NUM19_DA_B
+	BRA	NUM19_UnDefD25
+	BRA	NUM19_DA_FMin
+	BRA	NUM19_DA_FMaj
+	BRA	NUM19_DU_BUS
+	BRA	NUM19_DU_BS
+	BRA	NUM19_UnDefD30
+	BRA	NUM19_UnDefD31
+
+; /// NUM 19 : Destination Binaire, BYTE non sign‚
+
+NUM19_DB_BUS
+	RTS
+
+; /// NUM 19 : Destination Binaire, BYTE sign‚ ///
+
+NUM19_DB_BS
+	RTS
+
+; /// NUM 19 : Destination Binaire, WORD non sign‚ ///
+
+NUM19_DB_WUS
+	RTS
+
+; /// NUM 19 : Destination Binaire, WORD sign‚ ///
+
+NUM19_DB_WS
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD4
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD5
+	RTS
+
+; /// NUM 19 : Destination Binaire, LONG non sign‚ ///
+
+NUM19_DB_LUS
+	RTS
+
+; /// NUM 19 : Destination Binaire, LONG sign‚ ///
+
+NUM19_DB_LS
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD8
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD9
+	RTS
+
+; /// NUM 19 : Destination Flottante, Single ///
+
+NUM19_DF_S
+	RTS
+
+; /// NUM 19 : Destination Flottante, Double ///
+
+NUM19_DF_D
+	RTS
+
+; /// NUM 19 : Destination Flottante, Extended ///
+
+NUM19_DF_E
+	RTS
+
+; /// NUM 19 : Destination Flottante, Packed ///
+
+NUM19_DF_P
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD14
+	RTS
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD15
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD16
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD17
+	RTS
+
+; /// NUM 19 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM19_DA_DUS
+	RTS
+
+; /// NUM 19 : Destination ASCII, Octal non sign‚ ///
+
+NUM19_DA_OUS
+	RTS
+
+; /// NUM 19 : Destination ASCII, Octal sign‚ ///
+
+NUM19_DA_OS
+	RTS
+
+; /// NUM 19 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM19_DA_HUS
+	RTS
+
+; /// NUM 19 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM19_DA_HS
+	RTS
+
+; /// NUM 19 : Destination ASCII, Binaire ///
+
+NUM19_DA_B
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD25
+	RTS
+
+; /// NUM 19 : Destination ASCII, Flottant Minuscule ///
+
+NUM19_DA_FMin
+	RTS
+
+; /// NUM 19 : Destination ASCII, Flottant Majuscule ///
+
+NUM19_DA_FMaj
+	RTS
+
+; /// NUM 19 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM19_DU_BUS
+	RTS
+
+; /// NUM 19 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM19_DU_BS
+	RTS
+
+; /// NUM 19 : Non d‚finit ///
+
+NUM19_UnDefD30
+	RTS
+
+; /// NUM 19 : Non d‚finit
+
+NUM19_UnDefD31
+	RTS
+	
+; /// NUM 20 : Source ASCII, Octal non sign‚ ///
+
+SA_OUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM20_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM20_JUMP	BRA	NUM20_DB_BUS
+	BRA	NUM20_DB_BS
+	BRA	NUM20_DB_WUS
+	BRA	NUM20_DB_WS
+	BRA	NUM20_UnDefD4
+	BRA	NUM20_UnDefD5
+	BRA	NUM20_DB_LUS
+	BRA	NUM20_DB_LS
+	BRA	NUM20_UnDefD8
+	BRA	NUM20_UnDefD9
+	BRA	NUM20_DF_S
+	BRA	NUM20_DF_D
+	BRA	NUM20_DF_E
+	BRA	NUM20_DF_P
+	BRA	NUM20_UnDefD14
+	BRA	NUM20_UnDefD15
+	BRA	NUM20_UnDefD16
+	BRA	NUM20_UnDefD17
+	BRA	NUM20_DA_DUS
+	BRA	NUM20_DA_DS
+	BRA	NUMError1
+	BRA	NUM20_DA_OS
+	BRA	NUM20_DA_HUS
+	BRA	NUM20_DA_HS
+	BRA	NUM20_DA_B
+	BRA	NUM20_UnDefD25
+	BRA	NUM20_DA_FMin
+	BRA	NUM20_DA_FMaj
+	BRA	NUM20_DU_BUS
+	BRA	NUM20_DU_BS
+	BRA	NUM20_UnDefD30
+	BRA	NUM20_UnDefD31
+
+; /// NUM 20 : Destination Binaire, BYTE non sign‚
+
+NUM20_DB_BUS
+	RTS
+
+; /// NUM 20 : Destination Binaire, BYTE sign‚ ///
+
+NUM20_DB_BS
+	RTS
+
+; /// NUM 20 : Destination Binaire, WORD non sign‚ ///
+
+NUM20_DB_WUS
+	RTS
+
+; /// NUM 20 : Destination Binaire, WORD sign‚ ///
+
+NUM20_DB_WS
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD4
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD5
+	RTS
+
+; /// NUM 20 : Destination Binaire, LONG non sign‚ ///
+
+NUM20_DB_LUS
+	RTS
+
+; /// NUM 20 : Destination Binaire, LONG sign‚ ///
+
+NUM20_DB_LS
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD8
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD9
+	RTS
+
+; /// NUM 20 : Destination Flottante, Single ///
+
+NUM20_DF_S
+	RTS
+
+; /// NUM 20 : Destination Flottante, Double ///
+
+NUM20_DF_D
+	RTS
+
+; /// NUM 20 : Destination Flottante, Extended ///
+
+NUM20_DF_E
+	RTS
+
+; /// NUM 20 : Destination Flottante, Packed ///
+
+NUM20_DF_P
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD14
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD15
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD16
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD17
+	RTS
+
+; /// NUM 20 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM20_DA_DUS
+	RTS
+
+; /// NUM 20 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM20_DA_DS
+	RTS
+
+; /// NUM 20 : Destination ASCII, Octal sign‚ ///
+
+NUM20_DA_OS
+	RTS
+
+; /// NUM 20 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM20_DA_HUS
+	RTS
+
+; /// NUM 20 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM20_DA_HS
+	RTS
+
+; /// NUM 20 : Destination ASCII, Binaire ///
+
+NUM20_DA_B
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD25
+	RTS
+
+; /// NUM 20 : Destination ASCII, Flottant Minuscule ///
+
+NUM20_DA_FMin
+	RTS
+
+; /// NUM 20 : Destination ASCII, Flottant Majuscule ///
+
+NUM20_DA_FMaj
+	RTS
+
+; /// NUM 20 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM20_DU_BUS
+	RTS
+
+; /// NUM 20 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM20_DU_BS
+	RTS
+
+; /// NUM 20 : Non d‚finit ///
+
+NUM20_UnDefD30
+	RTS
+
+; /// NUM 20 : Non d‚finit
+
+NUM20_UnDefD31
+	RTS
+	
+; /// NUM 21 : Source ASCII, Octal sign‚ ///
+
+SA_OS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM21_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM21_JUMP	BRA	NUM21_DB_BUS
+	BRA	NUM21_DB_BS
+	BRA	NUM21_DB_WUS
+	BRA	NUM21_DB_WS
+	BRA	NUM21_UnDefD4
+	BRA	NUM21_UnDefD5
+	BRA	NUM21_DB_LUS
+	BRA	NUM21_DB_LS
+	BRA	NUM21_UnDefD8
+	BRA	NUM21_UnDefD9
+	BRA	NUM21_DF_S
+	BRA	NUM21_DF_D
+	BRA	NUM21_DF_E
+	BRA	NUM21_DF_P
+	BRA	NUM21_UnDefD14
+	BRA	NUM21_UnDefD15
+	BRA	NUM21_UnDefD16
+	BRA	NUM21_UnDefD17
+	BRA	NUM21_DA_DUS
+	BRA	NUM21_DA_DS
+	BRA	NUM21_DA_OUS
+	BRA	NUMError1
+	BRA	NUM21_DA_HUS
+	BRA	NUM21_DA_HS
+	BRA	NUM21_DA_B
+	BRA	NUM21_UnDefD25
+	BRA	NUM21_DA_FMin
+	BRA	NUM21_DA_FMaj
+	BRA	NUM21_DU_BUS
+	BRA	NUM21_DU_BS
+	BRA	NUM21_UnDefD30
+	BRA	NUM21_UnDefD31
+
+; /// NUM 21 : Destination Binaire, BYTE non sign‚
+
+NUM21_DB_BUS
+	RTS
+
+; /// NUM 21 : Destination Binaire, BYTE sign‚ ///
+
+NUM21_DB_BS
+	RTS
+
+; /// NUM 21 : Destination Binaire, WORD non sign‚ ///
+
+NUM21_DB_WUS
+	RTS
+
+; /// NUM 21 : Destination Binaire, WORD sign‚ ///
+
+NUM21_DB_WS
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD4
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD5
+	RTS
+
+; /// NUM 21 : Destination Binaire, LONG non sign‚ ///
+
+NUM21_DB_LUS
+	RTS
+
+; /// NUM 21 : Destination Binaire, LONG sign‚ ///
+
+NUM21_DB_LS
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD8
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD9
+	RTS
+
+; /// NUM 21 : Destination Flottante, Single ///
+
+NUM21_DF_S
+	RTS
+
+; /// NUM 21 : Destination Flottante, Double ///
+
+NUM21_DF_D
+	RTS
+
+; /// NUM 21 : Destination Flottante, Extended ///
+
+NUM21_DF_E
+	RTS
+
+; /// NUM 21 : Destination Flottante, Packed ///
+
+NUM21_DF_P
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD14
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD15
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD16
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD17
+	RTS
+
+; /// NUM 21 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM21_DA_DUS
+	RTS
+
+; /// NUM 21 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM21_DA_DS
+	RTS
+
+; /// NUM 21 : Destination ASCII, Octal non sign‚ ///
+
+NUM21_DA_OUS
+	RTS
+
+; /// NUM 21 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM21_DA_HUS
+	RTS
+
+; /// NUM 21 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM21_DA_HS
+	RTS
+
+; /// NUM 21 : Destination ASCII, Binaire ///
+
+NUM21_DA_B
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD25
+	RTS
+
+; /// NUM 21 : Destination ASCII, Flottant Minuscule ///
+
+NUM21_DA_FMin
+	RTS
+
+; /// NUM 21 : Destination ASCII, Flottant Majuscule ///
+
+NUM21_DA_FMaj
+	RTS
+
+; /// NUM 21 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM21_DU_BUS
+	RTS
+
+; /// NUM 21 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM21_DU_BS
+	RTS
+
+; /// NUM 21 : Non d‚finit ///
+
+NUM21_UnDefD30
+	RTS
+
+; /// NUM 21 : Non d‚finit
+
+NUM21_UnDefD31
+	RTS
+	
+; /// NUM 22 : Source ASCII, Hexad‚cimal non sign‚ ///
+
+SA_HUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM22_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM22_JUMP	BRA	NUM22_DB_BUS
+	BRA	NUM22_DB_BS
+	BRA	NUM22_DB_WUS
+	BRA	NUM22_DB_WS
+	BRA	NUM22_UnDefD4
+	BRA	NUM22_UnDefD5
+	BRA	NUM22_DB_LUS
+	BRA	NUM22_DB_LS
+	BRA	NUM22_UnDefD8
+	BRA	NUM22_UnDefD9
+	BRA	NUM22_DF_S
+	BRA	NUM22_DF_D
+	BRA	NUM22_DF_E
+	BRA	NUM22_DF_P
+	BRA	NUM22_UnDefD14
+	BRA	NUM22_UnDefD15
+	BRA	NUM22_UnDefD16
+	BRA	NUM22_UnDefD17
+	BRA	NUM22_DA_DUS
+	BRA	NUM22_DA_DS
+	BRA	NUM22_DA_OUS
+	BRA	NUM22_DA_OS
+	BRA	NUMError1
+	BRA	NUM22_DA_HS
+	BRA	NUM22_DA_B
+	BRA	NUM22_UnDefD25
+	BRA	NUM22_DA_FMin
+	BRA	NUM22_DA_FMaj
+	BRA	NUM22_DU_BUS
+	BRA	NUM22_DU_BS
+	BRA	NUM22_UnDefD30
+	BRA	NUM22_UnDefD31
+
+; /// NUM 22 : Destination Binaire, BYTE non sign‚
+
+NUM22_DB_BUS
+	RTS
+
+; /// NUM 22 : Destination Binaire, BYTE sign‚ ///
+
+NUM22_DB_BS
+	RTS
+
+; /// NUM 22 : Destination Binaire, WORD non sign‚ ///
+
+NUM22_DB_WUS
+	RTS
+
+; /// NUM 22 : Destination Binaire, WORD sign‚ ///
+
+NUM22_DB_WS
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD4
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD5
+	RTS
+
+; /// NUM 22 : Destination Binaire, LONG non sign‚ ///
+
+NUM22_DB_LUS
+	RTS
+
+; /// NUM 22 : Destination Binaire, LONG sign‚ ///
+
+NUM22_DB_LS
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD8
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD9
+	RTS
+
+; /// NUM 22 : Destination Flottante, Single ///
+
+NUM22_DF_S
+	RTS
+
+; /// NUM 22 : Destination Flottante, Double ///
+
+NUM22_DF_D
+	RTS
+
+; /// NUM 22 : Destination Flottante, Extended ///
+
+NUM22_DF_E
+	RTS
+
+; /// NUM 22 : Destination Flottante, Packed ///
+
+NUM22_DF_P
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD14
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD15
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD16
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD17
+	RTS
+
+; /// NUM 22 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM22_DA_DUS
+	RTS
+
+; /// NUM 22 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM22_DA_DS
+	RTS
+
+; /// NUM 22 : Destination ASCII, Octal non sign‚ ///
+
+NUM22_DA_OUS
+	RTS
+
+; /// NUM 22 : Destination ASCII, Octal sign‚ ///
+
+NUM22_DA_OS
+	RTS
+
+; /// NUM 22 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM22_DA_HS
+	RTS
+
+; /// NUM 22 : Destination ASCII, Binaire ///
+
+NUM22_DA_B
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD25
+	RTS
+
+; /// NUM 22 : Destination ASCII, Flottant Minuscule ///
+
+NUM22_DA_FMin
+	RTS
+
+; /// NUM 22 : Destination ASCII, Flottant Majuscule ///
+
+NUM22_DA_FMaj
+	RTS
+
+; /// NUM 22 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM22_DU_BUS	
+	RTS
+
+; /// NUM 22 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM22_DU_BS	
+	RTS
+
+; /// NUM 22 : Non d‚finit ///
+
+NUM22_UnDefD30
+	RTS
+
+; /// NUM 22 : Non d‚finit
+
+NUM22_UnDefD31
+	RTS
+	
+; /// NUM 23 : Source ASCII, Hexad‚cimal sign‚ ///
+
+SA_HS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM23_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM23_JUMP	BRA	NUM23_DB_BUS
+	BRA	NUM23_DB_BS
+	BRA	NUM23_DB_WUS
+	BRA	NUM23_DB_WS
+	BRA	NUM23_UnDefD4
+	BRA	NUM23_UnDefD5
+	BRA	NUM23_DB_LUS
+	BRA	NUM23_DB_LS
+	BRA	NUM23_UnDefD8
+	BRA	NUM23_UnDefD9
+	BRA	NUM23_DF_S
+	BRA	NUM23_DF_D
+	BRA	NUM23_DF_E
+	BRA	NUM23_DF_P
+	BRA	NUM23_UnDefD14
+	BRA	NUM23_UnDefD15
+	BRA	NUM23_UnDefD16
+	BRA	NUM23_UnDefD17
+	BRA	NUM23_DA_DUS
+	BRA	NUM23_DA_DS
+	BRA	NUM23_DA_OUS
+	BRA	NUM23_DA_OS
+	BRA	NUM23_DA_HUS
+	BRA	NUMError1
+	BRA	NUM23_DA_B
+	BRA	NUM23_UnDefD25
+	BRA	NUM23_DA_FMin
+	BRA	NUM23_DA_FMaj
+	BRA	NUM23_DU_BUS
+	BRA	NUM23_DU_BS
+	BRA	NUM23_UnDefD30
+	BRA	NUM23_UnDefD31
+
+; /// NUM 23 : Destination Binaire, BYTE non sign‚
+
+NUM23_DB_BUS
+	RTS
+
+; /// NUM 23 : Destination Binaire, BYTE sign‚ ///
+
+NUM23_DB_BS
+	RTS
+
+; /// NUM 23 : Destination Binaire, WORD non sign‚ ///
+
+NUM23_DB_WUS
+	RTS
+
+; /// NUM 23 : Destination Binaire, WORD sign‚ ///
+
+NUM23_DB_WS
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD4
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD5
+	RTS
+
+; /// NUM 23 : Destination Binaire, LONG non sign‚ ///
+
+NUM23_DB_LUS
+	RTS
+
+; /// NUM 23 : Destination Binaire, LONG sign‚ ///
+
+NUM23_DB_LS
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD8
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD9
+	RTS
+
+; /// NUM 23 : Destination Flottante, Single ///
+
+NUM23_DF_S
+	RTS
+
+; /// NUM 23 : Destination Flottante, Double ///
+
+NUM23_DF_D
+	RTS
+
+; /// NUM 23 : Destination Flottante, Extended ///
+
+NUM23_DF_E
+	RTS
+
+; /// NUM 23 : Destination Flottante, Packed ///
+
+NUM23_DF_P
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD14
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD15
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD16
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD17
+	RTS
+
+; /// NUM 23 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM23_DA_DUS
+	RTS
+
+; /// NUM 23 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM23_DA_DS
+	RTS
+
+; /// NUM 23 : Destination ASCII, Octal non sign‚ ///
+
+NUM23_DA_OUS
+	RTS
+
+; /// NUM 23 : Destination ASCII, Octal sign‚ ///
+
+NUM23_DA_OS
+	RTS
+
+; /// NUM 23 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM23_DA_HUS
+	RTS
+
+; /// NUM 23 : Destination ASCII, Binaire ///
+
+NUM23_DA_B
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD25
+	RTS
+
+; /// NUM 23 : Destination ASCII, Flottant Minuscule ///
+
+NUM23_DA_FMin
+	RTS
+
+; /// NUM 23 : Destination ASCII, Flottant Majuscule ///
+
+NUM23_DA_FMaj
+	RTS
+
+; /// NUM 23 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM23_DU_BUS	
+	RTS
+
+; /// NUM 23 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM23_DU_BS	
+	RTS
+
+; /// NUM 23 : Non d‚finit ///
+
+NUM23_UnDefD30
+	RTS
+
+; /// NUM 23 : Non d‚finit
+
+NUM23_UnDefD31
+	RTS
+	
+; /// NUM 24 : Source ASCII, Binaire ///
+
+SA_B	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM24_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM24_JUMP	BRA	NUM24_DB_BUS
+	BRA	NUM24_DB_BS
+	BRA	NUM24_DB_WUS
+	BRA	NUM24_DB_WS
+	BRA	NUM24_UnDefD4
+	BRA	NUM24_UnDefD5
+	BRA	NUM24_DB_LUS
+	BRA	NUM24_DB_LS
+	BRA	NUM24_UnDefD8
+	BRA	NUM24_UnDefD9
+	BRA	NUM24_DF_S
+	BRA	NUM24_DF_D
+	BRA	NUM24_DF_E
+	BRA	NUM24_DF_P
+	BRA	NUM24_UnDefD14
+	BRA	NUM24_UnDefD15
+	BRA	NUM24_UnDefD16
+	BRA	NUM24_UnDefD17
+	BRA	NUM24_DA_DUS
+	BRA	NUM24_DA_DS
+	BRA	NUM24_DA_OUS
+	BRA	NUM24_DA_OS
+	BRA	NUM24_DA_HUS
+	BRA	NUM24_DA_HS
+	BRA	NUMError1
+	BRA	NUM24_UnDefD25
+	BRA	NUM24_DA_FMin
+	BRA	NUM24_DA_FMaj
+	BRA	NUM24_DU_BUS
+	BRA	NUM24_DU_BS
+	BRA	NUM24_UnDefD30
+	BRA	NUM24_UnDefD31
+
+; /// NUM 24 : Destination Binaire, BYTE non sign‚
+
+NUM24_DB_BUS	
+	RTS
+
+; /// NUM 24 : Destination Binaire, BYTE sign‚ ///
+
+NUM24_DB_BS	
+	RTS
+
+; /// NUM 24 : Destination Binaire, WORD non sign‚ ///
+
+NUM24_DB_WUS	
+	RTS
+
+; /// NUM 24 : Destination Binaire, WORD sign‚ ///
+
+NUM24_DB_WS	
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD4
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD5
+	RTS
+
+; /// NUM 24 : Destination Binaire, LONG non sign‚ ///
+
+NUM24_DB_LUS	
+	RTS
+
+; /// NUM 24 : Destination Binaire, LONG sign‚ ///
+
+NUM24_DB_LS	
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD8
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD9
+	RTS
+
+; /// NUM 24 : Destination Flottante, Single ///
+
+NUM24_DF_S
+	RTS
+
+; /// NUM 24 : Destination Flottante, Double ///
+
+NUM24_DF_D
+	RTS
+
+; /// NUM 24 : Destination Flottante, Extended ///
+
+NUM24_DF_E
+	RTS
+
+; /// NUM 24 : Destination Flottante, Packed ///
+
+NUM24_DF_P
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD14
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD15
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD16
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD17
+	RTS
+
+; /// NUM 24 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM24_DA_DUS
+	RTS
+
+; /// NUM 24 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM24_DA_DS
+	RTS
+
+; /// NUM 24 : Destination ASCII, Octal non sign‚ ///
+
+NUM24_DA_OUS
+	RTS
+
+; /// NUM 24 : Destination ASCII, Octal sign‚ ///
+
+NUM24_DA_OS
+	RTS
+
+; /// NUM 24 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM24_DA_HUS
+	RTS
+
+; /// NUM 24 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM24_DA_HS
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD25
+	RTS
+
+; /// NUM 24 : Destination ASCII, Flottant Minuscule ///
+
+NUM24_DA_FMin
+	RTS
+
+; /// NUM 24 : Destination ASCII, Flottant Majuscule ///
+
+NUM24_DA_FMaj
+	RTS
+
+; /// NUM 24 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM24_DU_BUS	
+	RTS
+
+; /// NUM 24 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM24_DU_BS	
+	RTS
+
+; /// NUM 24 : Non d‚finit ///
+
+NUM24_UnDefD30
+	RTS
+
+; /// NUM 24 : Non d‚finit
+
+NUM24_UnDefD31
+	RTS
+	
+; /// NUM 25 : Non d‚finit ///
+
+UnDefS25	
+	RTS
+
+; /// NUM 26 : Source ASCII, Flottant Minuscule ///
+
+SA_FMin	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM26_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM26_JUMP	BRA	NUM26_DB_BUS
+	BRA	NUM26_DB_BS
+	BRA	NUM26_DB_WUS
+	BRA	NUM26_DB_WS
+	BRA	NUM26_UnDefD4
+	BRA	NUM26_UnDefD5
+	BRA	NUM26_DB_LUS
+	BRA	NUM26_DB_LS
+	BRA	NUM26_UnDefD8
+	BRA	NUM26_UnDefD9
+	BRA	NUM26_DF_S
+	BRA	NUM26_DF_D
+	BRA	NUM26_DF_E
+	BRA	NUM26_DF_P
+	BRA	NUM26_UnDefD14
+	BRA	NUM26_UnDefD15
+	BRA	NUM26_UnDefD16
+	BRA	NUM26_UnDefD17
+	BRA	NUM26_DA_DUS
+	BRA	NUM26_DA_DS
+	BRA	NUM26_DA_OUS
+	BRA	NUM26_DA_OS
+	BRA	NUM26_DA_HUS
+	BRA	NUM26_DA_HS
+	BRA	NUM26_DA_B
+	BRA	NUM26_UnDefD25
+	BRA	NUMError1
+	BRA	NUM26_DA_FMaj
+	BRA	NUM26_DU_BUS
+	BRA	NUM26_DU_BS
+	BRA	NUM26_UnDefD30
+	BRA	NUM26_UnDefD31
+
+; /// NUM 26 : Destination Binaire, BYTE non sign‚
+
+NUM26_DB_BUS
+	RTS
+
+; /// NUM 26 : Destination Binaire, BYTE sign‚ ///
+
+NUM26_DB_BS
+	RTS
+
+; /// NUM 26 : Destination Binaire, WORD non sign‚ ///
+
+NUM26_DB_WUS
+	RTS
+
+; /// NUM 26 : Destination Binaire, WORD sign‚ ///
+
+NUM26_DB_WS
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD4
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD5
+	RTS
+
+; /// NUM 26 : Destination Binaire, LONG non sign‚ ///
+
+NUM26_DB_LUS
+	RTS
+
+; /// NUM 26 : Destination Binaire, LONG sign‚ ///
+
+NUM26_DB_LS
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD8
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD9
+	RTS
+
+; /// NUM 26 : Destination Flottante, Single ///
+
+NUM26_DF_S
+	RTS
+
+; /// NUM 26 : Destination Flottante, Double ///
+
+NUM26_DF_D
+	RTS
+
+; /// NUM 26 : Destination Flottante, Extended ///
+
+NUM26_DF_E
+	RTS
+
+; /// NUM 26 : Destination Flottante, Packed ///
+
+NUM26_DF_P
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD14
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD15
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD16
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD17
+	RTS
+
+; /// NUM 26 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM26_DA_DUS
+	RTS
+
+; /// NUM 26 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM26_DA_DS
+	RTS
+
+; /// NUM 26 : Destination ASCII, Octal non sign‚ ///
+
+NUM26_DA_OUS
+	RTS
+
+; /// NUM 26 : Destination ASCII, Octal sign‚ ///
+
+NUM26_DA_OS
+	RTS
+
+; /// NUM 26 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM26_DA_HUS
+	RTS
+
+; /// NUM 26 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM26_DA_HS
+	RTS
+
+; /// NUM 26 : Destination ASCII, Binaire ///
+
+NUM26_DA_B
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD25
+	RTS
+
+; /// NUM 26 : Destination ASCII, Flottant Majuscule ///
+
+NUM26_DA_FMaj	
+	RTS
+
+; /// NUM 26 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM26_DU_BUS	
+	RTS
+
+; /// NUM 26 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM26_DU_BS
+	RTS
+
+; /// NUM 26 : Non d‚finit ///
+
+NUM26_UnDefD30
+	RTS
+
+; /// NUM 26 : Non d‚finit
+
+NUM26_UnDefD31
+	RTS
+	
+; /// NUM 27 : Source ASCII, Flottant Majuscule ///
+
+SA_FMaj	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM27_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM27_JUMP	BRA	NUM27_DB_BUS
+	BRA	NUM27_DB_BS
+	BRA	NUM27_DB_WUS
+	BRA	NUM27_DB_WS
+	BRA	NUM27_UnDefD4
+	BRA	NUM27_UnDefD5
+	BRA	NUM27_DB_LUS
+	BRA	NUM27_DB_LS
+	BRA	NUM27_UnDefD8
+	BRA	NUM27_UnDefD9
+	BRA	NUM27_DF_S
+	BRA	NUM27_DF_D
+	BRA	NUM27_DF_E
+	BRA	NUM27_DF_P
+	BRA	NUM27_UnDefD14
+	BRA	NUM27_UnDefD15
+	BRA	NUM27_UnDefD16
+	BRA	NUM27_UnDefD17
+	BRA	NUM27_DA_DUS
+	BRA	NUM27_DA_DS
+	BRA	NUM27_DA_OUS
+	BRA	NUM27_DA_OS
+	BRA	NUM27_DA_HUS
+	BRA	NUM27_DA_HS
+	BRA	NUM27_DA_B
+	BRA	NUM27_UnDefD25
+	BRA	NUM27_DA_FMin
+	BRA	NUMError1
+	BRA	NUM27_DU_BUS
+	BRA	NUM27_DU_BS
+	BRA	NUM27_UnDefD30
+	BRA	NUM27_UnDefD31
+
+; /// NUM 27 : Destination Binaire, BYTE non sign‚
+
+NUM27_DB_BUS
+	RTS
+
+; /// NUM 27 : Destination Binaire, BYTE sign‚ ///
+
+NUM27_DB_BS
+	RTS
+
+; /// NUM 27 : Destination Binaire, WORD non sign‚ ///
+
+NUM27_DB_WUS
+	RTS
+
+; /// NUM 27 : Destination Binaire, WORD sign‚ ///
+
+NUM27_DB_WS
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD4
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD5
+	RTS
+
+; /// NUM 27 : Destination Binaire, LONG non sign‚ ///
+
+NUM27_DB_LUS
+	RTS
+
+; /// NUM 27 : Destination Binaire, LONG sign‚ ///
+
+NUM27_DB_LS
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD8
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD9
+	RTS
+
+; /// NUM 27 : Destination Flottante, Single ///
+
+NUM27_DF_S
+	RTS
+
+; /// NUM 27 : Destination Flottante, Double ///
+
+NUM27_DF_D
+	RTS
+
+; /// NUM 27 : Destination Flottante, Extended ///
+
+NUM27_DF_E
+	RTS
+
+; /// NUM 27 : Destination Flottante, Packed ///
+
+NUM27_DF_P
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD14
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD15
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD16
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD17
+	RTS
+
+; /// NUM 27 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM27_DA_DUS
+	RTS
+
+; /// NUM 27 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM27_DA_DS
+	RTS
+
+; /// NUM 27 : Destination ASCII, Octal non sign‚ ///
+
+NUM27_DA_OUS
+	RTS
+
+; /// NUM 27 : Destination ASCII, Octal sign‚ ///
+
+NUM27_DA_OS
+	RTS
+
+; /// NUM 27 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM27_DA_HUS
+	RTS
+
+; /// NUM 27 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM27_DA_HS
+	RTS
+
+; /// NUM 27 : Destination ASCII, Binaire ///
+
+NUM27_DA_B
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD25
+	RTS
+
+; /// NUM 27 : Destination ASCII, Flottant Minuscule ///
+
+NUM27_DA_FMin	
+	RTS
+
+; /// NUM 27 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM27_DU_BUS
+	RTS
+
+; /// NUM 27 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM27_DU_BS
+	RTS
+
+; /// NUM 27 : Non d‚finit ///
+
+NUM27_UnDefD30
+	RTS
+
+; /// NUM 27 : Non d‚finit
+
+NUM27_UnDefD31
+	RTS
+	
+; /// NUM 28 : Source Ind‚finie, Binaire non sign‚ ///
+
+SU_BUS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM28_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+	
+NUM28_JUMP	BRA	NUM28_DB_BUS
+	BRA	NUM28_DB_BS
+	BRA	NUM28_DB_WUS
+	BRA	NUM28_DB_WS
+	BRA	NUM28_UnDefD4
+	BRA	NUM28_UnDefD5
+	BRA	NUM28_DB_LUS
+	BRA	NUM28_DB_LS
+	BRA	NUM28_UnDefD8
+	BRA	NUM28_UnDefD9
+	BRA	NUM28_DF_S
+	BRA	NUM28_DF_D
+	BRA	NUM28_DF_E
+	BRA	NUM28_DF_P
+	BRA	NUM28_UnDefD14
+	BRA	NUM28_UnDefD15
+	BRA	NUM28_UnDefD16
+	BRA	NUM28_UnDefD17
+	BRA	NUM28_DA_DUS
+	BRA	NUM28_DA_DS
+	BRA	NUM28_DA_OUS
+	BRA	NUM28_DA_OS
+	BRA	NUM28_DA_HUS
+	BRA	NUM28_DA_HS
+	BRA	NUM28_DA_B
+	BRA	NUM28_UnDefD25
+	BRA	NUM28_DA_FMin
+	BRA	NUM28_DA_FMaj
+	BRA	NUMError1
+	BRA	NUM28_DU_BS
+	BRA	NUM28_UnDefD30
+	BRA	NUM28_UnDefD31
+
+; /// NUM 28 : Destination Binaire, BYTE non sign‚
+
+NUM28_DB_BUS	
+	RTS
+
+; /// NUM 28 : Destination Binaire, BYTE sign‚ ///
+
+NUM28_DB_BS	
+	RTS
+
+; /// NUM 28 : Destination Binaire, WORD non sign‚ ///
+
+NUM28_DB_WUS	
+	RTS
+
+; /// NUM 28 : Destination Binaire, WORD sign‚ ///
+
+NUM28_DB_WS	
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD4
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD5
+	RTS
+
+; /// NUM 28 : Destination Binaire, LONG non sign‚ ///
+
+NUM28_DB_LUS	
+	RTS
+
+; /// NUM 28 : Destination Binaire, LONG sign‚ ///
+
+NUM28_DB_LS	
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD8
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD9
+	RTS
+
+; /// NUM 28 : Destination Flottante, Single ///
+
+NUM28_DF_S
+	RTS
+
+; /// NUM 28 : Destination Flottante, Double ///
+
+NUM28_DF_D
+	RTS
+
+; /// NUM 28 : Destination Flottante, Extended ///
+
+NUM28_DF_E
+	RTS
+
+; /// NUM 28 : Destination Flottante, Packed ///
+
+NUM28_DF_P
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD14
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD15
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD16
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD17
+	RTS
+
+; /// NUM 28 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM28_DA_DUS
+	RTS
+
+; /// NUM 28 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM28_DA_DS
+	RTS
+
+; /// NUM 28 : Destination ASCII, Octal non sign‚ ///
+
+NUM28_DA_OUS
+	RTS
+
+; /// NUM 28 : Destination ASCII, Octal sign‚ ///
+
+NUM28_DA_OS
+	RTS
+
+; /// NUM 28 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM28_DA_HUS	
+	RTS
+
+; /// NUM 28 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM28_DA_HS	
+	RTS
+
+; /// NUM 28 : Destination ASCII, Binaire ///
+
+NUM28_DA_B	
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD25
+	RTS
+
+; /// NUM 28 : Destination ASCII, Flottant Minuscule ///
+
+NUM28_DA_FMin
+	RTS
+
+; /// NUM 28 : Destination ASCII, Flottant Majuscule ///
+
+NUM28_DA_FMaj
+	RTS
+
+; /// NUM 28 : Destination Ind‚finie, Binaire sign‚ ///
+
+NUM28_DU_BS	
+	RTS
+
+; /// NUM 28 : Non d‚finit ///
+
+NUM28_UnDefD30
+	RTS
+
+; /// NUM 28 : Non d‚finit
+
+NUM28_UnDefD31
+	RTS
+
+; /// NUM 29 : Source Ind‚finie, Binaire sign‚ ///
+
+SU_BS	move.w	(16,SP),D0
+	cmpi.w	#31,D0
+	BGT	NUMError1
+	lea	NUM29_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+	RTS
+
+NUM29_JUMP	BRA	NUM29_DB_BUS
+	BRA	NUM29_DB_BS
+	BRA	NUM29_DB_WUS
+	BRA	NUM29_DB_WS
+	BRA	NUM29_UnDefD4
+	BRA	NUM29_UnDefD5
+	BRA	NUM29_DB_LUS
+	BRA	NUM29_DB_LS
+	BRA	NUM29_UnDefD8
+	BRA	NUM29_UnDefD9
+	BRA	NUM29_DF_S
+	BRA	NUM29_DF_D
+	BRA	NUM29_DF_E
+	BRA	NUM29_DF_P
+	BRA	NUM29_UnDefD14
+	BRA	NUM29_UnDefD15
+	BRA	NUM29_UnDefD16
+	BRA	NUM29_UnDefD17
+	BRA	NUM29_DA_DUS
+	BRA	NUM29_DA_DS
+	BRA	NUM29_DA_OUS
+	BRA	NUM29_DA_OS
+	BRA	NUM29_DA_HUS
+	BRA	NUM29_DA_HS
+	BRA	NUM29_DA_B
+	BRA	NUM29_UnDefD25
+	BRA	NUM29_DA_FMin
+	BRA	NUM29_DA_FMaj
+	BRA	NUM29_DU_BUS
+	BRA	NUMError1
+	BRA	NUM29_UnDefD30
+	BRA	NUM29_UnDefD31
+
+; /// NUM 29 : Destination Binaire, BYTE non sign‚
+
+NUM29_DB_BUS	
+	RTS
+
+; /// NUM 29 : Destination Binaire, BYTE sign‚ ///
+
+NUM29_DB_BS	
+	RTS
+
+; /// NUM 29 : Destination Binaire, WORD non sign‚ ///
+
+NUM29_DB_WUS	
+	RTS
+
+; /// NUM 29 : Destination Binaire, WORD sign‚ ///
+
+NUM29_DB_WS	
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD4
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD5
+	RTS
+
+; /// NUM 29 : Destination Binaire, LONG non sign‚ ///
+
+NUM29_DB_LUS	
+	RTS
+
+; /// NUM 29 : Destination Binaire, LONG sign‚ ///
+
+NUM29_DB_LS	
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD8
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD9
+	RTS
+
+; /// NUM 29 : Destination Flottante, Single ///
+
+NUM29_DF_S
+	RTS
+
+; /// NUM 29 : Destination Flottante, Double ///
+
+NUM29_DF_D
+	RTS
+
+; /// NUM 29 : Destination Flottante, Extended ///
+
+NUM29_DF_E
+	RTS
+
+; /// NUM 29 : Destination Flottante, Packed ///
+
+NUM29_DF_P
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD14
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD15
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD16
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD17
+	RTS
+
+; /// NUM 29 : Destination ASCII, D‚cimal non sign‚ ///
+
+NUM29_DA_DUS
+	RTS
+
+; /// NUM 29 : Destination ASCII, D‚cimal sign‚ ///
+
+NUM29_DA_DS
+	RTS
+
+; /// NUM 29 : Destination ASCII, Octal non sign‚ ///
+
+NUM29_DA_OUS
+	RTS
+
+; /// NUM 29 : Destination ASCII, Octal sign‚ ///
+
+NUM29_DA_OS
+	RTS
+
+; /// NUM 29 : Destination ASCII, Hexad‚cimal non sign‚ ///
+
+NUM29_DA_HUS	
+	RTS
+
+; /// NUM 29 : Destination ASCII, Hexad‚cimal sign‚ ///
+
+NUM29_DA_HS	
+	RTS
+
+; /// NUM 29 : Destination ASCII, Binaire ///
+
+NUM29_DA_B	
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD25
+	RTS
+
+; /// NUM 29 : Destination ASCII, Flottant Minuscule ///
+
+NUM29_DA_FMin
+	RTS
+
+; /// NUM 29 : Destination ASCII, Flottant Majuscule ///
+
+NUM29_DA_FMaj
+	RTS
+
+; /// NUM 29 : Destination Ind‚finie, Binaire non sign‚ ///
+
+NUM29_DU_BUS	
+	RTS
+
+; /// NUM 29 : Non d‚finit ///
+
+NUM29_UnDefD30
+	RTS
+
+; /// NUM 29 : Non d‚finit
+
+NUM29_UnDefD31
+	RTS
+	
+; /// NUM 30 : Non d‚finit
+
+UnDefS30
+	RTS
+
+; /// NUM 31 : Non d‚finit ///
+
+UnDefS31
+	RTS
+
+; *** Les routines de travail **************************************************************
+
+; /// NUM Null Code Watcher ///
+
+NUM_NullWatcher lea	SSAV_Wk1Buff(PC),A0
+	subq.l	#1,A0		; On fait attention
+Null_Watch	addq.l	#1,A0
+	tst.b	(A0)
+	BNE	Null_Watch		; Tant que l'on ne trouve pas
+	
+	RTS
+
+; /// NUM Copy Binary Code ///
+
+NUM_CopyBinary	subq.l	#1,D0		; On se remet … l'heure pour le DBF
+	lea	SSAV_Wk1Buff(PC),A1
+CopyCode	move.b	(A0)+,(A1)+
+	DBF	D0,CopyCode
+
+	RTS
+
+; /// NUM Logical Convertion ///
+
+NUM_LogConv	subq.l	#1,D0		; Idem, pour le DBF
+	lea	SSAV_Wk1Buff(PC),A0
+ConvCode	negx.b	(A0,D0.w)
+	DBF	D0,ConvCode
+	
+	RTS
+
+; /// NUM Clear Working Buffer ///
+
+NUM_ClrWkBuffer	lea	SSAV_Wk1Buff(PC),A0
+	move.w	#63,D0
+Clr_WkBuffer	clr.l	(A0)+
+	DBF	D0,Clr_WkBuffer
+	
+	RTS
+
+; *** Les routines de conversion ***********************************************************
+
+; /// NUM ASCII Deci To Binary ///
+
+NUM_Deci2Bin	
+
+	RTS
+
+; /// NUM Binary To ASCII Deci ///
+
+NUM_Bin2Deci	
+
+	RTS
+
+; /// NUM ASCII Octal To Binary ///
+
+NUM_Oct2Bin	
+
+	RTS
+
+; /// NUM Binary To ASCII Octal ///
+
+NUM_Bin2Oct	
+
+	RTS
+
+; /// NUM ASCII Hexa To Binary ///
+
+NUM_Hexa2Bin	andi.l	#$FFFF,D0		; Pour ‚viter V
+	divu.w	#2,D0		; Nombre de WORD … traiter
+	BCC	Hexa2Bin2		; Ca passe
+	addq.w	#1,D0		; Si retenue … cause d'un nombre d'OCTET impair, on arrondit au sup‚rieur
+Hexa2Bin2	move.w	D0,D1
+Hexa2Bin1	move.w	#1,D3		; On indique que l'on traite un nouveau WORD
+	move.w	(A0,D0.w*2),D2		; Le WORD en question
+Hexa2Bin0	lea	NUMHexa_Lib(PC),A2	; La librairie HexaD‚cimal pour v‚rification
+	clr.w	D4		; Le compteur de convertion
+HexaLib_Loop	move.b	(A2,D4.w),D5		; On prend l'OCTET de r‚f‚rence
+	BEQ	NUMError2		; C'est la fin, et l'on ne l'a pas trouv‚
+	cmp.b	D5,D2
+	BEQ	NextHexa_Loop		; C'est le bon...
+	addq.w	#1,D4		; On passe au suivant
+	BRA	HexaLib_Loop		; On continue jusqu'a trouver
+NextHexa_Loop	cmpi.w	#16,D5
+	BLT	NextHexa2Bin0
+	sub.w	#16,D5		; Si on ‚tait dans la partie haute de la librairie, on remet les choses en ordre
+NextHexa2Bin0	tst.w	D3
+	BEQ	Hexa0		; On termine le deuxieme OCTET
+	and.b	D5,(A1,D1.w)		; On l'impose en tant que QUARTET faible, et on efface le reste
+	BRA	NextHexa2Bin1
+Hexa0	rol.b	#4,D5		; On le place au bon endroit dans l'OCTET, ici en QUARTET fort
+	or.b	D5,(A1,D1.w)		; On le place en tant que QUARTET fort, sans effacer le reste
+NextHexa2Bin1	tst.w	D3
+	BEQ	NextHexa2Bin2		; On … trait‚ les deux WORD
+	rol.w	#8,D2		; Si l'on n'‚tait qu'au premier, on change l'OCTET, et l'on recommence sur le deuxieme du WORD
+	clr.w	D3		; L…, on passe au deuxieme OCTET
+	DBF	D1,Hexa2Bin0		; Zou...
+NextHexa2Bin2	subq.w	#1,D0		; WORD pr‚c‚dent
+	DBF	D1,Hexa2Bin1		; Zou aussi, mais sur le WORD pr‚c‚dent...
+	
+	RTS
+
+; /// NUM Binary To ASCII Hexa ///
+
+NUM_Bin2Hexa	move.w	D0,D1
+	subq.w	#1,D0		; On fait gaffe pour le DBF
+	mulu.w	#2,D1		; On traitera deux fois plus d'OCTET
+Bin2Hexa1	move.b	(A0,D0.w),D4
+	move.w	#1,D3		; On traite le premier QUARTET
+	subq.w	#1,D1		; On fait gaffe … la place de l'Octet
+Bin2Hexa0	move.b	D4,D2		; On sauvegarde pour le deuxieme QUARTET
+	andi.b	#15,D2		; On efface le QUARTET fort
+	cmpi.b	#10,D2		; On est au dessus de dix, ...
+	BGE	Bin2HexaSup		; ... et l'on doit traiter avec les lettres
+	add.b	#48,D2		; Les chiffres
+	BRA	NextBin2Hexa0
+Bin2HexaSup	add.b	#55,D2		; Les lettres majuscules … partie de 65 (55+10 et plus)
+NextBin2Hexa0	move.b	D2,(A1,D1.w)		; On inscrit
+	tst.w	D3
+	BEQ	NextBin2Hexa1		; On a trait‚ les deux QUARTET
+	ror.b	#4,D4		; On passe au QUARTET fort
+	subq.w	#1,D1		; On pr‚pare pour l'inscription
+	DBF	D3,Bin2Hexa0		; On retourne traiter, le deuxieme QUARTET
+NextBin2Hexa1	DBF	D0,Bin2Hexa1		; On passe … l'OCTET suivant
+	
+	RTS
+
+; /// NUM ASCII Binary To Binary ///
+
+NUM_Ascii2Bin	andi.l	#$FFFF,D0		; Pour ‚viter V
+	move.w	D0,D1
+	subq.w	#1,D0		; Pour le DBF
+	divu.w	#8,D1		; Le nombre d'OCTET final
+	BCC	ABin2Bin1
+	addq.w	#1,D1		; Si retenue
+ABin2Bin1	clr.w	D3		; La place du BIT … traiter
+ABin2Bin0	move.b	(A0,D0.w),D2		; L'OCTET en question
+	lea	NUMBin_Lib(PC),A2	; La librairie de v‚rification
+	clr.w	D4		; Le compteur du BIT
+BinLib_Loop	move.b	(A2,D4.w),D5
+	BEQ	NUMError2		; Je suis arriv‚ … la fin, SANS trouver!
+	cmp.b	D5,D2
+	BEQ	NextBin_Loop		; Match...
+	addq.w	#1,D4		; Le suivant dans la liste
+	BRA	BinLib_Loop		; On continue la recherche
+NextBin_Loop	cmpi.w	#2,D5
+	BLT	NextABin2Bin0
+	subq.w	#2,D5		; J'‚tait dans la partie haute de la librairie
+NextABin2Bin0	tst.w	D5
+	BEQ	ABin0		; C'est un 0
+	bset.b	D3,(A1,D1.w)		; L…, c'est un 1
+	BRA	NextABin2Bin1		; Zoup...
+ABin0	bclr.b	D3,(A1,D1.w)		; On efface le truc
+NextABin2Bin1	addq.w	#1,D3		; On passe au BIT suivant
+	cmpi.w	#8,D3		; Je suis arriv‚ au bout?
+	BLT	NextABin2Bin2		; Meuh non...
+	subq.w	#1,D0		; On part en croisade contre l'OCTET source suivant, ...
+	DBF	D1,ABin2Bin1		; Mais on traite aussi le prochain OCTET destination puisque l'on vient de finit de fabriquer un OCTET
+NextABin2Bin2	DBF	D0,ABin2Bin0		; On part traiter l'OCTET source suivant
+	
+	RTS
+
+; /// NUM Binary To ASCII Binary ///
+
+NUM_Bin2Ascii	subq.w	#1,D0		; On fait gaffe au DBF
+Bin2ABin1	move.b	(A0)+,D2		; On prend...
+	moveq.w	#7,D1		; Une petite boucle
+Bin2ABin0	btst.l	D1,D2		; On cherche l'‚tat du BIT
+	BEQ	Bin2ABin_Null
+	move.b	#49,(A1)+		; 1
+	BRA	NextBin2ABin0
+Bin2ABin_Null	move.b	#48,(A1)+		; 0
+NextBin2ABin0	DBF	D1,Bin2ABin0		; BIT suivant
+	DBF	D0,Bin2ABin1		; OCTET suivant
+	
+	RTS
+
+; /// NUM Float To Binary ///
+
+NUM_Float2Bin
+	RTS
+
+; /// NUM Binary To Float ///
+
+NUM_Bin2Float
+	RTS
+
+
+; *** Les routines additionelles ***********************************************************
+
+; /// NUM Bit's Power ///
+
+NUM_BitPower	move.b	#1,(A0)+
+	tst.w	D0
+	BEQ	Exit_BitPower
+	
+	movea.l	A0,A1
+	
+BitAdd_Loop0	movea.l	A1,A0
+	move.w	#256,D1
+	ori	#%100,CCR		; Z … 1
+	
+BitAdd_Loop1	abcd	-(A0),-(A0)
+	DBEQ	D1,BitAdd_Loop1
+	
+	DBEQ	D0,BitAdd_Loop0
+	
+Exit_BitPower	RTS
+
+; /// NUM Packed Add ///
+
+NUM_ABCDX	move.w	#256,D0
+	ori	#%100,CCR		; Z … 1
+	
+ABCDX_Loop	abcd	-(A0),-(A1)
+	DBEQ	D0,ABCDX_Loop
+	
+	RTS
+	
+; /// NUM Packed Cmp ///
+
+NUM_CmpBCDX	move.w	#256,D0
+	ori	#%100,CCR		; Z … 1
+	
+CmpBCDX_Loop	sbcd	-(A0),-(A1)
+	DBEQ	D0,CmpBCDX_Loop
+
+	move.b	(A1),D0
+	cmpi.b	#$99,D0
+	BNE	Exit_CmpBCDX
+	
+	ori	#%1000,CCR		; N … 1
+
+Exit_CmpBCDX	RTS
+
+; /// NUM Float Power ///
+
+NUM_FloatPower	
+
+	RTS
+
+; /// NUM Float Sub ///
+
+NUM_FloatSubX
+
+	RTS
+
+; /// NUM Float Cmp ///
+
+NUM_CmpFloatX	
+
+	RTS
+
+; /// NUM Pseudo Float Div ///
+
+NUM_DivFloatX
+
+	RTS
+
+; *** Les erreurs **************************************************************************
+
+; /// NUM Error -1 : General Failure ///
+	
+NUMError1	move.w	#-1,D0
+	RTS
+	
+; /// NUM Error -2 : Bad Format ///
+
+NUMError2	move.w	#-2,D0
+	RTS
+	
+; /// NUM Error -3 : Too Big ///
+
+NUMError3	move.w	#-3,D0
+	RTS
+
+; /// NUM Error -4 : No More Place ///
+
+NUMError4	move.w	#-4,D0
+	RTS
+
+
+; *** La routine de consulation des registres **********************************************
+
+; /// Motorola's Register Reference Routine ///
+
+MotoRegister	move.l	(30,SP),D0		; Y'a un RTS … la fin, gaffe...
+	BPL	MotoGuest		; Bwoa, une adresse "normale"...
+	cmpi.l	#-48,D0
+	BLT	MotoGuest		; Adresse extreme, qui resemble … du sign‚
+	lea	MotoReg_JUMP(PC),A2
+	JMP	(A2,D0.w*4)
+MotoGuest	RTS
+
+	BRA	MotoReserved5
+	BRA	MotoReserved4
+	BRA	MotoReserved3
+	BRA	MotoReserved2
+	BRA	MotoReserved1
+	BRA	MotoFP7
+	BRA	MotoFP6
+	BRA	MotoFP5
+	BRA	MotoFP4
+	BRA	MotoFP3
+	BRA	MotoFP2
+	BRA	MotoFP1
+	BRA	MotoFP0
+	BRA	MotoFPIAR
+	BRA	MotoFPSR
+	BRA	MotoFPCR
+	BRA	MotoMMUSR
+	BRA	MotoTT1
+	BRA	MotoTT0
+	BRA	MotoSRP
+	BRA	MotoCRP
+	BRA	MotoTC
+	BRA	MotoCAAR
+	BRA	MotoCACR
+	BRA	MotoMSP
+	BRA	MotoISP
+	BRA	MotoDFC
+	BRA	MotoSFC
+	BRA	MotoVBR
+	BRA	MotoPC
+	BRA	MotoSR
+	BRA	MotoSSP
+	BRA	MotoUSP
+	BRA	MotoA7
+	BRA	MotoA6
+	BRA	MotoA5
+	BRA	MotoA4
+	BRA	MotoA3
+	BRA	MotoA2
+	BRA	MotoA1
+	BRA	MotoA0
+	BRA	MotoD7
+	BRA	MotoD6
+	BRA	MotoD5
+	BRA	MotoD4
+	BRA	MotoD3
+	BRA	MotoD2
+	BRA	MotoD1
+	BRA	MotoD0
+MotoReg_JUMP	BRA	MotoGuest		; Ben, mais enfin, ...
+	
+MotoD0
+
+	RTS
+
+MotoD1
+
+	RTS
+
+MotoD2
+
+	RTS
+
+MotoD3
+
+	RTS
+
+MotoD4
+
+	RTS
+
+MotoD5
+
+	RTS
+
+MotoD6
+
+	RTS
+
+MotoD7
+
+	RTS
+
+MotoA0
+
+	RTS
+
+MotoA1
+
+	RTS
+
+MotoA2
+
+	RTS
+
+MotoA3
+
+	RTS
+
+MotoA4
+
+	RTS
+
+MotoA5
+
+	RTS
+
+MotoA6
+
+	RTS
+
+MotoA7
+
+	RTS
+
+MotoUSP
+
+	RTS
+
+MotoSSP
+
+	RTS
+
+MotoSR
+
+	RTS
+
+MotoPC
+
+	RTS
+
+MotoVBR
+
+	RTS
+
+MotoSFC
+
+	RTS
+
+MotoDFC
+
+	RTS
+
+MotoISP
+
+	RTS
+
+MotoMSP
+
+	RTS
+
+MotoCACR
+
+	RTS
+
+MotoCAAR
+
+	RTS
+
+MotoTC
+
+	RTS
+
+MotoCRP
+
+	RTS
+
+MotoSRP
+
+	RTS
+
+MotoTT0
+
+	RTS
+
+MotoTT1
+
+	RTS
+
+MotoMMUSR
+
+	RTS
+
+MotoFPCR
+
+	RTS
+
+MotoFPSR
+
+	RTS
+
+MotoFPIAR
+
+	RTS
+
+MotoFP0
+
+	RTS
+
+MotoFP1
+
+	RTS
+
+MotoFP2
+
+	RTS
+
+MotoFP3
+
+	RTS
+
+MotoFP4
+
+	RTS
+
+MotoFP5
+
+	RTS
+
+MotoFP6
+
+	RTS
+
+MotoFP7
+
+	RTS
+
+MotoReserved1
+
+	RTS
+
+MotoReserved2
+
+	RTS
+
+MotoReserved3
+
+	RTS
+
+MotoReserved4
+
+	RTS
+
+MotoReserved5
+
+	RTS
+
+; *** Les librairies de r‚f‚rence **********************************************************
+
+; /// NUM Format Reference Library ///
+
+NUMDeci_Lib	dc.b	"0123456789",16,17,18,19,20,21,22,23,24,25,0
+NUMOctal_Lib	dc.b	"01234567",16,17,18,19,20,21,22,23,0
+NUMHexa_Lib	dc.b	"0123456789ABCDEF",16,17,18,19,20,21,22,23,24,25,"abcdedf",0
+NUMBin_Lib	dc.b	"01",16,17,0,0		; 00 = Even

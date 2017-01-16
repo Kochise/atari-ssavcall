@@ -1,0 +1,51 @@
+/// Arborescence de l'archive... //////////////////////////////////////////////
+
+RD : RootDirectory
+SD : SubDirectory
+
+RD  SSAVCALL.253
+    |
+SD  +-DATAS               ; Les donn‚es binaires utiles
+    | |
+    | +-EXCLAMA .ICN      ; Icone 32*32 monochrome ("!" systeme)
+    | +-INTEROG .ICN      ; Icone 32*32 monochrome ("?" systeme)
+    | +-IVN-INST.RSM      ; Ressource integr‚e de l'installateur IVN-INST.S
+    | +-IVP-INST.RSM      ; Ressource integr‚e de l'installateur IVP-INST.S
+    | '-STOP    .ICN      ; Icone 32*32 monochrome ("STOP" systeme)
+    |
+SD  +-DOCUS               ; La documentation de SSAVCALL
+    | |
+    | +-ACCS    .FRA      ; Manuel de programmation des accessoires
+    | +-AES     .FRA      ; Manuel d'utilisation de l'AES via SSAVCALL
+    | +-BASEPAGE.FRA      ; Descriptif du ProgHeader et de la BasePage
+    | +-COOKIES .FRA      ; Descriptif des Cookies
+    | +-CRASH   .FRA      ; Descriptif de la CrashPage
+    | +-INDICES .FRA      ; Indices de pr‚sence de SSAVCALL en m‚moire
+    | +-INTRO   .FRA      ; Introduction et discution sur l'utilit‚ de SSAVCALL
+    | +-IVX-INST.FRA      ; Descriptif des installateurs
+    | +-KASSAV  .FRA      ; Un interlude
+    | +-LINEA   .FRA      ; Les commandes LineA
+    | +-OPSLOGIC.FRA      ; Un r‚sum‚ des op‚rations logiques
+    | +-PRINT   .LST      ; L'ordre d'impression de la documentation
+    | +-SSAVCALL.FRA      ; Manuel des fonctions avanc‚es de SSAVCALL
+    | +-TUBEGEM .FRA      ; Descriptif du protocole TubeGEM
+    | +-XBRA    .FRA      ; Descriptif du protocole XBRA
+    | +-XCTRLCPX.FRA      ; Manuel de programmation du XControl et des CPXs
+    | '-VDI     .FRA      ; Manuel d'utilisation du VDI via SSAVCALL
+    |
+SD  +-UTILS               ; Quelques utilitaires bien utiles
+    | |
+    | +-FICHIERS.DOC      ; Une information sur le programme FICHIERS.PRG
+    | +-FICHIERS.PRG      ; Un utilitaire DP de copie de fichiers A:<->A:
+    | +-REAL-FPU.FRA      ; Descriptif du programme REAL-FPU_PRG
+    | +-REAL-FPU.PRG      ; Modificateur du Cookie "_FPU" pour avoir 68882
+    | '-REAL-FPU.S        ; Source du programme REAL-FPU.PRG
+    |
+    +-FILE_ID .DIZ        ; Descriptif de l'archive pour les BBS
+    +-INSTALL .PRG        ; Installateur bas‚ sur la source IVP-INST.S
+    +-INSTALL .S          ; La source du l'installateur (reluquez l…...)
+    +-IVN-INST.S          ; Installateur normal (simple disons...)
+    +-IVP-INST.S          ; Installateur professionnel (costaud...)
+    +-LISEZMOI.SVP        ; Informations de bienvenue
+    +-SSAVCALL.PRG        ; Le programme … mettre dans le dossier AUTO
+    '-TREE    .LST        ; Ce fichier

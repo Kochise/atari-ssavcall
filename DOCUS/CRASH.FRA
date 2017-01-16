@@ -1,0 +1,15 @@
+/// Ze Crash Process Document... //////////////////////////////////////////////
+
+Lorsque le processeur fait une erreur, il y a exception. Les bombes de l'ATARI
+en sont la meilleure manifestation.
+S'il y a eu "Crash", le processeur Motorola (pas seulement dans l'ATARI), fait
+les choses suivantes:
+
+En $380, met $12345678 pour dire que les informations de la page de Crash (de
+         $384 … $3EC) sont valides, donc qu'il y a eu Crash.
+En $384, met 8 LONGs, D0 … D7
+En $3A4, met 8 LONGs, A0 … A7
+         Le A7 est la SSP, car l'exception se d‚roule en superviseur
+En $3C4, met 1 BYTE, le num‚ro de l'exception
+En $3C8, met 1 LONG, la USP
+En $3CC, met les 16 premiers WORDs point‚s par la SSP

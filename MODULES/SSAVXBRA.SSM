@@ -1,0 +1,6 @@
+; /// SSAV - XBRA Control - By KOSS ///
+
+	cmpi.w	#115,(4,SP)		; Appel du VDI
+	BEQ	VDI_Control
+	cmpi.w	#200,(4,SP)		; Appel de l'AES
+	BEQ	AES_Control

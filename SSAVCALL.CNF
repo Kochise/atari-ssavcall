@@ -1,0 +1,34 @@
+# Fichier de Configuration de SSAVCALL V2.xx
+# A mettre dans le mˆme r‚pertoire que SSAVCALL.PRG
+
+# Configuration minimale (le reste du fichier de configuration n'est pas lu)
+# Use      : [YES/NO]
+MINIMUM=NO
+
+# Chemin des fichiers Plug'In
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [PATH]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+PINPATH=YES,BOOT,\SSAVPLUG.IN,PIN,PIX
+
+# Chemin des accessoires
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [PATH]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+ACCPATH=YES,BOOT,\ACCS,ACC,ACX
+
+# Chemin du ClipBoard
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [PATH]
+# Create   : [YES/NO] (Only if directory NOT FOUND or NOT VALID)
+CLIPATH=YES,BOOT,\CLIPBRD,YES
+
+#Nombre de Cookies
+# Number   : [DEFAULT/Number]
+JARSIZE=DEFAULT
+

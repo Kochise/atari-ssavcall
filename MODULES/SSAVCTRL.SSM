@@ -1,0 +1,17 @@
+;Memory_Referee	include	XMEMORYR.SSM
+;Cookie_Factory	include	COOKFACT.SSM
+;RNG_Layer	include	RNGLAYER.SSM
+;Number_Translator	include	NUMTRANS.SSM
+;Jar_Screamer	include	JARSCREM.SSM
+;Resource_Manager	include	RSCMANAG.SSM
+;Processing_Library	include	PROC-LIB.SSM
+;Language_Processor	include	LNG-PROC.SSM
+;CPX_Maker	include	CPXMAKER.SSM
+;GAF_Scrutinizer	include	GAFSCRUT.SSM
+;Chip_Dialer	include	CHIPDIAL.SSM
+;TOS_Extender	include	TOSXTNDR.SSM
+;Patch_Library	include	PATCHLIB.SSM
+;Icons_Library	include	ICONSLIB.SSM
+;Graphics_Library	include	GRAFSLIB.SSM
+;Image_Grinder	include	IMGRINGR.SSM
+;Module_Prayer	include	MODPRAYR.SSM

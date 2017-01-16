@@ -1,0 +1,17 @@
+Memory_Referee          XMEMORYR.PIN
+Cookie_Factory          COOKFACT.PIN
+RNG_Layer               RNGLAYER.PIN
+Number_Translator       NUMTRANS.PIN
+Jar_Screamer            JARSCREM.PIN
+Resource_Manager        RSCMANAG.PIN
+Processing_Library      PROC-LIB.PIN
+Language_Processor      LNG-PROC.PIN
+CPX_Maker               CPXMAKER.PIN
+GAF_Scrutinizer         GAFSCRUT.PIN
+Chip_Dialer             CHIPDIAL.PIN
+TOS_Extender            TOSXTNDR.PIN
+Patch_Library           PATCHLIB.PIN
+Icons_Library           ICONSLIB.PIN
+Graphics_Library        GRAFSLIB.PIN
+Image_Grinder           IMGRINGR.PIN
+PlugIn_Prayer           PINPRAYR.PIN
