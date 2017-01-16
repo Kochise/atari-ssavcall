@@ -1,0 +1,42 @@
+/// SSAVCALL 2.55 - KOSS 1996-1999 ////////////////////////////////////////////
+
+This is a never finished version of SSAVCALL !
+
+Target computer : ATARI Falcon030
+
+SSAVCALL was coded to offer application services for assembler coders, such :
+ - AES call in ASM                      (works)
+ - VDI call in ASM                      (works)
+ - SYS functions for general usage (some works)
+ - AIM functions for Automatic Interface Management
+ - ...
+ - Complete documentation of the AES/VDI (almost finished)
+
+Unimplemented functions, also promised in the DOC and in the SRC :
+ - Mathematic conversion
+ - Interface management
+ - ...
+
+But what really works is :
+ - AES conversion part
+ - VDI conversion part
+ - SYS functions (ONLY the documented functions : PROG - COOK - XBRA)
+
+What this release could be used for :
+ - GEM discovering
+ - AES documentation (no C explanations, MinT, MagiC, Geneva, N.aes)
+ - VDI documentation (no C explanations, MinT, MagiC, Geneva, N.aes, SpdG)
+ - AES call using ASM (ONLY the documented functions)
+ - VDI call using ASM (ONLY the documented functions)
+ - SYS functions (ONLY the documented functions : PROG - COOK - XBRA)
+ 
+WARNING : The source files syntax was a bit strange. I changed since,
+          as you can see in SSAVINIT.SS, the init of SSAV for your
+          programs. See SSAVDEMO.SS !
+          
+          The stuff have some bugs somewhere, nothing dangerous !
+         
+Contact me at :
+
+kochise@caramail.com (spammed email-box, put SSAVCALL in subject)
+david.koch@libertysurf.fr

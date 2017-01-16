@@ -1,0 +1,9 @@
+; /// New Resource File - KOSS 1999 ///
+;
+; Objects : Menu -> Menu_Bar
+;                   Menu_Tools
+;                   Menu_PopUp
+;           Tool -> Tool_Bar
+;                   Tool_PopUp
+;           Form -> Form_Fly
+;                   Form_Window

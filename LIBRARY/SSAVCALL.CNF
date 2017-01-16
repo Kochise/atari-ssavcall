@@ -1,0 +1,54 @@
+# Fichier de Configuration de SSAVCALL V2.xx
+# A mettre dans le mˆme r‚pertoire que SSAVCALL.PRG !
+
+# Configuration minimale (le reste du fichier de configuration n'est pas lu)
+# Pendant la barre de SSAVCALL, appuyez sur [Control] pour effet identique
+# Use      : [YES/NO/(FAST)/(CARD)] (): Not in use yet!
+MINIMUM=NO
+
+# Chemin des fichiers Plug'In
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+PINPATH=YES,BOOT,\SSAVCALL.DIR\PLUG-IN.DIR,PIN,PIX
+
+# Chemin des accessoires
+# Merci pour l'id‚e … MURPHY Dave (ACCFOLDR) et COUSIN Micka‰l (ACCS)
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+ACCPATH=YES,BOOT,\ACCS,ACC,ACX
+
+# Chemin du ClipBoard
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Create   : [YES/NO] (Only if directory NOT FOUND or NOT VALID)
+CLIPATH=YES,BOOT,\CLIPBRD,YES
+
+# Nombre de Cookies
+# Merci pour l'id‚e aux REMOVERS [Seb/Stabylo] (Cook-It)
+# Number   : [DEFAULT/Number]
+JARSIZE=DEFAULT
+
+# Type du coprocesseur
+# SoftWare : [AUTO/NONE/88?/881/882/040/+SFP]
+# HardWare : [AUTO/NONE/88?/881/882/040/+SFP]
+FPUKIND=AUTO,882
+
+# Gestionnaire de m‚moire physique
+# STRam    : [MAX/1/2/4/8/16/32/64]
+# TTRam    : [NONE/MAX/1/2/4/8/16/32/64/128/256/512]
+RAMSIZE=MAX,NONE
+
+# Gestionnaire de m‚moire virtuelle
+# Use      : [YES/NO]
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Size     : [SizeInMb]
+VIRTUAL=NO,BOOT,\,2
+

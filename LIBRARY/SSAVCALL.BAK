@@ -1,0 +1,35 @@
+# Fichier de Configuration de SSAVCALL V2.xx
+# A mettre dans le mˆme r‚pertoire que SSAVCALL.PRG!
+
+# Chemin des fichiers Plug'In
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+PINPATH=BOOT,\SSAVCALL.DIR\PLUG-IN.DIR,PIN,PIX
+
+# Chemin des accessoires
+# Merci pour l'id‚e … MURPHY Dave (ACCFOLDR) et COUSIN Micka‰l (ACCS)
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Valid    : [Kind]
+# Invalid  : [Kind]
+ACCPATH=BOOT,\ACCS,ACC,ACX
+
+# Chemin du ClipBoard
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Create   : [YES/NO] (Only if directory NOT FOUND or NOT VALID)
+CLIPATH=BOOT,\CLIPBRD,YES
+# WARNING : "CLIPBRD" is the OFFICIAL ClipBoard's Directory Name
+
+# Nombre de Cookies
+# Merci pour l'id‚e aux REMOVERS [Seb/Stabylo] (Cook-It)
+# Number   : [DEFAULT/Number]
+JARSIZE=DEFAULT
+
+# Gestionnaire de m‚moire virtuelle
+# Drive    : [BOOT/DriveID]
+# Path     : [Path]
+# Size     : [SizeInMb/DEV]
+VIRTUAL=BOOT,\,0

@@ -1,0 +1,1747 @@
+; /// SSAVCALL Project - VDI Control - KOSS 1998-2004 ///
+; C'est parfait, n'y touche plus...
+; Faudra encore ajouter les fonctions manquantes (SpeedoGDOS)
+
+	move.w	(6,SP),D0
+	cmpi.w	#255,D0
+	BGT	SSAV_TUS_VDI_VDI_ERROR	; Au dessus de VDI 255, y'a rien
+	cmpi.w	#-1,D0
+	BMI	SSAV_TUS_VDI_VDI_ERROR	; En dessous de VDI -1, y'a rien
+	move.l	(8,SP),A1	; VDI_PARAMS
+
+	clr.l	([A1])	; Contrl0-1, Pour etre certain
+	clr.l	([A1],4)	; Contrl2-3, de l'hygiene
+	clr.w	([A1],8)	; Contrl4
+
+	lea	SSAV_TUS_VDI_VDI_JUMP,A2	; Le fun...
+
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(A1),A0	; Contrl
+	addq.l	#1,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])	; On saute
+
+SSAV_TUS_VDI_VDI_ERROR:	RTS
+
+	dc.l	-1,0,SSAV_TUS_VDI_V_Set_App_Buff,$FF000000; VDI -1
+SSAV_TUS_VDI_VDI_JUMP:	dc.l	1,0,SSAV_TUS_VDI_V_OpnWk,$0100060B	; VDI   1
+	dc.l	2,0,SSAV_TUS_VDI_V_ClsWk,$02000000	; VDI   2
+	dc.l	3,0,SSAV_TUS_VDI_V_ClrWk,$03000000	; VDI   3
+	dc.l	4,0,SSAV_TUS_VDI_V_UpdWk,$04000000	; VDI   4
+	dc.l	5,0,SSAV_TUS_VDI_V_Escape,$05000000	; VDI   5
+	dc.l	6,0,SSAV_TUS_VDI_V_Pline,$06000000	; VDI   6
+	dc.l	7,0,SSAV_TUS_VDI_V_PMarker,$07000000	; VDI   7
+	dc.l	8,0,SSAV_TUS_VDI_V_GText,$08000000	; VDI   8
+	dc.l	9,0,SSAV_TUS_VDI_V_FillArea,$09000000	; VDI   9
+	dc.l	10,0,SSAV_TUS_VDI_V_CellArray,$0A000000	; VDI  10
+	dc.l	11,0,SSAV_TUS_VDI_V_GDP,$0B000000	; VDI  11
+	dc.l	12,0,SSAV_TUS_VDI_Vst_Heigh,$0C010200	; VDI  12
+	dc.l	13,0,SSAV_TUS_VDI_Vst_Rotation,$0D000201	; VDI  13
+	dc.l	14,0,SSAV_TUS_VDI_Vs_Color,$0E000003	; VDI  14
+	dc.l	15,0,SSAV_TUS_VDI_Vsl_Type,$0F000000	; VDI  15
+	dc.l	16,0,SSAV_TUS_VDI_Vsl_Width,$10010100	; VDI  16
+	dc.l	17,0,SSAV_TUS_VDI_Vsl_Color,$11000001	; VDI  17
+	dc.l	18,0,SSAV_TUS_VDI_Vsm_Type,$12000001	; VDI  18
+	dc.l	19,0,SSAV_TUS_VDI_Vsm_Height,$13010100	; VDI  19
+	dc.l	20,0,SSAV_TUS_VDI_Vsm_Color,$14000001	; VDI  20
+	dc.l	21,0,SSAV_TUS_VDI_Vst_Font,$15000001	; VDI  21
+	dc.l	22,0,SSAV_TUS_VDI_Vst_Color,$16000001	; VDI  22
+	dc.l	23,0,SSAV_TUS_VDI_Vsf_Interior,$17000001	; VDI  23
+	dc.l	24,0,SSAV_TUS_VDI_Vsf_Style,$18000001	; VDI  24
+	dc.l	25,0,SSAV_TUS_VDI_Vsf_Color,$19000001	; VDI  25
+	dc.l	26,0,SSAV_TUS_VDI_Vq_Color,$1A000002	; VDI  26
+	dc.l	27,0,SSAV_TUS_VDI_Vqt_Array,$1B020002	; VDI  27
+	dc.l	28,0,SSAV_TUS_VDI_Vrq_Locator,$1C010100	; VDI  28
+	dc.l	29,0,SSAV_TUS_VDI_Vrq_Valuator,$1D000001	; VDI  29
+	dc.l	30,0,SSAV_TUS_VDI_Vrq_Choice,$1E000000	; VDI  30
+	dc.l	31,0,SSAV_TUS_VDI_Vrq_String,$1F010002	; VDI  31
+	dc.l	32,0,SSAV_TUS_VDI_Vswr_Mode,$20000001	; VDI  32
+	dc.l	33,0,SSAV_TUS_VDI_VSin_Mode,$21000002	; VDI  33
+	dc.l	35,0,SSAV_TUS_VDI_Vql_Attributes,$23000100	; VDI  35
+	dc.l	36,0,SSAV_TUS_VDI_Vqm_Attributes,$24000100	; VDI  36
+	dc.l	37,0,SSAV_TUS_VDI_Vqf_Attributes,$25000000	; VDI  37
+	dc.l	38,0,SSAV_TUS_VDI_Vqt_Attributes,$26000200	; VDI  38
+	dc.l	39,0,SSAV_TUS_VDI_Vst_Alignment,$27000002	; VDI  39
+	dc.l	100,0,SSAV_TUS_VDI_V_OpnVWk,$6400060B	; VDI 100
+	dc.l	101,0,SSAV_TUS_VDI_V_ClsVWk,$65000000	; VDI 101
+	dc.l	102,0,SSAV_TUS_VDI_Vq_Extnd,$66000601	; VDI 102
+	dc.l	103,0,SSAV_TUS_VDI_V_ContourFill,$67010001	; VDI 103
+	dc.l	104,0,SSAV_TUS_VDI_Vsf_Perimeter,$68000001	; VDI 104
+	dc.l	105,0,SSAV_TUS_VDI_V_Get_Pixel,$69010000	; VDI 105
+	dc.l	106,0,SSAV_TUS_VDI_Vst_Effects,$6A000001	; VDI 106
+	dc.l	107,0,SSAV_TUS_VDI_Vst_Point,$6B000201	; VDI 107
+	dc.l	108,0,SSAV_TUS_VDI_Vsl_Ends,$6C000002	; VDI 108
+	dc.l	109,0,SSAV_TUS_VDI_Vro_CpyFm,$6D040001	; VDI 109
+	dc.l	110,0,SSAV_TUS_VDI_Vr_TrnFm,$6E000000	; VDI 110
+	dc.l	111,0,SSAV_TUS_VDI_Vsc_Form,$6F000025	; VDI 111
+	dc.l	112,0,SSAV_TUS_VDI_Vsf_UDPat,$70000000	; VDI 112
+	dc.l	113,0,SSAV_TUS_VDI_Vsl_UDSty,$71000001	; VDI 113
+	dc.l	114,0,SSAV_TUS_VDI_Vr_RectFl,$72000000	; VDI 114
+	dc.l	116,0,SSAV_TUS_VDI_Vqt_Extent,$74000004	; VDI 116
+	dc.l	117,0,SSAV_TUS_VDI_Vqt_Width,$75000301	; VDI 117
+	dc.l	118,0,SSAV_TUS_VDI_Vex_Timv,$76000000	; VDI 118
+	dc.l	119,0,SSAV_TUS_VDI_Vst_Load_Fonts,$77000001	; VDI 119
+	dc.l	120,0,SSAV_TUS_VDI_Vst_UnLoad_Fonts,$78000001	; VDI 120
+	dc.l	121,0,SSAV_TUS_VDI_Vrt_CpyFm,$79040003	; VDI 121
+	dc.l	122,0,SSAV_TUS_VDI_V_Show_C,$7A000001	; VDI 122
+	dc.l	123,0,SSAV_TUS_VDI_V_Hide_C,$7B000000	; VDI 123
+	dc.l	124,0,SSAV_TUS_VDI_Vq_Mouse,$7C000100	; VDI 124
+	dc.l	125,0,SSAV_TUS_VDI_Vex_ButV,$7D000000	; VDI 125
+	dc.l	126,0,SSAV_TUS_VDI_Vex_MotV,$7E000000	; VDI 126
+	dc.l	127,0,SSAV_TUS_VDI_Vex_CurV,$7F000000	; VDI 127
+	dc.l	128,0,SSAV_TUS_VDI_Vq_Key_S,$80000000	; VDI 128
+	dc.l	129,0,SSAV_TUS_VDI_Vs_Clip,$81020001	; VDI 129
+	dc.l	130,0,SSAV_TUS_VDI_Vqt_Name,$82000001	; VDI 130
+	dc.l	131,0,SSAV_TUS_VDI_Vqt_FontInfo,$83000500	; VDI 131
+	dc.l	232,0,SSAV_TUS_VDI_Vqt_FontHeader,$E8000000	; VDI 232
+	dc.l	234,0,SSAV_TUS_VDI_Vqt_TrackKern,$EA000000	; VDI 234
+	dc.l	235,0,SSAV_TUS_VDI_Vqt_PairKern,$EB000000	; VDI 235
+	dc.l	236,0,SSAV_TUS_VDI_Vst_CharMap,$EC000000	; VDI 236
+	dc.l	237,0,SSAV_TUS_VDI_Vst_Kern,$ED000000	; VDI 237
+	dc.l	239,0,SSAV_TUS_VDI_V_GetBitMap_Info,$EF000000	; VDI 239
+	dc.l	240,0,SSAV_TUS_VDI_Vqt_F_Extent,$F0000000	; VDI 240
+	dc.l	241,0,SSAV_TUS_VDI_V_FText,$F1000000	; VDI 241
+	dc.l	242,0,SSAV_TUS_VDI_V_FText_OffSet,$F2000000	; VDI 242
+	dc.l	243,0,SSAV_TUS_VDI_V_GetOutLine,$F3000000	; VDI 243
+	dc.l	244,0,SSAV_TUS_VDI_Vst_Scratch,$F4000000	; VDI 244
+	dc.l	245,0,SSAV_TUS_VDI_Vst_Error,$F5000000	; VDI 245
+	dc.l	246,0,SSAV_TUS_VDI_Vst_ArbPt,$F6000000	; VDI 246
+	dc.l	247,0,SSAV_TUS_VDI_Vqt_Advance,$F7000000	; VDI 247
+	dc.l	248,0,SSAV_TUS_VDI_Vqt_DevInfo,$F8000000	; VDI 248
+	dc.l	249,0,SSAV_TUS_VDI_V_SaveCache,$F9000000	; VDI 249
+	dc.l	250,0,SSAV_TUS_VDI_V_LoadCache,$FA000000	; VDI 250
+	dc.l	251,0,SSAV_TUS_VDI_V_FlushCache,$FB000000	; VDI 251
+	dc.l	252,0,SSAV_TUS_VDI_Vst_SetSize,$FC000000	; VDI 252
+	dc.l	253,0,SSAV_TUS_VDI_Vst_Skew,$FD000000	; VDI 253
+	dc.l	254,0,SSAV_TUS_VDI_Vqt_Get_Table,$FE000000	; VDI 254
+	dc.l	255,0,SSAV_TUS_VDI_Vqt_CacheSize,$FF000000	; VDI 255
+
+; /// VDI -1 : V_SET_APP_BUFF ///
+
+SSAV_TUS_VDI_V_Set_App_Buff:
+
+	move.w	#-1,([A1])	; OpCode dans Contrl0
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   1 : V_OPNWK (OPEN WORKSTATION) ///
+
+SSAV_TUS_VDI_V_OpnWk:	move.w	(32,SP),([4,A1])	; Num‚ro P‚riph‚rique dans IntIn0
+	move.w	(30,SP),([4,A1],2)	; Type de Ligne dans IntIn1
+	move.w	(28,SP),([4,A1],4)	; Index Ligne dans IntIn2
+	move.w	(26,SP),([4,A1],6)	; Type de RepŠre dans IntIn3
+	move.w	(24,SP),([4,A1],8)	; Index RepŠre dans IntIn4
+	move.w	(22,SP),([4,A1],10)	; Fonte dans IntIn5
+	move.w	(20,SP),([4,A1],12)	; Index Texte dans IntIn6
+	move.w	(18,SP),([4,A1],14)	; Style dans IntIn7
+	move.w	(16,SP),([4,A1],16)	; Index Style dans IntIn8
+	move.w	(14,SP),([4,A1],18)	; Index Couleur dans IntIn9
+	move.w	(12,SP),([4,A1],20)	; SystŠme dans IntIn10
+
+	move.w	#45,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([A1],12),D0	; Handle
+	move.l	(12,A1),D1	; IntOut
+	move.l	(16,A1),D2	; PtsOut
+
+	RTS
+
+; /// VDI   2 : V_CLSWK (CLOSE WORKSTATION) ///
+
+SSAV_TUS_VDI_V_ClsWk:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   3 : V_CLRWK (CLEAR WORKSTATION) ///
+
+SSAV_TUS_VDI_V_ClrWk:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   4 : V_UPDWK (UPDATE WORKSTATION) ///
+
+SSAV_TUS_VDI_V_UpdWk:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5 : ESCAPE ///
+
+SSAV_TUS_VDI_V_Escape:	move.w	(12,SP),D0
+	cmpi.w	#19,D0
+	BGT	SSAV_TUS_VDI_ESC_ERROR	; Au dessus de ESC 19, y'a rien
+	move.w	D0,([A1],10)	; Sous Fonction dans Contrl5
+
+	lea	SSAV_TUS_VDI_ESC_JUMP(PC),A2	; Le Very fun...
+
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
+
+SSAV_TUS_VDI_ESC_ERROR:	RTS
+
+SSAV_TUS_VDI_ESC_JUMP:	dc.l	1,0,SSAV_TUS_VDI_Escape1,2
+	dc.l	2,0,SSAV_TUS_VDI_Escape2,0
+	dc.l	3,0,SSAV_TUS_VDI_Escape3,0
+	dc.l	4,0,SSAV_TUS_VDI_Escape4,0
+	dc.l	5,0,SSAV_TUS_VDI_Escape5,0
+	dc.l	6,0,SSAV_TUS_VDI_Escape6,0
+	dc.l	7,0,SSAV_TUS_VDI_Escape7,0
+	dc.l	8,0,SSAV_TUS_VDI_Escape8,0
+	dc.l	9,0,SSAV_TUS_VDI_Escape9,0
+	dc.l	10,0,SSAV_TUS_VDI_Escape10,0
+	dc.l	11,0,SSAV_TUS_VDI_Escape11,$200
+	dc.l	12,0,SSAV_TUS_VDI_Escape12,0
+	dc.l	13,0,SSAV_TUS_VDI_Escape13,0
+	dc.l	14,0,SSAV_TUS_VDI_Escape14,0
+	dc.l	15,0,SSAV_TUS_VDI_Escape15,2
+	dc.l	16,0,SSAV_TUS_VDI_Escape16,0
+	dc.l	17,0,SSAV_TUS_VDI_Escape17,0
+	dc.l	18,0,SSAV_TUS_VDI_Escape18,$1000000
+	dc.l	19,0,SSAV_TUS_VDI_Escape19,0
+
+; /// VDI   5,1 : INQUIRE ADDRESSABLE ALPHA CHARACTER CELLS ///
+
+SSAV_TUS_VDI_Escape1:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; Ligne - Colonne
+
+	RTS
+
+; /// VDI   5,2 : EXIT ALPHA MODE ///
+
+SSAV_TUS_VDI_Escape2:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,3 : ENTER ALPHA MODE ///
+
+SSAV_TUS_VDI_Escape3:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,4 : ALPHA CURSOR UP ///
+
+SSAV_TUS_VDI_Escape4:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,5 : ALPHA CURSOR DOWN ///
+
+SSAV_TUS_VDI_Escape5:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,6 : ALPHA CURSOR RIGHT ///
+
+SSAV_TUS_VDI_Escape6:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,7 : ALPHA CURSOR LEFT ///
+
+SSAV_TUS_VDI_Escape7:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,8 : HOME ALPHA CURSOR ///
+
+SSAV_TUS_VDI_Escape8:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,9 : ERASE TO END OF ALPHA SCREEN ///
+
+SSAV_TUS_VDI_Escape9:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,10 : ERASE TO END OF ALPHA TEXT LINE ///
+
+SSAV_TUS_VDI_Escape10:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,11 : DIRECT ALPHA CURSOR ADDRESS ///
+
+SSAV_TUS_VDI_Escape11:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),([4,A1])	; Ligne dans IntIn0
+	move.w	(14,SP),([4,A1],2)	; Colonne dans IntIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,12 : OUTPUT CURSOR ADDRESSABLE ALPHA TEXT ///
+
+SSAV_TUS_VDI_Escape12:	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(18,SP),D0
+	move.w	D0,([A1],6)	; Nombre dans Contrl3
+	move.l	(14,SP),A0	; Adresse
+	move.l	(4,A1),A2	; IntIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_ESC12:	clr.w	D1
+	move.b	(A0)+,D1
+	move.w	D1,(A2)+
+	DBF	D0,Copy_ESC12
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,13 : REVERSE VIDEO ON ///
+
+SSAV_TUS_VDI_Escape13:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,14 : REVERSE VIDEO OFF ///
+
+SSAV_TUS_VDI_Escape14:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,15 : INQUIRE CURRENT ALPHA CURSOR ADDRESS ///
+
+SSAV_TUS_VDI_Escape15:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; Ligne - Colonne
+
+	RTS
+
+; /// VDI   5,16 : INQUIRE TABLET STATUS ///
+
+SSAV_TUS_VDI_Escape16:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Etat
+
+	RTS
+
+; /// VDI   5,17 : HARD COPY ///
+
+SSAV_TUS_VDI_Escape17:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,18 : PLACE GRAPHIC CURSOR AT LOCATION ///
+
+SSAV_TUS_VDI_Escape18:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),([8,A1])	; X dans PtsIn0
+	move.w	(14,SP),([8,A1],2)	; Y dans PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,19 : REMOVE LAST GRAPHIC CURSOR ///
+
+SSAV_TUS_VDI_Escape19:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   5,99 : V_BEZ_QUAL ///
+
+SSAV_TUS_VDI_V_Bez_Qual:	move.w	#5,([A1])	; OpCode dans Contrl0
+	clr.w	([A1],2)	; Contrl1
+	clr.w	([A1],4)	; Contrl2
+	clr.w	([A1],6)	; Contrl3
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   6 : V_PLINE (POLYLINE) ///
+
+SSAV_TUS_VDI_V_Pline:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),D0	; Nb de points
+	move.l	(12,SP),A0	; Adresse du tableau
+	move.l	(8,A1),A2	; PtsIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI6:	move.l	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI6
+
+	move.w	(18,SP),([A1],2)	; Nb de points dans Contrl1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   6,13 : V_BEZ ///
+
+SSAV_TUS_VDI_V_Bez:	move.w	#6,([A1])	; OpCode dans Contrl0
+	clr.w	([A1],2)	; Contrl1
+	clr.w	([A1],4)	; Contrl2
+	clr.w	([A1],6)	; Contrl3
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   7 : V_PMARKER (POLYMARKER) ///
+
+SSAV_TUS_VDI_V_PMarker:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),D0	; Nb de points
+	move.l	(12,SP),A0	; Adresse du tableau
+	move.l	(8,A1),A2	; PtsIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI7:	move.l	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI7
+
+	move.w	(18,SP),([A1],2)	; Nb de points dans Contrl1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   8 : V_GTEXT (TEXT) ///
+
+SSAV_TUS_VDI_V_GText:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),D0	; Nb de points
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+	move.l	(12,SP),A0	; Adresse de la chaine
+	move.l	(4,A1),A2	; IntIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI8:	clr.w	D1
+	move.b	(A0)+,D1
+	move.w	D1,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI8
+
+	move.w	(20,SP),([A1],2)	; Contrl1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   9 : V_FILLAREA (FILLED AREA) ///
+
+SSAV_TUS_VDI_V_FillArea:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),D0	; Nb de points
+	move.l	(12,SP),A0	; Adresse du tableau
+	move.l	(8,A1),A2	; PtsIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI9:	move.l	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI9
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI   9,13 : V_BEZ_FILL ///
+
+SSAV_TUS_VDI_V_Bez_Fill:
+
+	move.w	#9,([A1])	; OpCode dans Contrl0
+	clr.w	([A1],2)	; Contrl1
+	clr.w	([A1],4)	; Contrl2
+	clr.w	([A1],6)	; Contrl3
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  10 : V_CELLARRAY (CELL ARRAY) ///
+
+SSAV_TUS_VDI_V_CellArray:
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11 : Generalized Drawing Primitives ///
+
+SSAV_TUS_VDI_V_GDP:	move.w	(12,SP),D0
+	cmpi.w	#13,D0
+	BGT	SSAV_TUS_VDI_GDP_ERROR	; Au dessus de GDP 13, y'a rien
+	move.w	D0,([A1],10)	; Sous Fonction dans Contrl5
+
+	lea	SSAV_TUS_VDI_GDP_JUMP(PC),A2	; Le Very fun...
+
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
+
+SSAV_TUS_VDI_GDP_ERROR:	RTS
+
+SSAV_TUS_VDI_GDP_JUMP:	dc.l	SSAV_TUS_VDI_V_Bar,$2000000	; GDP  1
+	dc.l	SSAV_TUS_VDI_V_Arc,$4000200	; GDP  2
+	dc.l	SSAV_TUS_VDI_V_PieSlice,$4000200	; GDP  3
+	dc.l	SSAV_TUS_VDI_V_Circle,$3000000	; GDP  4
+	dc.l	SSAV_TUS_VDI_V_Ellipse,$2000000	; GDP  5
+	dc.l	SSAV_TUS_VDI_V_EllArc,$2000200	; GDP  6
+	dc.l	SSAV_TUS_VDI_V_EllPie,$2000200	; GDP  7
+	dc.l	SSAV_TUS_VDI_V_RBox,$2000000	; GDP  8
+	dc.l	SSAV_TUS_VDI_V_RFBox,$2000000	; GDP  9
+	dc.l	SSAV_TUS_VDI_V_Justified,$2000000	; GDP 10
+	dc.l	SSAV_TUS_VDI_V_Bez_Param,0	; GDP 13
+
+; /// VDI  11,1 : V_BAR (BAR) ///
+
+SSAV_TUS_VDI_V_Bar:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,2 : V_ARC (ARC) ///
+
+SSAV_TUS_VDI_V_Arc:	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(22,SP),([4,A1])	; Angle D dans IntIn0
+	move.w	(20,SP),([4,A1],2)	; Angle F dans IntIn1
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+	clr.w	([8,A1],4)	; PtsIn2
+	clr.w	([8,A1],6)	; PtsIn3
+	clr.w	([8,A1],8)	; PtsIn4
+	clr.w	([8,A1],10)	; PtsIn5
+	move.w	(14,SP),([8,A1],12)	; Rayon dans PtsIn6
+	clr.w	([8,A1],14)	; PtsIn7
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,3 : V_PIESLICE (PIE) ///
+
+SSAV_TUS_VDI_V_PieSlice:	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(22,SP),([4,A1])	; Angle D dans IntIn0
+	move.w	(20,SP),([4,A1],2)	; Angle F dans IntIn1
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+	clr.w	([8,A1],4)	; PtsIn2
+	clr.w	([8,A1],6)	; PtsIn3
+	clr.w	([8,A1],8)	; PtsIn4
+	clr.w	([8,A1],10)	; PtsIn5
+	move.w	(14,SP),([8,A1],12)	; Rayon dans PtsIn6
+	clr.w	([8,A1],14)	; PtsIn7
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,4 : V_CIRCLE (CIRCLE) ///
+
+SSAV_TUS_VDI_V_Circle:	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+	clr.w	([8,A1],4)	; PtsIn2
+	clr.w	([8,A1],6)	; PtsIn3
+	move.w	(14,SP),([8,A1],8)	; Rayon dansPtsIn4
+	clr.w	([8,A1],10)	; PtsIn5
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,5 : V_ELLIPSE (ELLIPSE) ///
+
+SSAV_TUS_VDI_V_Ellipse:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),([8,A1])	; X dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,6 : V_ELLARC (ELLIPTICAL ARC) ///
+
+SSAV_TUS_VDI_V_EllArc:	move.w	(26,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(24,SP),([4,A1])	; Angle D dans IntIn0
+	move.w	(22,SP),([4,A1],2)	; Angle F dans IntIn1
+	move.w	(20,SP),([8,A1])	; X dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,7 : V_ELLPIE (ELLIPTICAL PIE) ///
+
+SSAV_TUS_VDI_V_EllPie:	move.w	(26,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(24,SP),([4,A1])	; Angle D dans IntIn0
+	move.w	(22,SP),([4,A1],2)	; Angle F dans IntIn1
+	move.w	(20,SP),([8,A1])	; X dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,8 : V_RBOX (ROUNDED RECTANGLE) ///
+
+SSAV_TUS_VDI_V_RBox:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,9 : V_RFBOX (FILLED ROUNDED RECTANGLE) ///
+
+SSAV_TUS_VDI_V_RFBox:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(18,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,10 : V_JUSTIFIED (JUSTIFIED GRAPHICS TEXT) ///
+
+SSAV_TUS_VDI_V_Justified:	move.w	(28,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(26,SP),D0	; Nb de points
+	move.w	D0,D1
+	addq.w	#2,D1
+	move.w	D1,([A1],6)	; Nombre+2 dans Contrl3
+	move.w	(24,SP),([4,A1])	; Scp mot dans IntIn0
+	move.w	(22,SP),([4,A1],2)	; Scp lettre dans IntIn1
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+	move.w	(14,SP),([8,A1],2)	; Longeur dans PtsIn1
+	move.l	(20,SP),A0	; Adresse de la chaine
+	lea	([4,A1],4),A2	; IntIn2
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_GDP10:	clr.w	D1
+	move.b	(A0)+,D1
+	move.w	D1,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_GDP10
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,13 : V_BEZ_PARAM ///
+
+SSAV_TUS_VDI_V_Bez_Param:	move.w	(14,SP),D0
+	cmpi.w	#1,D0
+	BGT	SSAV_TUS_VDI_BEZ_ERROR	; Au dessus de BEZ 1, y'a rien
+
+	lea	SSAV_TUS_VDI_BEZ_JUMP(PC),A2	; Le Very fun...
+
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
+
+SSAV_TUS_VDI_BEZ_ERROR:	RTS
+
+SSAV_TUS_VDI_BEZ_JUMP:	dc.l	V_Bez_Off,0
+	dc.l	V_Bez_On,0
+
+; /// VDI  11,13,0 : V_BEZ_OFF ///
+
+SSAV_TUS_VDI_V_Bez_Off:
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  11,13,1 : V_BEZ_ON ///
+
+SSAV_TUS_VDI_V_Bez_On:
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  12 : VST_HEIGH (SET CHARACTER HEIGHT - ABSOLUTE MODE) ///
+
+SSAV_TUS_VDI_Vst_Heigh:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	clr.w	([8,A1])	; PtsIn0
+	move.w	(12,SP),([8,A1],2)	; Hauteur dans PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(16,A1),D0	; PtsOut
+
+	RTS
+
+; /// VDI  13 : VST_ROTATION (SET CHARACTER BASELINE VECTOR) ///
+
+SSAV_TUS_VDI_Vst_Rotation:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Hauteur dans IntIn0
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(16,A1),D0	; PtsOut
+
+	RTS
+
+; /// VDI  14 : VS_COLOR (SET COLOR REPRESENTATION) ///
+
+SSAV_TUS_VDI_Vs_Color:	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(18,SP),([4,A1])	; Index dans IntIn0
+	move.w	(16,SP),([4,A1],2)	; Rouge dans IntIn1
+	move.w	(14,SP),([4,A1],4)	; Vert dans IntIn2
+	move.w	(12,SP),([4,A1],6)	; Bleu dans IntIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI  15 : VSL_TYPE (SET POLYLINE LINE TYPE) ///
+
+SSAV_TUS_VDI_Vsl_Type:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Type dans IntIn0
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// VDI  16 : VSL_WIDTH (SET POLYLINE LINE WIDTH) ///
+
+SSAV_TUS_VDI_Vsl_Width:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([8,A1])	; Largeur dans PtsIn0
+	clr.w	([8,A1],2)	; PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([16,A1]),D0	; Largeur
+
+	RTS
+
+; /// VDI  17 : VSL_COLOR (SET POLYLINE COLOR INDEX) ///
+
+SSAV_TUS_VDI_Vsl_Color:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Index dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Index
+
+	RTS
+
+; /// VDI  18 : VSM_TYPE (SET POLYMARKER TYPE) ///
+
+SSAV_TUS_VDI_Vsm_Type:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Type dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Type
+
+	RTS
+
+; /// VDI  19 : VSM_HEIGHT (SET POLYMARKER HEIGHT)///
+
+SSAV_TUS_VDI_Vsm_Height:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	clr.w	([8,A1])	; PtsIn0
+	move.w	(12,SP),([8,A1],2)	; Type dans PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([16,A1]),D0	; Largeur - Hauteur
+
+	RTS
+
+; /// VDI  20 : VSM_COLOR (SET POLYMARKER COLOUR INDEX) ///
+
+SSAV_TUS_VDI_Vsm_Color:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Index dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Index
+
+	RTS
+
+; /// VDI  21 : VST_FONT (SET TEXT FACE) ///
+
+SSAV_TUS_VDI_Vst_Font:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Fonte dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Fonte
+
+	RTS
+
+; /// VDI  22 : VST_COLOR (SET GRAPHIC TEXT COLOUR INDEX) ///
+
+SSAV_TUS_VDI_Vst_Color:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Index dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Index
+
+	RTS
+
+; /// VDI  23 : VSF_INTERIOR (SET FILL INTERIOR STYLE) ///
+
+SSAV_TUS_VDI_Vsf_Interior:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Type dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Type
+
+	RTS
+
+; /// VDI  24 : VSF_STYLE (SET FILL STYLE INDEX) ///
+
+SSAV_TUS_VDI_Vsf_Style:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Type dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Type
+
+	RTS
+
+; /// VDI  25 : VSF_COLOR (SET FILL COLOUR INDEX) ///
+
+SSAV_TUS_VDI_Vsf_Color:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Index dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Index
+
+	RTS
+
+; /// VDI  26 : VQ_COLOR () ///
+
+SSAV_TUS_VDI_Vq_Color:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([4,A1])	; Index dans IntIn0
+	move.w	(12,SP),([4,A1],2)	; Mode dans IntIn1
+
+	move.w	#4,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+
+	RTS
+
+; /// VDI  27 : VQT_ARRAY (INQUIRE CELL ARRAY)  ///
+
+SSAV_TUS_VDI_Vqt_Array:	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(22,SP),([A1],14)	; Longueur dans Contrl7
+	move.w	(20,SP),([A1],16)	; Nombre lignes dans Contrl8
+	move.w	(18,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+	move.l	#Double_VDIBuff,D1
+	movea.l	D1,A0
+	move.w	([A1],8),(A0)+	; Longueur
+	move.w	([A1],18),(A0)+	; Nombre
+	move.w	([A1],20),(A0)+	; Lignes
+	move.w	([A1],22),(A0)	; Validit‚
+
+	RTS
+
+; /// VDI  28 : VRQ_LOCATOR (INPUT LOCATOR) ///
+
+SSAV_TUS_VDI_Vrq_Locator:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([8,A1])	; X dans PtsIn0
+	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Code ASCII
+	swap	D0
+	clr.w	D0
+	move.w	([A1],4),D2
+	BEQ	SSAV_TUS_VDI_Next1_VDI28
+	bset	#0,D0
+SSAV_TUS_VDI_Next1_VDI28:	move.w	([A1],8),D2
+	BEQ	SSAV_TUS_VDI_Next2_VDI28
+	bset	#1,D0
+SSAV_TUS_VDI_Next2_VDI28:	move.w	([16,A1]),D1	; X
+	swap	D1
+	move.w	([16,A1],2),D1	; Y
+
+	RTS
+
+; /// VDI  29 : VRQ_VALUATOR (INPUT VALUATOR) ///
+
+SSAV_TUS_VDI_Vrq_Valuator:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Valeur dans IntIn0
+
+	move.w	#2,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; Valeur - Code ASCII
+	move.w	([A1],8),D1	; Evenement
+
+	RTS
+
+; /// VDI  30 : VRQ_CHOICE (INPUT CHOICE) ///
+
+SSAV_TUS_VDI_Vrq_Choice:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),D0
+	BMI	SSAV_TUS_VDI_Next1_VDI30
+	move.w	D0,([4,A1])	; Valeur dans IntIn0
+	move.w	#1,([A1],6)	; Contrl3
+	BRA	SSAV_TUS_VDI_Next2_VDI30
+SSAV_TUS_VDI_Next1_VDI30:	clr.w	([A1],6)	; Contrl3
+
+SSAV_TUS_VDI_Next2_VDI30:	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Code ASCII
+	move.w	([A1],8),D1	; Evenement
+
+	RTS
+
+; /// VDI  31 : VRQ_STRING (INPUT STRING) ///
+
+SSAV_TUS_VDI_Vrq_String:	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(22,SP),([4,A1])	; Longueur dans IntIn0
+	move.w	(20,SP),([4,A1],2)	; Mode dans IntIn1
+	move.w	(18,SP),([8,A1])	; X dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([A1],8),D0	; Longueur
+	BEQ	SSAV_TUS_VDI_Exit_VDI31
+	move.l	(12,A1),A0	; IntOut
+	move.l	(12,SP),A2	; Tampon
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI31:	move.w	(A0)+,D1
+	move.b	D1,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI31
+
+SSAV_TUS_VDI_Exit_VDI31:	RTS
+
+; /// VDI  32 : VSWR_MODE (SET WRITING MODE) ///
+
+SSAV_TUS_VDI_Vswr_Mode:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Mode
+
+	RTS
+
+; /// VDI  33 : VSIN_MODE (SET INPUT MODE) ///
+
+SSAV_TUS_VDI_VSin_Mode:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([4,A1])	; P‚riph‚rique IntIn0
+	move.w	(12,SP),([4,A1],2)	; Mode dans IntIn1
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Mode
+
+	RTS
+
+; /// VDI  35 : VQL_ATTRIBUTES (INQUIRE CURRENT POLYLINE ATTRIBUTES) ///
+
+SSAV_TUS_VDI_Vql_Attributes:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#5,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+	move.w	([16,A1]),D1	; Largeur
+
+	RTS
+
+; /// VDI  36 : VQM_ATTRIBUTES (INQUIRE CURRENT POLYMARKER ATTRIBUTES) ///
+
+SSAV_TUS_VDI_Vqm_Attributes:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#3,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+	move.l	([16,A1]),D1	; PtsOut0-1
+
+	RTS
+
+; /// VDI  37 : VQF_ATTRIBUTES (INQUIRE CURRENT FILL AREA ATTRIBUTES) ///
+
+SSAV_TUS_VDI_Vqf_Attributes:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#5,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+
+	RTS
+
+; /// VDI  38 : VQT_ATTRIBUTES (INQUIRE CURRENT GRAPHIC TEXT ATTRIBUTES) ///
+
+SSAV_TUS_VDI_Vqt_Attributes:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#6,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+	move.l	(16,A1),D1	; PtsOut
+
+	RTS
+
+; /// VDI  39 : VST_ALIGNMENT (SET GRAPHIC TEXT ALIGNMENT) ///
+
+SSAV_TUS_VDI_Vst_Alignment:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([4,A1])	; X dans IntIn0
+	move.w	(12,SP),([4,A1],2)	; Y dans IntIn1
+
+	move.w	#2,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; IntOut0-1
+
+	RTS
+
+; /// VDI 100 : V_OPNVWK (OPEN VIRTUAL WORKSTATION) ///
+
+SSAV_TUS_VDI_V_OpnVWk:	move.w	(34,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(32,SP),([4,A1])	; Num‚ro P‚riph‚rique dans IntIn0
+	move.w	(30,SP),([4,A1],2)	; Type de Ligne dans IntIn1
+	move.w	(28,SP),([4,A1],4)	; Index Ligne dans IntIn2
+	move.w	(26,SP),([4,A1],6)	; Type de RepŠre dans IntIn3
+	move.w	(24,SP),([4,A1],8)	; Index RepŠre dans IntIn4
+	move.w	(22,SP),([4,A1],10)	; Fonte dans IntIn5
+	move.w	(20,SP),([4,A1],12)	; Index Texte dans IntIn6
+	move.w	(18,SP),([4,A1],14)	; Style dans IntIn7
+	move.w	(16,SP),([4,A1],16)	; Index Style dans IntIn8
+	move.w	(14,SP),([4,A1],18)	; Index Couleur dans IntIn9
+	move.w	(12,SP),([4,A1],20)	; SystŠme dans IntIn10
+
+	move.w	#45,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([A1],12),D0	; Handle
+	move.l	(12,A1),D1	; IntOut
+	move.l	(16,A1),D2	; PtsOut
+
+	RTS
+
+; /// VDI 101 : V_CLSVWK (CLOSE VIRTUAL WORKSTATION) ///
+
+SSAV_TUS_VDI_V_ClsVWk:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 102 : VQ_EXTND (EXTENDED INQUIRE FONCTION) ///
+
+SSAV_TUS_VDI_Vq_Extnd:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
+
+	move.w	#45,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([A1],12),D0	; Handle
+	move.l	(12,A1),D1	; IntOut
+	move.l	(16,A1),D2	; PtsOut
+
+	RTS
+
+; /// VDI 103 : V_CONTOURFILL (CONTOUR FILL) ///
+
+SSAV_TUS_VDI_V_ContourFill:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),([4,A1])	; Index dans IntIn0
+	move.w	(14,SP),([8,A1])	; X dans PtsIn0
+	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 104 : VSF_PERIMETER (SET FILL PERIMETER VISIBILITY) ///
+
+SSAV_TUS_VDI_Vsf_Perimeter:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Mode
+
+	RTS
+
+; /// VDI 105 : V_GET_PIXEL (GET PIXEL) ///
+
+SSAV_TUS_VDI_V_Get_Pixel:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([8,A1])	; X dans PtsIn0
+	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
+
+	move.w	#2,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; Valeur - Index
+
+	RTS
+
+; /// VDI 106 : VST_EFFECTS (SET GRAPHIC TEXT SPECIAL EFFECTS) ///
+
+SSAV_TUS_VDI_Vst_Effects:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Mode
+
+	RTS
+
+; /// VDI 107 : VST_POINT (SET CHARACTER CELL HEIGHT - POINTS MODE) ///
+
+SSAV_TUS_VDI_Vst_Point:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Hauteur dans IntIn0
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(16,A1),D0	; PtsOut
+
+	RTS
+
+; /// VDI 108 : VSL_ENDS (SET POLYLINE END STYLES) ///
+
+SSAV_TUS_VDI_Vsl_Ends:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(14,SP),([4,A1])	; Style D dans IntIn0
+	move.w	(12,SP),([4,A1],2)	; Style F dans IntIn1
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 109 : VRO_CPYFM (COPY RASTER - OPAQUE) ///
+
+SSAV_TUS_VDI_Vro_CpyFm:	move.w	(38,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(36,SP),([4,A1])	; Op‚ration dans IntIn0
+	move.w	(34,SP),([8,A1])	; X1 Source dans PtsIn0
+	move.w	(32,SP),([8,A1],2)	; Y1 Source dans PtsIn1
+	move.w	(30,SP),([8,A1],4)	; X2 Source dans PtsIn2
+	move.w	(28,SP),([8,A1],6)	; Y2 Source dans PtsIn3
+	move.w	(26,SP),([8,A1],8)	; X1 Destination dans PtsIn4
+	move.w	(24,SP),([8,A1],10)	; Y1 Destination dans PtsIn5
+	move.w	(22,SP),([8,A1],12)	; X2 Destination dans PtsIn6
+	move.w	(20,SP),([8,A1],14)	; Y2 Destination dans PtsIn7
+	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
+	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 110 : VR_TRNFM (TRANSFORM FORM) ///
+
+SSAV_TUS_VDI_Vr_TrnFm:	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
+	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
+	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 111 : VSC_FORM (SET MOUSE FORM) ///
+
+SSAV_TUS_VDI_Vsc_Form:	move.w	(28,SP),([A1],12)	; Handle danns Contrl6
+	move.w	(26,SP),([4,A1])	; X dans IntIn0
+	move.w	(24,SP),([4,A1],2)	; Y dans IntIn1
+	move.w	#1,([4,A1],4)	; IntIn2
+	move.w	(22,SP),([4,A1],6)	; Couleur masque dans IntIn3
+	move.w	(20,SP),([4,A1],8)	; Couleur donn‚es dans IntIn4
+	move.l	(16,SP),A0	; Adresse masque
+	move.l	(4,SP),A2	; IntIn
+	adda.l	#10,A2	; IntIn5
+	move.w	#15,D0
+SSAV_TUS_VDI_Copy1_VDI111:	move.w	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy1_VDI111
+	move.l	(12,SP),A0
+	move.w	#15,D0
+SSAV_TUS_VDI_Copy2_VDI111:	move.w	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy2_VDI111
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 112 : VSF_UDPAT (SET USER DEFINED FILL PATTERN) ///
+
+SSAV_TUS_VDI_Vsf_UDPat:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),D0
+	mulu.w	#16,D0
+	move.w	D0,([A1],6)	; Nb plan dans Contrl3
+	move.l	(12,SP),A0
+	move.l	(4,A1),A2	; IntIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI112:	move.w	(A0)+,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI112
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 113 : VSL_UDSTY (SET USER-DEFINED LINE STYLE PATTERN) ///
+
+SSAV_TUS_VDI_Vsl_UDSty:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Style dans IntIn0
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 114 : VR_RECTFL (FILL RECTANGLE) ///
+
+SSAV_TUS_VDI_Vr_RectFl:	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(18,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 116 : VQT_EXTENT (INQUIRE TEXT EXTENT) ///
+
+SSAV_TUS_VDI_Vqt_Extent:	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(16,SP),D0
+	move.w	D0,([A1],6)	; Contrl3
+	move.l	(12,SP),A0	; Adresse
+	move.l	(4,A1),A2	; IntIn
+	subq.w	#1,D0
+SSAV_TUS_VDI_Copy_VDI116:	clr.w	D1
+	move.b	(A0)+,D1
+	move.w	D1,(A2)+
+	DBF	D0,SSAV_TUS_VDI_Copy_VDI116
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(16,A1),D0	; PtsOut
+
+	RTS
+
+; /// VDI 117 : VQT_WIDTH (INQUIRE CHARACTER CELL WIDTH) ///
+
+SSAV_TUS_VDI_Vqt_Width:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Code ASCII dans IntIn0
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Code ASCII
+
+	move.l	#Double_VDIBuff,D1
+	movea.l	D1,A0
+	move.w	([16,A1]),(A0)+	; Largeur
+	move.w	([16,A1],4),(A0)+	; Alignement Gauche
+	move.w	([16,A1],8),(A0)+	; Alignement Droit
+	clr.w	(A0)
+
+	RTS
+
+Double_VDIBuff	ds.w	4	; Un truc con (VDI 27 et 117)
+
+; /// VDI 118 : VEX_TIMV (EXCHANGE TIMER INTERRUPT VECTOR) ///
+
+SSAV_TUS_VDI_Vex_Timv:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Nombre
+	move.l	([A1],18),D1	; Adresse
+
+	RTS
+
+; /// VDI 119 : VST_LOAD_FONTS (LOAD FONTS) ///
+
+SSAV_TUS_VDI_Vst_Load_Fonts:	clr.w	([4,A1])	; 0 dans IntIn0
+	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// VDI 120 : VST_UNLOAD_FONTS (UNLOAD FONTS) ///
+
+SSAV_TUS_VDI_Vst_UnLoad_Fonts:	clr.w	([4,A1])	; 0 dans IntIn0
+	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 121 : VRT_CPYFM (COPY RASTER - TRANSPARENT) ///
+
+SSAV_TUS_VDI_Vrt_CpyFm:	move.w	(42,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(40,SP),([4,A1])	; Mode dans IntIn0
+	move.w	(38,SP),([4,A1],2)	; Couleur Bit 1 dans IntIn1
+	move.w	(36,SP),([4,A1],4)	; Couleur Bit 0 dans IntIn2
+	move.w	(34,SP),([8,A1])	; X1 Source dans PtsIn0
+	move.w	(32,SP),([8,A1],2)	; Y1 Source dans PtsIn1
+	move.w	(30,SP),([8,A1],4)	; X2 Source dans PtsIn2
+	move.w	(28,SP),([8,A1],6)	; Y2 Source dans PtsIn3
+	move.w	(26,SP),([8,A1],8)	; X1 Destination dans PtsIn4
+	move.w	(24,SP),([8,A1],10)	; Y1 Destination dans PtsIn5
+	move.w	(22,SP),([8,A1],12)	; X2 Destination dans PtsIn6
+	move.w	(20,SP),([8,A1],14)	; Y2 Destination dans PtsIn7
+	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
+	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 122 : V_SHOW_C (SHOW CURSOR) ///
+
+SSAV_TUS_VDI_V_Show_C:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 123 : V_HIDE_C (HIDE CURSOR) ///
+
+SSAV_TUS_VDI_V_Hide_C:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 124 : VQ_MOUSE (SAMPLE MOUSE BUTTON STATE) ///
+
+SSAV_TUS_VDI_Vq_Mouse:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([16,A1]),D0	; X
+	swap	D0
+	move.w	([16,A1],2),D0	; Y
+	move.w	([12,A1]),D1	; Boutons
+
+	RTS
+
+; /// VDI 125 : VEX_BUTV (EXCHANGE BUTTON CHANGE VECTOR) ///
+
+SSAV_TUS_VDI_Vex_ButV:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([A1],18),D0	; Adresse
+
+	RTS
+
+; /// VDI 126 : VEX_MOTV (EXCHANGE MOUSE MOVEMENT VECTOR) ///
+
+SSAV_TUS_VDI_Vex_MotV:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([A1],18),D0	; Adresse
+
+	RTS
+
+; /// VDI 127 : VEX_CURV (EXCHANGE CURSOR CHANGE VECTOR) ///
+
+SSAV_TUS_VDI_Vex_CurV:	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
+	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([A1],18),D0	; Adresse
+
+	RTS
+
+; /// VDI 128 : VQ_KEY_S (SAMPLE KEYBOARD STATE INFORMATION) ///
+
+SSAV_TUS_VDI_Vq_Key_S:	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#1,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.w	([12,A1]),D0	; Touches
+
+	RTS
+
+; /// VDI 129 : VS_CLIP (SET CLIPPING RECTANGLE) ///
+
+SSAV_TUS_VDI_Vs_Clip:	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(20,SP),([4,A1])	; Mode dans IntIn0
+	move.w	(18,SP),([8,A1])	; X1 dans PtsIn0
+	move.w	(16,SP),([8,A1],2)	; Y1 dans PtsIn1
+	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
+	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 130 : VQT_NAME (INQUIRE FACE NAME & INDEX) ///
+
+SSAV_TUS_VDI_Vqt_Name:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+	move.w	(12,SP),([4,A1])	; Index dans IntIn0
+
+	move.w	#33,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	(12,A1),D0	; IntOut
+
+	RTS
+
+; /// VDI 131 : VQT_FONTINFO (INQUIRE CURRENT FACE INFORMATION) ///
+
+SSAV_TUS_VDI_Vqt_FontInfo:	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
+
+	move.w	#2,([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	move.l	([12,A1]),D0	; IntOut0-1
+	move.l	(16,A1),D1	; PtsOut
+
+	RTS
+
+; /// VDI 232 : VQT_FONTHEADER () ///
+
+SSAV_TUS_VDI_Vqt_FontHeader:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 234 : VQT_TRACKKERN () ///
+
+SSAV_TUS_VDI_Vqt_TrackKern:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 235 : VQT_PAIRKERN () ///
+
+SSAV_TUS_VDI_Vqt_PairKern:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 236 : VST_CHARMAP () ///
+
+SSAV_TUS_VDI_Vst_CharMap:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 237 : VST_KERN () ///
+
+SSAV_TUS_VDI_Vst_Kern:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 239 : V_GETBITMAT_INFO () ///
+
+SSAV_TUS_VDI_V_GetBitMap_Info:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 240 : VQT_F_EXTENT () ///
+
+SSAV_TUS_VDI_Vqt_F_Extent:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 241 : V_FTEXT () ///
+
+SSAV_TUS_VDI_V_FText:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 242 : V_FTEXT_OFFSET () ///
+
+SSAV_TUS_VDI_V_FText_OffSet:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 243 : V_GETOUTLINE () ///
+
+SSAV_TUS_VDI_V_GetOutLine:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 244 : VST_SCRATCH () ///
+
+SSAV_TUS_VDI_Vst_Scratch:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 245 : VST_ERROR () ///
+
+SSAV_TUS_VDI_Vst_Error:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 246 : VST_ARBPT () ///
+
+SSAV_TUS_VDI_Vst_ArbPt:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 247 : VQT_ADVANCE () ///
+
+SSAV_TUS_VDI_Vqt_Advance:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 248 : VQT_DEVINFO () ///
+
+SSAV_TUS_VDI_Vqt_DevInfo:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 249 : V_SAVECACHE () ///
+
+SSAV_TUS_VDI_V_SaveCache:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 250 : V_LOADCACHE () ///
+
+SSAV_TUS_VDI_V_LoadCache:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 251 : V_FLUSHCACHE () ///
+
+SSAV_TUS_VDI_V_FlushCache:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 252 : VST_SETSIZE() ///
+
+SSAV_TUS_VDI_Vst_SetSize:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 253 : VST_SKEW () ///
+
+SSAV_TUS_VDI_Vst_Skew:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 254 : VQT_GET_TABLE () ///
+
+SSAV_TUS_VDI_Vqt_Get_Table:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// VDI 255 : VQT_CACHESIZE () ///
+
+SSAV_TUS_VDI_Vqt_CacheSize:
+
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	SSAV_TUS_VDI_COMMIT
+
+	RTS
+
+; /// L'appel au VDI
+
+SSAV_TUS_VDI_COMMIT:	move.w	#115,D0	; VDI
+	move.l	(8,SP),D1	; VDI_PARAMS
+	TRAP	#2	; *** AES/VDI ***
+
+	RTS
+

@@ -1,0 +1,36 @@
+; /// Dynamic Memory Manager - KOSS 1999 ///
+;
+; Static_ProgramDescriptor :  0 WORD : AP_ID
+;                                      -1 if BOOT_Mode, else the AP_ID given by AES if GEM_Mode
+;                             2 LONG : Size of the program in memory
+;                                      WARNING : Ready to be used with P_TERMRES
+;                                        BasePage  
+;                                       +SECTION TEXT
+;                                       +SECTION DATA (if any)
+;                                       +SECTION BSS  (if any)
+;                                       +NewStackFrame
+;                             6 LONG : End of program AREA (include the NewStackFrame)
+;                             8 LONG : Address of the Static_MemoryDescriptor
+;                             C LONG : Address of the TKR Buffer (50 bytes)
+;                            10 LONG : Address of the AES_Params Table (6 entries)
+;                            14 LONG : Address of the VDI_Params Table (5 entries)
+;
+; AES_Params :  0 LONG : Control  (WDIM  5=10 bytes)
+;               4 LONG : Global   (WDIM 14=28 bytes)
+;               8 LONG : Int_In   (WDIM 16=32 bytes)
+;               C LONG : Int_Out  (WDIM  7=14 bytes)
+;              10 LONG : Addr_In  (LDIM  3=12 bytes)
+;              14 LONG : Addr_Out (LDIM  1= 4 bytes)
+;                                   Total 100 bytes 
+;
+; VDI_Params :  0 LONG : Contrl (WDIM  12= 24 bytes)
+;               4 LONG : IntIn  (WDIM >30=>60 bytes)
+;               8 LONG : PtsIn  (WDIM >45=>95 bytes)
+;               C LONG : IntOut (WDIM >30=>60 bytes)
+;              10 LONG : PtsOut (WDIM >12=>24 bytes)
+;                                  Total >263 bytes  
+;
+; Static_MemoryDescriptor  :
+;
+; Dynamic_BlocksDescriptor :
+;
