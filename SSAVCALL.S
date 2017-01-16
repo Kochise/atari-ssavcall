@@ -6,7 +6,7 @@
 ; ///                                            ///
 ; //////////////////////////////////////////////////
 ;
-; AutoInstall Version 1.52
+; AutoInstall Version 1.63
 ; Cookie SSAV -> START_SSAV
 ;
 ; /// VERSION 2.31 ///
@@ -25,7 +25,12 @@ StartUp	include	MODULES\AUTOINST.SSM	; <<<
 	dc.w	%10010100001000		; 8 Aout 1998
 	ds.w	1		; Compteur
 
-Start_SSAV	include	MODULES\SSAVXBRA.SSM	; <<<
+Start_SSAV	cmpi.w	#115,(4,SP)		; Appel du VDI
+	BEQ	VDI_Control
+	cmpi.w	#200,(4,SP)		; Appel de l'AES
+	BEQ	AES_Control
+
+	RTS
 
 AES_Control	include	MODULES\AES-CTRL.SSM	; <<<
 VDI_Control	include	MODULES\VDI-CTRL.SSM	; <<<
@@ -33,9 +38,17 @@ VDI_Control	include	MODULES\VDI-CTRL.SSM	; <<<
 	SECTION	DATA
 
 Cookie_Name	dc.b	"SSAV"
-;SSAV_Logo	incbin	SSAVBOOT\SSAVLOGO.IMG	; <<<
-;SSAV_Boot	incbin	SSAVBOOT\SSAVBOOT.IMG	; <<<
+	include	DATAS\SSAVCALL.RSM	; <<< La ressource
 
 	SECTION	BSS
 	
-	
+; /// LES VARIABLES DE L'AES ///
+
+AES_Handle	ds.w	1
+Control	ds.w	5
+Global	ds.w	14
+Int_In	ds.w	16
+Int_Out	ds.w	7
+Addr_In	ds.l	3
+Addr_Out	ds.l	1
+AES_Params	ds.l	6

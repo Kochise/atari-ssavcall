@@ -1,271 +1,294 @@
-move.w	(6,SP),D0
+	move.w	(6,SP),D0
 	cmpi.w	#255,D0
-	BGT	VDI_ERROR	; Au dessus de VDI 255, y'a rien (sauf VDI -1)
+	BGT	VDI_ERROR	; Au dessus de VDI 255, y'a rien
+	cmpi.w	#-1,D0
+	BMI	VDI_ERROR	; En dessous de VDI -1, y'a rien
 	move.l	(8,SP),A1	; VDI_PARAMS
-	lea	VDI_JUMP(PC),A2	; Le fun...
-	JMP	(A2,D0.w*4)
 
-VDI_ERROR	cmpi.w	#-1,D0
-	BEQ	V_Set_App_Buff
+	clr.l	([A1])	; Contrl0-1, Pour etre certain
+	clr.l	([A1],4)	; Contrl2-3, de l'hygiene
+	clr.w	([A1],8)	; Contrl4
+
+	lea	VDI_JUMP,A2	; Le fun...
+	
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(A1),A0	; Contrl
+	addq.l	#1,A0
+	movep.l	D1,(A0)
+	
+	JMP	([A2,D0.w*8])	; On saute
+	
+VDI_ERROR	RTS
+	
+	dc.l	V_Set_App_Buff,$FF000000; VDI -1
+VDI_JUMP	dc.l	UnDefVDI0,0
+	dc.l	V_OpnWk,$0100060B	; VDI   1
+	dc.l	V_ClsWk,$02000000	; VDI   2
+	dc.l	V_ClrWk,$03000000	; VDI   3
+	dc.l	V_UpdWk,$04000000	; VDI   4
+	dc.l	V_Escape,$05000000	; VDI   5
+	dc.l	V_Pline,$06000000	; VDI   6
+	dc.l	V_PMarker,$07000000	; VDI   7
+	dc.l	V_GText,$08000000	; VDI   8
+	dc.l	V_FillArea,$09000000	; VDI   9
+	dc.l	V_CellArray,$0A000000	; VDI  10
+	dc.l	V_GDP,$0B000000	; VDI  11
+	dc.l	Vst_Heigh,$0C010200	; VDI  12
+	dc.l	Vst_Rotation,$0D000201	; VDI  13
+	dc.l	Vs_Color,$0E000003	; VDI  14
+	dc.l	Vsl_Type,$0F000000	; VDI  15
+	dc.l	Vsl_Width,$10010100	; VDI  16
+	dc.l	Vsl_Color,$11000001	; VDI  17
+	dc.l	Vsm_Type,$12000001	; VDI  18
+	dc.l	Vsm_Height,$13010100	; VDI  19
+	dc.l	Vsm_Color,$14000001	; VDI  20
+	dc.l	Vst_Font,$15000001	; VDI  21
+	dc.l	Vst_Color,$16000001	; VDI  22
+	dc.l	Vsf_Interior,$17000001	; VDI  23
+	dc.l	Vsf_Style,$18000001	; VDI  24
+	dc.l	Vsf_Color,$19000001	; VDI  25
+	dc.l	Vq_Color,$1A000002	; VDI  26
+	dc.l	Vqt_Array,$1B020002	; VDI  27
+	dc.l	Vrq_Locator,$1C010100	; VDI  28
+	dc.l	Vrq_Valuator,$1D000001	; VDI  29
+	dc.l	Vrq_Choice,$1E000000	; VDI  30
+	dc.l	Vrq_String,$1F010002	; VDI  31
+	dc.l	Vswr_Mode,$20000001	; VDI  32
+	dc.l	VSin_Mode,$21000002	; VDI  33
+	dc.l	UnDefVDI34,0
+	dc.l	Vql_Attributes,$23000100; VDI  35
+	dc.l	Vqm_Attributes,$24000100; VDI  36
+	dc.l	Vqf_Attributes,$25000000; VDI  37
+	dc.l	Vqt_Attributes,$26000200; VDI  38
+	dc.l	Vst_Alignment,$27000002	; VDI  39
+	dc.l	UnDefVDI40,0
+	dc.l	UnDefVDI41,0
+	dc.l	UnDefVDI42,0
+	dc.l	UnDefVDI43,0
+	dc.l	UnDefVDI44,0
+	dc.l	UnDefVDI45,0
+	dc.l	UnDefVDI46,0
+	dc.l	UnDefVDI47,0
+	dc.l	UnDefVDI48,0
+	dc.l	UnDefVDI49,0
+	dc.l	UnDefVDI50,0
+	dc.l	UnDefVDI51,0
+	dc.l	UnDefVDI52,0
+	dc.l	UnDefVDI53,0
+	dc.l	UnDefVDI54,0
+	dc.l	UnDefVDI55,0
+	dc.l	UnDefVDI56,0
+	dc.l	UnDefVDI57,0
+	dc.l	UnDefVDI58,0
+	dc.l	UnDefVDI59,0
+	dc.l	UnDefVDI60,0
+	dc.l	UnDefVDI61,0
+	dc.l	UnDefVDI62,0
+	dc.l	UnDefVDI63,0
+	dc.l	UnDefVDI64,0
+	dc.l	UnDefVDI65,0
+	dc.l	UnDefVDI66,0
+	dc.l	UnDefVDI67,0
+	dc.l	UnDefVDI68,0
+	dc.l	UnDefVDI69,0
+	dc.l	UnDefVDI70,0
+	dc.l	UnDefVDI71,0
+	dc.l	UnDefVDI72,0
+	dc.l	UnDefVDI73,0
+	dc.l	UnDefVDI74,0
+	dc.l	UnDefVDI75,0
+	dc.l	UnDefVDI76,0
+	dc.l	UnDefVDI77,0
+	dc.l	UnDefVDI78,0
+	dc.l	UnDefVDI79,0
+	dc.l	UnDefVDI80,0
+	dc.l	UnDefVDI81,0
+	dc.l	UnDefVDI82,0
+	dc.l	UnDefVDI83,0
+	dc.l	UnDefVDI84,0
+	dc.l	UnDefVDI85,0
+	dc.l	UnDefVDI86,0
+	dc.l	UnDefVDI87,0
+	dc.l	UnDefVDI88,0
+	dc.l	UnDefVDI89,0
+	dc.l	UnDefVDI90,0
+	dc.l	UnDefVDI91,0
+	dc.l	UnDefVDI92,0
+	dc.l	UnDefVDI93,0
+	dc.l	UnDefVDI94,0
+	dc.l	UnDefVDI95,0
+	dc.l	UnDefVDI96,0
+	dc.l	UnDefVDI97,0
+	dc.l	UnDefVDI98,0
+	dc.l	UnDefVDI99,0
+	dc.l	V_OpnVWk,$6400060B	; VDI 100
+	dc.l	V_ClsVWk,$65000000	; VDI 101
+	dc.l	Vq_Extnd,$66000601	; VDI 102
+	dc.l	V_ContourFill,$67010001	; VDI 103
+	dc.l	Vsf_Perimeter,$68000001	; VDI 104	
+	dc.l	V_Get_Pixel,$69010000	; VDI 105
+	dc.l	Vst_Effects,$6A000001	; VDI 106
+	dc.l	Vst_Point,$6B000201	; VDI 107
+	dc.l	Vsl_Ends,$6C000002	; VDI 108
+	dc.l	Vro_CpyFm,$6D040001	; VDI 109
+	dc.l	Vr_TrnFm,$6E000000	; VDI 110
+	dc.l	Vsc_Form,$6F000025	; VDI 111
+	dc.l	Vsf_UDPat,$70000000	; VDI 112
+	dc.l	Vsl_UDSty,$71000001	; VDI 113
+	dc.l	Vr_RectFl,$72000000	; VDI 114
+	dc.l	UnDefVDI115,0	
+	dc.l	Vqt_Extent,$74000004	; VDI 116
+	dc.l	Vqt_Width,$75000301	; VDI 117
+	dc.l	Vex_Timv,$76000000	; VDI 118
+	dc.l	Vst_Load_Fonts,$77000001; VDI 119
+	dc.l	Vst_UnLoad_Fonts,$78000001; VDI 120
+	dc.l	Vrt_CpyFm,$79040003	; VDI 121
+	dc.l	V_Show_C,$7A000001	; VDI 122
+	dc.l	V_Hide_C,$7B000000	; VDI 123
+	dc.l	Vq_Mouse,$7C000100	; VDI 124
+	dc.l	Vex_ButV,$7D000000	; VDI 125
+	dc.l	Vex_MotV,$7E000000	; VDI 126
+	dc.l	Vex_CurV,$7F000000	; VDI 127
+	dc.l	Vq_Key_S,$80000000	; VDI 128
+	dc.l	Vs_Clip,$81020001	; VDI 129
+	dc.l	Vqt_Name,$82000001	; VDI 130
+	dc.l	Vqt_FontInfo,$83000500	; VDI 131
+	dc.l	UnDefVDI132,0
+	dc.l	UnDefVDI133,0
+	dc.l	UnDefVDI134,0
+	dc.l	UnDefVDI135,0
+	dc.l	UnDefVDI136,0
+	dc.l	UnDefVDI137,0
+	dc.l	UnDefVDI138,0
+	dc.l	UnDefVDI139,0
+	dc.l	UnDefVDI140,0
+	dc.l	UnDefVDI141,0
+	dc.l	UnDefVDI142,0
+	dc.l	UnDefVDI143,0
+	dc.l	UnDefVDI144,0
+	dc.l	UnDefVDI145,0
+	dc.l	UnDefVDI146,0
+	dc.l	UnDefVDI147,0
+	dc.l	UnDefVDI148,0
+	dc.l	UnDefVDI149,0
+	dc.l	UnDefVDI150,0
+	dc.l	UnDefVDI151,0
+	dc.l	UnDefVDI152,0
+	dc.l	UnDefVDI153,0
+	dc.l	UnDefVDI154,0
+	dc.l	UnDefVDI155,0
+	dc.l	UnDefVDI156,0
+	dc.l	UnDefVDI157,0
+	dc.l	UnDefVDI158,0
+	dc.l	UnDefVDI159,0
+	dc.l	UnDefVDI160,0
+	dc.l	UnDefVDI161,0
+	dc.l	UnDefVDI162,0
+	dc.l	UnDefVDI163,0
+	dc.l	UnDefVDI164,0
+	dc.l	UnDefVDI165,0
+	dc.l	UnDefVDI166,0
+	dc.l	UnDefVDI167,0
+	dc.l	UnDefVDI168,0
+	dc.l	UnDefVDI169,0
+	dc.l	UnDefVDI170,0
+	dc.l	UnDefVDI171,0
+	dc.l	UnDefVDI172,0
+	dc.l	UnDefVDI173,0
+	dc.l	UnDefVDI174,0
+	dc.l	UnDefVDI175,0
+	dc.l	UnDefVDI176,0
+	dc.l	UnDefVDI177,0
+	dc.l	UnDefVDI178,0
+	dc.l	UnDefVDI179,0
+	dc.l	UnDefVDI180,0
+	dc.l	UnDefVDI181,0
+	dc.l	UnDefVDI182,0
+	dc.l	UnDefVDI183,0
+	dc.l	UnDefVDI184,0
+	dc.l	UnDefVDI185,0
+	dc.l	UnDefVDI186,0
+	dc.l	UnDefVDI187,0
+	dc.l	UnDefVDI188,0
+	dc.l	UnDefVDI189,0
+	dc.l	UnDefVDI190,0
+	dc.l	UnDefVDI191,0
+	dc.l	UnDefVDI192,0
+	dc.l	UnDefVDI193,0
+	dc.l	UnDefVDI194,0
+	dc.l	UnDefVDI195,0
+	dc.l	UnDefVDI196,0
+	dc.l	UnDefVDI197,0
+	dc.l	UnDefVDI198,0
+	dc.l	UnDefVDI199,0
+	dc.l	UnDefVDI200,0
+	dc.l	UnDefVDI201,0
+	dc.l	UnDefVDI202,0
+	dc.l	UnDefVDI203,0
+	dc.l	UnDefVDI204,0
+	dc.l	UnDefVDI205,0
+	dc.l	UnDefVDI206,0
+	dc.l	UnDefVDI207,0
+	dc.l	UnDefVDI208,0
+	dc.l	UnDefVDI209,0
+	dc.l	UnDefVDI210,0
+	dc.l	UnDefVDI211,0
+	dc.l	UnDefVDI212,0
+	dc.l	UnDefVDI213,0
+	dc.l	UnDefVDI214,0
+	dc.l	UnDefVDI215,0
+	dc.l	UnDefVDI216,0
+	dc.l	UnDefVDI217,0
+	dc.l	UnDefVDI218,0
+	dc.l	UnDefVDI219,0
+	dc.l	UnDefVDI220,0
+	dc.l	UnDefVDI221,0
+	dc.l	UnDefVDI222,0
+	dc.l	UnDefVDI223,0
+	dc.l	UnDefVDI224,0
+	dc.l	UnDefVDI225,0
+	dc.l	UnDefVDI226,0
+	dc.l	UnDefVDI227,0
+	dc.l	UnDefVDI228,0
+	dc.l	UnDefVDI229,0
+	dc.l	UnDefVDI230,0
+	dc.l	UnDefVDI231,0
+	dc.l	Vqt_FontHeader,$E8000000; VDI 232
+	dc.l	UnDefVDI233,0
+	dc.l	Vqt_TrackKern,$EA000000	; VDI 234
+	dc.l	Vqt_PairKern,$EB000000	; VDI 235
+	dc.l	Vst_CharMap,$EC000000	; VDI 236
+	dc.l	Vst_Kern,$ED000000	; VDI 237
+	dc.l	UnDefVDI238,0
+	dc.l	V_GetBitMap_Info,$EF000000; VDI 239
+	dc.l	Vqt_F_Extent,$F0000000	; VDI 240
+	dc.l	V_FText,$F1000000	; VDI 241
+	dc.l	V_FText_OffSet,$F2000000; VDI 242
+	dc.l	V_GetOutLine,$F3000000	; VDI 243
+	dc.l	Vst_Scratch,$F4000000	; VDI 244
+	dc.l	Vst_Error,$F5000000	; VDI 245
+	dc.l	Vst_ArbPt,$F6000000	; VDI 246
+	dc.l	Vqt_Advance,$F7000000	; VDI 247
+	dc.l	Vqt_DevInfo,$F8000000	; VDI 248
+	dc.l	V_SaveCache,$F9000000	; VDI 249
+	dc.l	V_LoadCache,$FA000000	; VDI 250
+	dc.l	V_FlushCache,$FB000000	; VDI 251
+	dc.l	Vst_SetSize,$FC000000	; VDI 252
+	dc.l	Vst_Skew,$FD000000	; VDI 253
+	dc.l	Vqt_Get_Table,$FE000000	; VDI 254
+	dc.l	Vqt_CacheSize,$FF000000	; VDI 255
+
+; /// VDI -1 : V_SET_APP_BUFF ///
+
+V_Set_App_Buff	
+
+	move.w	#-1,([A1])	; OpCode dans Contrl0
+	clr.w	([A1],8)	; Contrl4
+
+	JSR	VDI_Call
+	
 	RTS
-
-	BRA	V_Set_App_Buff	; VDI -1
-VDI_JUMP	BRA	UnDefVDI0
-	BRA	V_OpnWk	; VDI   1
-	BRA	V_ClsWk	; VDI   2
-	BRA	V_ClrWk	; VDI   3
-	BRA	V_UpdWk	; VDI   4
-	BRA	V_Escape	; VDI   5
-	BRA	V_Pline	; VDI   6
-	BRA	V_PMarker	; VDI   7
-	BRA	V_GText	; VDI   8
-	BRA	V_FillArea	; VDI   9
-	BRA	V_CellArray	; VDI  10
-	BRA	V_GDP	; VDI  11
-	BRA	Vst_Heigh	; VDI  12
-	BRA	Vst_Rotation	; VDI  13
-	BRA	Vs_Color	; VDI  14
-	BRA	Vsl_Type	; VDI  15
-	BRA	Vsl_Width	; VDI  16
-	BRA	Vsl_Color	; VDI  17
-	BRA	Vsm_Type	; VDI  18
-	BRA	Vsm_Height	; VDI  19
-	BRA	Vsm_Color	; VDI  20
-	BRA	Vst_Font	; VDI  21
-	BRA	Vst_Color	; VDI  22
-	BRA	Vsf_Interior	; VDI  23
-	BRA	Vsf_Style	; VDI  24
-	BRA	Vsf_Color	; VDI  25
-	BRA	Vq_Color	; VDI  26
-	BRA	Vqt_Array	; VDI  27
-	BRA	Vrq_Locator	; VDI  28
-	BRA	Vrq_Valuator	; VDI  29
-	BRA	Vrq_Choice	; VDI  30
-	BRA	Vrq_String	; VDI  31
-	BRA	Vswr_Mode	; VDI  32
-	BRA	VSin_Mode	; VDI  33
-	BRA	UnDefVDI34
-	BRA	Vql_Attributes	; VDI  35
-	BRA	Vqm_Attributes	; VDI  36
-	BRA	Vqf_Attributes	; VDI  37
-	BRA	Vqt_Attributes	; VDI  38
-	BRA	Vst_Alignment	; VDI  39
-	BRA	UnDefVDI40
-	BRA	UnDefVDI41
-	BRA	UnDefVDI42
-	BRA	UnDefVDI43
-	BRA	UnDefVDI44
-	BRA	UnDefVDI45
-	BRA	UnDefVDI46
-	BRA	UnDefVDI47
-	BRA	UnDefVDI48
-	BRA	UnDefVDI49
-	BRA	UnDefVDI50
-	BRA	UnDefVDI51
-	BRA	UnDefVDI52
-	BRA	UnDefVDI53
-	BRA	UnDefVDI54
-	BRA	UnDefVDI55
-	BRA	UnDefVDI56
-	BRA	UnDefVDI57
-	BRA	UnDefVDI58
-	BRA	UnDefVDI59
-	BRA	UnDefVDI60
-	BRA	UnDefVDI61
-	BRA	UnDefVDI62
-	BRA	UnDefVDI63
-	BRA	UnDefVDI64
-	BRA	UnDefVDI65
-	BRA	UnDefVDI66
-	BRA	UnDefVDI67
-	BRA	UnDefVDI68
-	BRA	UnDefVDI69
-	BRA	UnDefVDI70
-	BRA	UnDefVDI71
-	BRA	UnDefVDI72
-	BRA	UnDefVDI73
-	BRA	UnDefVDI74
-	BRA	UnDefVDI75
-	BRA	UnDefVDI76
-	BRA	UnDefVDI77
-	BRA	UnDefVDI78
-	BRA	UnDefVDI79
-	BRA	UnDefVDI80
-	BRA	UnDefVDI81
-	BRA	UnDefVDI82
-	BRA	UnDefVDI83
-	BRA	UnDefVDI84
-	BRA	UnDefVDI85
-	BRA	UnDefVDI86
-	BRA	UnDefVDI87
-	BRA	UnDefVDI88
-	BRA	UnDefVDI89
-	BRA	UnDefVDI90
-	BRA	UnDefVDI91
-	BRA	UnDefVDI92
-	BRA	UnDefVDI93
-	BRA	UnDefVDI94
-	BRA	UnDefVDI95
-	BRA	UnDefVDI96
-	BRA	UnDefVDI97
-	BRA	UnDefVDI98
-	BRA	UnDefVDI99
-	BRA	V_OpnVWk	; VDI 100
-	BRA	V_ClsVWk	; VDI 101
-	BRA	Vq_Extnd	; VDI 102
-	BRA	V_ContourFill	; VDI 103
-	BRA	Vsf_Perimeter	; VDI 104	
-	BRA	V_Get_Pixel	; VDI 105
-	BRA	Vst_Effects	; VDI 106
-	BRA	Vst_Point	; VDI 107
-	BRA	Vsl_Ends	; VDI 108
-	BRA	Vro_CpyFm	; VDI 109
-	BRA	Vr_TrnFm	; VDI 110
-	BRA	Vsc_Form	; VDI 111
-	BRA	Vsf_UDPat	; VDI 112
-	BRA	Vsl_UDSty	; VDI 113
-	BRA	Vr_RectFl	; VDI 114
-	BRA	UnDefVDI115	
-	BRA	Vqt_Extent	; VDI 116
-	BRA	Vqt_Width	; VDI 117
-	BRA	Vex_Timv	; VDI 118
-	BRA	Vst_Load_Fonts	; VDI 119
-	BRA	Vst_UnLoad_Fonts	; VDI 120
-	BRA	Vrt_CpyFm	; VDI 121
-	BRA	V_Show_C	; VDI 122
-	BRA	V_Hide_C	; VDI 123
-	BRA	Vq_Mouse	; VDI 124
-	BRA	Vex_ButV	; VDI 125
-	BRA	Vex_MotV	; VDI 126
-	BRA	Vex_CurV	; VDI 127
-	BRA	Vq_Key_S	; VDI 128
-	BRA	Vs_Clip	; VDI 129
-	BRA	Vqt_Name	; VDI 130
-	BRA	Vqt_FontInfo	; VDI 131
-	BRA	UnDefVDI132
-	BRA	UnDefVDI133
-	BRA	UnDefVDI134
-	BRA	UnDefVDI135
-	BRA	UnDefVDI136
-	BRA	UnDefVDI137
-	BRA	UnDefVDI138
-	BRA	UnDefVDI139
-	BRA	UnDefVDI140
-	BRA	UnDefVDI141
-	BRA	UnDefVDI142
-	BRA	UnDefVDI143
-	BRA	UnDefVDI144
-	BRA	UnDefVDI145
-	BRA	UnDefVDI146
-	BRA	UnDefVDI147
-	BRA	UnDefVDI148
-	BRA	UnDefVDI149
-	BRA	UnDefVDI150
-	BRA	UnDefVDI151
-	BRA	UnDefVDI152
-	BRA	UnDefVDI153
-	BRA	UnDefVDI154
-	BRA	UnDefVDI155
-	BRA	UnDefVDI156
-	BRA	UnDefVDI157
-	BRA	UnDefVDI158
-	BRA	UnDefVDI159
-	BRA	UnDefVDI160
-	BRA	UnDefVDI161
-	BRA	UnDefVDI162
-	BRA	UnDefVDI163
-	BRA	UnDefVDI164
-	BRA	UnDefVDI165
-	BRA	UnDefVDI166
-	BRA	UnDefVDI167
-	BRA	UnDefVDI168
-	BRA	UnDefVDI169
-	BRA	UnDefVDI170
-	BRA	UnDefVDI171
-	BRA	UnDefVDI172
-	BRA	UnDefVDI173
-	BRA	UnDefVDI174
-	BRA	UnDefVDI175
-	BRA	UnDefVDI176
-	BRA	UnDefVDI177
-	BRA	UnDefVDI178
-	BRA	UnDefVDI179
-	BRA	UnDefVDI180
-	BRA	UnDefVDI181
-	BRA	UnDefVDI182
-	BRA	UnDefVDI183
-	BRA	UnDefVDI184
-	BRA	UnDefVDI185
-	BRA	UnDefVDI186
-	BRA	UnDefVDI187
-	BRA	UnDefVDI188
-	BRA	UnDefVDI189
-	BRA	UnDefVDI190
-	BRA	UnDefVDI191
-	BRA	UnDefVDI192
-	BRA	UnDefVDI193
-	BRA	UnDefVDI194
-	BRA	UnDefVDI195
-	BRA	UnDefVDI196
-	BRA	UnDefVDI197
-	BRA	UnDefVDI198
-	BRA	UnDefVDI199
-	BRA	UnDefVDI200
-	BRA	UnDefVDI201
-	BRA	UnDefVDI202
-	BRA	UnDefVDI203
-	BRA	UnDefVDI204
-	BRA	UnDefVDI205
-	BRA	UnDefVDI206
-	BRA	UnDefVDI207
-	BRA	UnDefVDI208
-	BRA	UnDefVDI209
-	BRA	UnDefVDI210
-	BRA	UnDefVDI211
-	BRA	UnDefVDI212
-	BRA	UnDefVDI213
-	BRA	UnDefVDI214
-	BRA	UnDefVDI215
-	BRA	UnDefVDI216
-	BRA	UnDefVDI217
-	BRA	UnDefVDI218
-	BRA	UnDefVDI219
-	BRA	UnDefVDI220
-	BRA	UnDefVDI221
-	BRA	UnDefVDI222
-	BRA	UnDefVDI223
-	BRA	UnDefVDI224
-	BRA	UnDefVDI225
-	BRA	UnDefVDI226
-	BRA	UnDefVDI227
-	BRA	UnDefVDI228
-	BRA	UnDefVDI229
-	BRA	UnDefVDI230
-	BRA	UnDefVDI231
-	BRA	Vqt_FontHeader	; VDI 232
-	BRA	UnDefVDI233
-	BRA	Vqt_TrackKern	; VDI 234
-	BRA	Vqt_PairKern	; VDI 235
-	BRA	Vst_CharMap	; VDI 236
-	BRA	Vst_Kern	; VDI 237
-	BRA	UnDefVDI238 
-	BRA	V_GetBitMap_Info	; VDI 239
-	BRA	Vqt_F_Extent	; VDI 240
-	BRA	V_FText	; VDI 241
-	BRA	V_FText_OffSet	; VDI 242
-	BRA	V_GetOutLine	; VDI 243
-	BRA	Vst_Scratch	; VDI 244
-	BRA	Vst_Error	; VDI 245
-	BRA	Vst_ArbPt	; VDI 246
-	BRA	Vqt_Advance	; VDI 247
-	BRA	Vqt_DevInfo	; VDI 248
-	BRA	V_SaveCache	; VDI 249
-	BRA	V_LoadCache	; VDI 250
-	BRA	V_FlushCache	; VDI 251
-	BRA	Vst_SetSize	; VDI 252
-	BRA	Vst_Skew	; VDI 253
-	BRA	Vqt_Get_Table	; VDI 254
-	BRA	Vqt_CacheSize	; VDI 255
 
 ; /// VDI   0 : Non D‚finit ///
 
@@ -286,10 +309,6 @@ V_OpnWk	move.w	(32,SP),([4,A1])	; Num‚ro P‚riph‚rique dans IntIn0
 	move.w	(14,SP),([4,A1],18)	; Index Couleur dans IntIn9
 	move.w	(12,SP),([4,A1],20)	; SystŠme dans IntIn10
 
-	move.w	#1,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#6,([A1],4)	; Contrl2
-	move.w	#11,([A1],6)	; Contrl3
 	move.w	#45,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -304,12 +323,6 @@ V_OpnWk	move.w	(32,SP),([4,A1])	; Num‚ro P‚riph‚rique dans IntIn0
 
 V_ClsWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#2,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 
 	RTS
@@ -317,12 +330,6 @@ V_ClsWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   3 : V_CLRWK (CLEAR WORKSTATION) ///
 
 V_ClrWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
-
-	move.w	#3,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -332,48 +339,49 @@ V_ClrWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
 V_UpdWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#4,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
 
 ; /// VDI   5 : ESCAPE ///
 
-V_Escape	move.w	#5,([A1])	; OpCode dans Contrl0
-	move.w	(12,SP),D0
+V_Escape	move.w	(12,SP),D0
 	cmpi.w	#19,D0
 	BGT	ESC_ERROR	; Au dessus de ESC 19, y'a rien
 	move.w	D0,([A1],10)	; Sous Fonction dans Contrl5
+
 	lea	ESC_JUMP(PC),A2	; Le Very fun...
-	JMP	(A2,D0.w*4)
+
+	move.l	(4,A2,D0.w*8),D1
+
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
 
 ESC_ERROR	RTS
 
-ESC_JUMP	BRA	UnDefESC0
-	BRA	Escape1
-	BRA	Escape2
-	BRA	Escape3
-	BRA	Escape4
-	BRA	Escape5
-	BRA	Escape6
-	BRA	Escape7
-	BRA	Escape8
-	BRA	Escape9
-	BRA	Escape10
-	BRA	Escape11
-	BRA	Escape12
-	BRA	Escape13
-	BRA	Escape14
-	BRA	Escape15
-	BRA	Escape16
-	BRA	Escape17
-	BRA	Escape18
-	BRA	Escape19
+ESC_JUMP	dc.l	UnDefESC0,0
+	dc.l	Escape1,2
+	dc.l	Escape2,0
+	dc.l	Escape3,0
+	dc.l	Escape4,0
+	dc.l	Escape5,0
+	dc.l	Escape6,0
+	dc.l	Escape7,0
+	dc.l	Escape8,0
+	dc.l	Escape9,0
+	dc.l	Escape10,0
+	dc.l	Escape11,$200
+	dc.l	Escape12,0
+	dc.l	Escape13,0
+	dc.l	Escape14,0
+	dc.l	Escape15,2
+	dc.l	Escape16,0
+	dc.l	Escape17,0
+	dc.l	Escape18,$1000000
+	dc.l	Escape19,0
 
 ; /// VDI   5,0 : Non d‚finit ///
 
@@ -383,11 +391,6 @@ UnDefESC0
 ; /// VDI   5,1 : INQUIRE ADDRESSABLE ALPHA CHARACTER CELLS ///
 
 Escape1	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	move.w	#2,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -399,11 +402,6 @@ Escape1	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape2	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -411,11 +409,6 @@ Escape2	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,3 : ENTER ALPHA MODE ///
 
 Escape3	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -425,11 +418,6 @@ Escape3	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape4	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -437,11 +425,6 @@ Escape4	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,5 : ALPHA CURSOR DOWN ///
 
 Escape5	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -451,11 +434,6 @@ Escape5	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape6	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -463,11 +441,6 @@ Escape6	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,7 : ALPHA CURSOR LEFT ///
 
 Escape7	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -477,11 +450,6 @@ Escape7	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape8	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -489,11 +457,6 @@ Escape8	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,9 : ERASE TO END OF ALPHA SCREEN ///
 
 Escape9	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -503,11 +466,6 @@ Escape9	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape10	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -518,11 +476,6 @@ Escape11	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([4,A1])	; Ligne dans IntIn0
 	move.w	(14,SP),([4,A1],2)	; Colonne dans IntIn1
 	
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -540,10 +493,6 @@ Copy_ESC12	clr.w	D1
 	move.w	D1,(A2)+
 	DBF	D0,Copy_ESC12
 	
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -551,11 +500,6 @@ Copy_ESC12	clr.w	D1
 ; /// VDI   5,13 : REVERSE VIDEO ON ///
 
 Escape13	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -565,11 +509,6 @@ Escape13	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape14	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -578,11 +517,6 @@ Escape14	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape15	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	move.w	#2,([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.l	([12,A1]),D0	; Ligne - Colonne
@@ -592,11 +526,6 @@ Escape15	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,16 : INQUIRE TABLET STATUS ///
 
 Escape16	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -608,11 +537,6 @@ Escape16	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Escape17	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -623,11 +547,6 @@ Escape18	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([8,A1])	; X dans PtsIn0
 	move.w	(14,SP),([8,A1],2)	; Y dans PtsIn1
 	
-	move.w	#1,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -635,11 +554,6 @@ Escape18	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI   5,19 : REMOVE LAST GRAPHIC CURSOR ///
 
 Escape19	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -667,11 +581,7 @@ V_Pline	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 Copy_VDI6	move.l	(A0)+,(A2)+
 	DBF	D0,Copy_VDI6
 
-	move.w	#6,([A1])	; OpCode dans Contrl0
 	move.w	(18,SP),([A1],2)	; Nb de points dans Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -699,11 +609,7 @@ V_PMarker	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 Copy_VDI7	move.l	(A0)+,(A2)+
 	DBF	D0,Copy_VDI7
 
-	move.w	#7,([A1])	; OpCode dans Contrl0
 	move.w	(18,SP),([A1],2)	; Nb de points dans Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -723,11 +629,7 @@ Copy_VDI8	clr.w	D1
 	move.w	D1,(A2)+
 	DBF	D0,Copy_VDI8
 
-	move.w	#8,([A1])	; OpCode dans Contrl0
 	move.w	(20,SP),([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -742,12 +644,6 @@ V_FillArea	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 	subq.w	#1,D0
 Copy_VDI9	move.l	(A0)+,(A2)+
 	DBF	D0,Copy_VDI9
-
-	move.w	#9,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -771,42 +667,43 @@ V_Bez_Fill
 
 V_CellArray	
 
-	move.w	#10,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
 
 ; /// VDI  11 : Generalized Drawing Primitives ///
 
-V_GDP	move.w	#11,([A1])	; OpCode dans Contrl0
-	move.w	(12,SP),D0
+V_GDP	move.w	(12,SP),D0
 	cmpi.w	#13,D0
 	BGT	GDP_ERROR	; Au dessus de GDP 13, y'a rien
 	move.w	D0,([A1],10)	; Sous Fonction dans Contrl5
+	
 	lea	GDP_JUMP(PC),A2	; Le Very fun...
-	JMP	(A2,D0.w*4)
+	
+	move.l	(4,A2,D0.w*8),D1
+	
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
 
 GDP_ERROR	RTS
 
-GDP_JUMP	BRA	UnDefGDP0
-	BRA	V_Bar	; GDP  1
-	BRA	V_Arc	; GDP  2
-	BRA	V_PieSlice	; GDP  3
-	BRA	V_Circle	; GDP  4
-	BRA	V_Ellipse	; GDP  5
-	BRA	V_EllArc	; GDP  6
-	BRA	V_EllPie	; GDP  7
-	BRA	V_RBox	; GDP  8
-	BRA	V_RFBox	; GDP  9
-	BRA	V_Justified	; GDP 10
-	BRA	UnDefGDP11
-	BRA	UnDefGDP12
-	BRA	V_Bez_Param	; GDP 13
+GDP_JUMP	dc.l	UnDefGDP0,0
+	dc.l	V_Bar,$2000000	; GDP  1
+	dc.l	V_Arc,$4000200	; GDP  2
+	dc.l	V_PieSlice,$4000200	; GDP  3
+	dc.l	V_Circle,$3000000	; GDP  4
+	dc.l	V_Ellipse,$2000000	; GDP  5
+	dc.l	V_EllArc,$2000200	; GDP  6
+	dc.l	V_EllPie,$2000200	; GDP  7
+	dc.l	V_RBox,$2000000	; GDP  8
+	dc.l	V_RFBox,$2000000	; GDP  9
+	dc.l	V_Justified,$2000000	; GDP 10
+	dc.l	UnDefGDP11,0
+	dc.l	UnDefGDP12,0
+	dc.l	V_Bez_Param,0	; GDP 13
 		
 ; /// VDI  11,0 : Non d‚finit ///
 
@@ -820,11 +717,6 @@ V_Bar	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(18,SP),([8,A1],2)	; Y1 dans PtsIn1
 	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
-
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -844,11 +736,6 @@ V_Arc	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1],12)	; Rayon dans PtsIn6
 	clr.w	([8,A1],14)	; PtsIn7
 
-	move.w	#4,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -867,11 +754,6 @@ V_PieSlice	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1],12)	; Rayon dans PtsIn6
 	clr.w	([8,A1],14)	; PtsIn7
 
-	move.w	#4,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -886,11 +768,6 @@ V_Circle	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1],8)	; Rayon dansPtsIn4
 	clr.w	([8,A1],10)	; PtsIn5
 
-	move.w	#3,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -902,11 +779,6 @@ V_Ellipse	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(18,SP),([8,A1],2)	; Y dans PtsIn1
 	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
-
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -922,11 +794,6 @@ V_EllArc	move.w	(26,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
 
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -941,11 +808,6 @@ V_EllPie	move.w	(26,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([8,A1],4)	; Rayon X dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Rayon Y dans PtsIn3
 
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -958,11 +820,6 @@ V_RBox	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
 
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -974,11 +831,6 @@ V_RFBox	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(18,SP),([8,A1],2)	; Y1 dans PtsIn1
 	move.w	(16,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(14,SP),([8,A1],6)	; Y2 dans PtsIn3
-
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -1004,10 +856,6 @@ Copy_GDP10	clr.w	D1
 	move.w	D1,(A2)+
 	DBF	D0,Copy_GDP10
 
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],8)	; Contrl4
-	
 	JSR	VDI_Call
 	
 	RTS
@@ -1027,23 +875,25 @@ UnDefGDP12
 V_Bez_Param	move.w	(14,SP),D0
 	cmpi.w	#1,D0
 	BGT	BEZ_ERROR	; Au dessus de BEZ 1, y'a rien
+	
 	lea	BEZ_JUMP(PC),A2	; Le Very fun...
-	JMP	(A2,D0.w*4)
+	
+	move.l	(4,A2,D0.w*8),D1
+	
+	move.l	(8,A1),A0	; Contrl
+	addq.l	#3,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])
 
 BEZ_ERROR	RTS
 
-BEZ_JUMP	BRA	V_Bez_Off
-	BRA	V_Bez_On
+BEZ_JUMP	dc.l	V_Bez_Off,0
+	dc.l	V_Bez_On,0
 	
 ; /// VDI  11,13,0 : V_BEZ_OFF ///
 
 V_Bez_Off	
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -1051,12 +901,6 @@ V_Bez_Off
 ; /// VDI  11,13,1 : V_BEZ_ON ///
 
 V_Bez_On	
-
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -1066,12 +910,6 @@ V_Bez_On
 Vst_Heigh	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	clr.w	([8,A1])	; PtsIn0
 	move.w	(12,SP),([8,A1],2)	; Hauteur dans PtsIn1
-
-	move.w	#12,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	move.w	#2,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -1083,12 +921,6 @@ Vst_Heigh	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Vst_Rotation	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Hauteur dans IntIn0
-
-	move.w	#13,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#2,([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -1104,12 +936,6 @@ Vs_Color	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1],4)	; Vert dans IntIn2
 	move.w	(12,SP),([4,A1],6)	; Bleu dans IntIn3
 
-	move.w	#14,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#3,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -1118,12 +944,6 @@ Vs_Color	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
 
 Vsl_Type	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Type dans IntIn0
-
-	move.w	#15,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -1137,12 +957,6 @@ Vsl_Width	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([8,A1])	; Largeur dans PtsIn0
 	clr.w	([8,A1],2)	; PtsIn1
 
-	move.w	#16,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.w	([16,A1]),D0	; Largeur
@@ -1154,10 +968,6 @@ Vsl_Width	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsl_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Index dans IntIn0
 
-	move.w	#17,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1171,10 +981,6 @@ Vsl_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsm_Type	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Type dans IntIn0
 
-	move.w	#18,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1189,12 +995,6 @@ Vsm_Height	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	clr.w	([8,A1])	; PtsIn0
 	move.w	(12,SP),([8,A1],2)	; Type dans PtsIn1
 
-	move.w	#19,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.w	([16,A1]),D0	; Largeur - Hauteur
@@ -1206,10 +1006,6 @@ Vsm_Height	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsm_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Index dans IntIn0
 
-	move.w	#20,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1223,10 +1019,6 @@ Vsm_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vst_Font	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Fonte dans IntIn0
 
-	move.w	#21,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1240,10 +1032,6 @@ Vst_Font	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vst_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Index dans IntIn0
 
-	move.w	#22,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1257,10 +1045,6 @@ Vst_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsf_Interior	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Type dans IntIn0
 
-	move.w	#23,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1274,10 +1058,6 @@ Vsf_Interior	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsf_Style	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Type dans IntIn0
 
-	move.w	#24,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1291,10 +1071,6 @@ Vsf_Style	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsf_Color	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Index dans IntIn0
 
-	move.w	#25,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1309,10 +1085,6 @@ Vq_Color	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1])	; Index dans IntIn0
 	move.w	(12,SP),([4,A1],2)	; Mode dans IntIn1
 
-	move.w	#26,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
 	move.w	#4,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1331,15 +1103,10 @@ Vqt_Array	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
 
-	move.w	#27,([A1])	; OpCode dans Contrl0
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-
 	JSR	VDI_Call
 	
 	move.l	(12,A1),D0	; IntOut
-	move.l	#SSAV_Wk1Buff,D1
+	move.l	#Double_VDIBuff,D1
 	movea.l	D1,A0
 	move.w	([A1],8),(A0)+	; Longueur
 	move.w	([A1],18),(A0)+	; Nombre
@@ -1354,10 +1121,6 @@ Vrq_Locator	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1])	; X dans PtsIn0
 	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
 
-	move.w	#28,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1382,10 +1145,6 @@ Next2_VDI28	move.w	([16,A1]),D1	; X
 Vrq_Valuator	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Valeur dans IntIn0
 
-	move.w	#29,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#2,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1405,12 +1164,7 @@ Vrq_Choice	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	BRA	Next2_VDI30
 Next1_VDI30	clr.w	([A1],6)	; Contrl3
 
-Next2_VDI30	move.w	#30,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],8)	; Contrl4
-
-	JSR	VDI_Call
+Next2_VDI30	JSR	VDI_Call
 	
 	move.w	([12,A1]),D0	; Code ASCII
 	move.w	([A1],8),D1	; Evenement
@@ -1424,12 +1178,6 @@ Vrq_String	move.w	(24,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(20,SP),([4,A1],2)	; Mode dans IntIn1
 	move.w	(18,SP),([8,A1])	; X dans PtsIn0
 	move.w	(16,SP),([8,A1],2)	; Y dans PtsIn1
-
-	move.w	#31,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -1449,10 +1197,6 @@ Exit_VDI31	RTS
 Vswr_Mode	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
 
-	move.w	#32,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1467,10 +1211,6 @@ VSin_Mode	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1])	; P‚riph‚rique IntIn0
 	move.w	(12,SP),([4,A1],2)	; Mode dans IntIn1
 
-	move.w	#33,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1488,10 +1228,6 @@ UnDefVDI34
 
 Vql_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 	
-	move.w	#35,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#5,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1505,10 +1241,6 @@ Vql_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
 Vqm_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 	
-	move.w	#36,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#3,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1522,10 +1254,6 @@ Vqm_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
 Vqf_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 	
-	move.w	#37,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#5,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1538,10 +1266,6 @@ Vqf_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
 Vqt_Attributes	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 	
-	move.w	#38,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#2,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#6,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1557,10 +1281,6 @@ Vst_Alignment	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1])	; X dans IntIn0
 	move.w	(12,SP),([4,A1],2)	; Y dans IntIn1
 
-	move.w	#39,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
 	move.w	#2,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1884,10 +1604,6 @@ V_OpnVWk	move.w	(34,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1],18)	; Index Couleur dans IntIn9
 	move.w	(12,SP),([4,A1],20)	; SystŠme dans IntIn10
 	
-	move.w	#100,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#6,([A1],4)	; Contrl2
-	move.w	#11,([A1],6)	; Contrl3
 	move.w	#45,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1902,12 +1618,6 @@ V_OpnVWk	move.w	(34,SP),([A1],12)	; Handle dans Contrl6
 
 V_ClsVWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#101,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -1917,10 +1627,6 @@ V_ClsVWk	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 Vq_Extnd	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
 
-	move.w	#102,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#6,([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#45,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1938,12 +1644,6 @@ V_ContourFill	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1])	; X dans PtsIn0
 	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
 
-	move.w	#103,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -1953,10 +1653,6 @@ V_ContourFill	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 Vsf_Perimeter	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
 	
-	move.w	#104,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1971,10 +1667,6 @@ V_Get_Pixel	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1])	; X dans PtsIn0
 	move.w	(12,SP),([8,A1],2)	; Y dans PtsIn1
 
-	move.w	#105,([A1])	; OpCode dans Contrl0
-	move.w	#1,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#2,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -1988,10 +1680,6 @@ V_Get_Pixel	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 Vst_Effects	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
 
-	move.w	#106,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2005,12 +1693,6 @@ Vst_Effects	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vst_Point	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Hauteur dans IntIn0
 
-	move.w	#107,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#2,([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.l	(16,A1),D0	; PtsOut
@@ -2022,12 +1704,6 @@ Vst_Point	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 Vsl_Ends	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([4,A1])	; Style D dans IntIn0
 	move.w	(12,SP),([4,A1],2)	; Style F dans IntIn1
-
-	move.w	#108,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#2,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2048,12 +1724,6 @@ Vro_CpyFm	move.w	(38,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
 	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
 
-	move.w	#109,([A1])	; OpCode dans Contrl0
-	move.w	#4,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2063,12 +1733,6 @@ Vro_CpyFm	move.w	(38,SP),([A1],12)	; Handle dans Contrl6
 Vr_TrnFm	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
 	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
-
-	move.w	#110,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2093,12 +1757,6 @@ Copy1_VDI111	move.w	(A0)+,(A2)+
 Copy2_VDI111	move.w	(A0)+,(A2)+
 	DBF	D0,Copy2_VDI111
 
-	move.w	#111,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#37,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2115,11 +1773,6 @@ Vsf_UDPat	move.w	(18,SP),([A1],12)	; Handle dans Contrl6
 Copy_VDI112	move.w	(A0)+,(A2)+
 	DBF	D0,Copy_VDI112
 
-	move.w	#112,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2128,12 +1781,6 @@ Copy_VDI112	move.w	(A0)+,(A2)+
 
 Vsl_UDSty	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Style dans IntIn0
-
-	move.w	#113,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2146,12 +1793,6 @@ Vr_RectFl	move.w	(20,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(16,SP),([8,A1],2)	; Y1 dans PtsIn1
 	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
-
-	move.w	#114,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2175,11 +1816,6 @@ Copy_VDI116	clr.w	D1
 	move.w	D1,(A2)+
 	DBF	D0,Copy_VDI116
 
-	move.w	#116,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#4,([A1],4)	; Contrl2
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.l	(16,A1),D0	; PtsOut
@@ -2191,33 +1827,28 @@ Copy_VDI116	clr.w	D1
 Vqt_Width	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Code ASCII dans IntIn0
 
-	move.w	#117,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#3,([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
 	move.w	([12,A1]),D0	; Code ASCII
 	
-	move.l	#SSAV_Wk1Buff,D1
+	move.l	#Double_VDIBuff,D1
 	movea.l	D1,A0
 	move.w	([16,A1]),(A0)+	; Largeur
 	move.w	([16,A1],4),(A0)+	; Alignement Gauche
 	move.w	([16,A1],8),(A0)+	; Alignement Droit
+	clr.w	(A0)
 	
 	RTS
+
+Double_VDIBuff	ds.w	4	; Un truc con (VDI 27 et 117)
 	
 ; /// VDI 118 : VEX_TIMV (EXCHANGE TIMER INTERRUPT VECTOR) ///
 
 Vex_Timv	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
 		
-	move.w	#118,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2232,10 +1863,6 @@ Vex_Timv	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 Vst_Load_Fonts	clr.w	([4,A1])	; 0 dans IntIn0
 	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#119,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2248,12 +1875,6 @@ Vst_Load_Fonts	clr.w	([4,A1])	; 0 dans IntIn0
 
 Vst_UnLoad_Fonts	clr.w	([4,A1])	; 0 dans IntIn0
 	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
-
-	move.w	#120,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2276,12 +1897,6 @@ Vrt_CpyFm	move.w	(42,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(16,SP),([A1],14)	; MFDB Source dans Contrl7-8
 	move.l	(12,SP),([A1],18)	; MFDB Destination dans Contrl9-10
 
-	move.w	#121,([A1])	; OpCode dans Contrl0
-	move.w	#4,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#3,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2291,12 +1906,6 @@ Vrt_CpyFm	move.w	(42,SP),([A1],12)	; Handle dans Contrl6
 V_Show_C	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Mode dans IntIn0
 
-	move.w	#122,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2304,12 +1913,6 @@ V_Show_C	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 ; /// VDI 123 : V_HIDE_C (HIDE CURSOR) ///
 
 V_Hide_C	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
-
-	move.w	#123,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2319,10 +1922,6 @@ V_Hide_C	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
 Vq_Mouse	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#124,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#1,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2339,12 +1938,6 @@ Vq_Mouse	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 Vex_ButV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
 	
-	move.w	#125,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.l	([A1],18),D0	; Adresse
@@ -2355,12 +1948,6 @@ Vex_ButV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 
 Vex_MotV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
-
-	move.w	#126,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
@@ -2373,12 +1960,6 @@ Vex_MotV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 Vex_CurV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 	move.l	(12,SP),([A1],14)	; Adresse dans Contrl7-8
 
-	move.w	#127,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	move.l	([A1],18),D0	; Adresse
@@ -2389,10 +1970,6 @@ Vex_CurV	move.w	(16,SP),([A1],12)	; Handle dans Contrl6
 
 Vq_Key_S	move.w	(12,SP),([A1],12)	; Handle dans Contrl6
 
-	move.w	#128,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#1,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2410,12 +1987,6 @@ Vs_Clip	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(14,SP),([8,A1],4)	; X2 dans PtsIn2
 	move.w	(12,SP),([8,A1],6)	; Y2 dans PtsIn3
 	
-	move.w	#129,([A1])	; OpCode dans Contrl0
-	move.w	#2,([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
 	JSR	VDI_Call
 	
 	RTS
@@ -2425,10 +1996,6 @@ Vs_Clip	move.w	(22,SP),([A1],12)	; Handle dans Contrl6
 Vqt_Name	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	move.w	(12,SP),([4,A1])	; Index dans IntIn0
 
-	move.w	#130,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	move.w	#1,([A1],6)	; Contrl3
 	move.w	#33,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2441,10 +2008,6 @@ Vqt_Name	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 
 Vqt_FontInfo	move.w	(14,SP),([A1],12)	; Handle dans Contrl6
 	
-	move.w	#131,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	move.w	#5,([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	move.w	#2,([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2958,10 +2521,6 @@ UnDefVDI231
 
 Vqt_FontHeader	
 
-	move.w	#232,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2977,10 +2536,6 @@ UnDefVDI233
 
 Vqt_TrackKern	
 
-	move.w	#234,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -2991,10 +2546,6 @@ Vqt_TrackKern
 
 Vqt_PairKern	
 
-	move.w	#235,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3005,10 +2556,6 @@ Vqt_PairKern
 
 Vst_CharMap	
 
-	move.w	#236,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3019,10 +2566,6 @@ Vst_CharMap
 
 Vst_Kern	
 
-	move.w	#237,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3038,10 +2581,6 @@ UnDefVDI238
 
 V_GetBitMap_Info	
 
-	move.w	#239,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3052,10 +2591,6 @@ V_GetBitMap_Info
 
 Vqt_F_Extent	
 
-	move.w	#240,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3066,10 +2601,6 @@ Vqt_F_Extent
 
 V_FText	
 
-	move.w	#241,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3080,10 +2611,6 @@ V_FText
 
 V_FText_OffSet	
 
-	move.w	#242,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3094,10 +2621,6 @@ V_FText_OffSet
 
 V_GetOutLine	
 
-	move.w	#243,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3108,10 +2631,6 @@ V_GetOutLine
 
 Vst_Scratch	
 
-	move.w	#244,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3122,10 +2641,6 @@ Vst_Scratch
 
 Vst_Error	
 
-	move.w	#245,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3136,10 +2651,6 @@ Vst_Error
 
 Vst_ArbPt	
 
-	move.w	#246,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3150,10 +2661,6 @@ Vst_ArbPt
 
 Vqt_Advance	
 
-	move.w	#247,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3164,10 +2671,6 @@ Vqt_Advance
 
 Vqt_DevInfo	
 
-	move.w	#248,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3178,10 +2681,6 @@ Vqt_DevInfo
 
 V_SaveCache	
 	
-	move.w	#249,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3192,10 +2691,6 @@ V_SaveCache
 
 V_LoadCache	
 
-	move.w	#250,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3206,10 +2701,6 @@ V_LoadCache
 
 V_FlushCache	
 
-	move.w	#251,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3220,10 +2711,6 @@ V_FlushCache
 
 Vst_SetSize	
 
-	move.w	#252,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3234,10 +2721,6 @@ Vst_SetSize
 
 Vst_Skew	
 
-	move.w	#253,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3248,10 +2731,6 @@ Vst_Skew
 
 Vqt_Get_Table	
 
-	move.w	#254,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
@@ -3262,29 +2741,13 @@ Vqt_Get_Table
 
 Vqt_CacheSize	
 
-	move.w	#255,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
 	clr.w	([A1],8)	; Contrl4
 
 	JSR	VDI_Call
 	
 	RTS
 	
-; /// VDI -1 : V_SET_APP_BUFF ///
-
-V_Set_App_Buff	
-
-	move.w	#-1,([A1])	; OpCode dans Contrl0
-	clr.w	([A1],2)	; Contrl1
-	clr.w	([A1],4)	; Contrl2
-	clr.w	([A1],6)	; Contrl3
-	clr.w	([A1],8)	; Contrl4
-
-	JSR	VDI_Call
-	
-	RTS
+; /// L'appel au VDI
 
 VDI_Call	move.w	#115,D0	; VDI
 	move.l	(8,SP),D1	; VDI_PARAMS

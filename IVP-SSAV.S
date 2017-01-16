@@ -1,8 +1,11 @@
 ; /// INSTALLATEUR Version >Professionelle< DE SSAV POUR VOTRE APPLICATION ///
 ;
-; Taille incompressible : 12969 octets
+; Taille incompressible : 13042 octets (assembl‚ tel quel, et STRIP‚)
 ;
 ; Veuillez suivre les conseils...
+; Je n'ais volontairement pas optimis‚ cet installateur afin de vous
+; permettre de le comprendre
+; TAB=24 SCREEN=768/576
 
 	SECTION	TEXT	; Le programme
 	
@@ -50,9 +53,9 @@ Not_Installed	movea.l	4(SP),A6	; Adresse de la BasePage
 		
 	; APPL_INIT	
 
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$A000100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	BSR	AES_Call
 	
@@ -64,9 +67,9 @@ Not_Installed	movea.l	4(SP),A6	; Adresse de la BasePage
 
 	; GRAF_MOUSE, pour rendre l'aspect normal … la souris
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$4E010100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	#0,Int_In
 	
@@ -81,9 +84,9 @@ Start_Reloc	lea	Reloc_Data,A0
 	move.w	(A0,D5.w*2),D7
 	clr.w	D6
 	
-Reloc_RSC	lea	Control+1,A0
+Reloc_RSC	lea	Control,A0
 	move.l	#$72010101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	D6,Int_In
 	lea	Rs_trindex,A0
@@ -102,7 +105,10 @@ Reloc_Data	dc.w	15,13,11,11,11,11,13,13,13
 
 	; On gere l'arbre suivant les choix de l'utilisateur
 
-CHOICE_Form	move.l	Rs_trindex,TreeToDo	; Formulaire CHOICE
+CHOICE_Form	; On demande comment faire pour installer SSAVCALL
+	; Automatiquement ou Manuellement
+
+	move.l	Rs_trindex,TreeToDo	; Formulaire CHOICE
 	BSR	Aff_Form
 	cmpi.w	#13,D0
 	BEQ	MANUEL_Form
@@ -111,30 +117,41 @@ CHOICE_Form	move.l	Rs_trindex,TreeToDo	; Formulaire CHOICE
 ; J'ai d‚cid‚ de mettre le "Clr_Form" au d‚but de chaque proc‚dure pour que le formulaire
 ; reste affich‚ pendant que l'ordinateur travaille. 
 	
-MANUEL_Form	BSR	Clr_Form
+MANUEL_Form	; On dit comment faire Manuellement, et on quitte
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+4,TreeToDo	; Formulaire MANUEL
 	BSR	Aff_Form
 	BSR	Clr_Form
 	BRA	Appl_Exit
 
-RESTART_Form	BSR	Clr_Form
+RESTART_Form	; On averti que l'ordinateur va red‚marrer, et on Boot
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+8,TreeToDo	; Formulaire RESTART
 	BSR	Aff_Form
 	BSR	Clr_Form
 	BRA	ColdBoot
 
-NOFOUND_Form	BSR	Clr_Form
+NOFOUND_Form	; On dit que la version incluse de SSAVCALL n'a
+	; pas ‚t‚ trouv‚e dans le r‚pertoire actuel
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+12,TreeToDo	; Formulaire NOFOUND
 	BSR	Aff_Form
 	BRA	MANUEL_Form
 
-NOWRITE_Form	BSR	Clr_Form
+NOWRITE_Form	; Erreur d'‚criture, et l'on quitte
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+16,TreeToDo	; Formulaire NOWRITE
 	BSR	Aff_Form
 	BSR	Clr_Form
 	BRA	Appl_Exit
 
-FULLDISK_Form	; On ferme le fichier ouvert
+FULLDISK_Form	; L'unit‚e est pleine, on ne peut installer SSAVCALL
+
+	; On ferme le fichier ouvert
 
 	move.w	D7,-(SP)
 	move.w	#$3E,-(SP)	; - F_CLOSE -
@@ -147,14 +164,23 @@ FULLDISK_Form	; On ferme le fichier ouvert
 	BSR	Clr_Form
 	BRA	Appl_Exit
 
-OLDER_Form	BSR	Clr_Form
+OLDER_Form	; La version en place est plus vieille que la
+	; version incluse. R‚activer l'ancienne version,
+	; ou la remplacer par la nouvelle
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+24,TreeToDo	; Formulaire OLDER
 	BSR	Aff_Form
 	cmpi.w	#11,D0
 	BEQ	ReName_Old
 	BRA	Install_New
 
-PRXFOUND_Form	move.w	D0,D7	; Handle
+PRXFOUND_Form	; Une version d‚sactiv‚e de SSAVCALL … ‚t‚ trouv‚e
+	; dans la partition Boot. Ca peut etre un PRX, mais
+	; aussi un PRG. Cela peut se produire si l'on Boot
+	; en gardant Control enfonc‚.
+
+	move.w	D0,D7	; Handle
 	BSR	Clr_Form
 	move.l	Rs_trindex+28,TreeToDo	; Formulaire PRXFOUND
 	BSR	Aff_Form
@@ -162,7 +188,10 @@ PRXFOUND_Form	move.w	D0,D7	; Handle
 	BEQ	Verify_Old
 	BRA	Install_New
 
-WHATDO_Form	BSR	Clr_Form
+WHATDO_Form	; Que faire avant de disparaitre
+	; Red‚marrer l'ordinateur, ou sortir sur le bureau
+
+	BSR	Clr_Form
 	move.l	Rs_trindex+32,TreeToDo	; Formulaire WHATDO
 	BSR	Aff_Form
 	cmpi.w	#9,D0
@@ -171,33 +200,29 @@ WHATDO_Form	BSR	Clr_Form
 
 	; APPL_EXIT
 
-Appl_Exit	lea	Control+1,A0
+Appl_Exit	lea	Control,A0
 	move.l	#$13000100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	BSR	AES_Call
 
-	; P_TERM0
+	; P_TERM0 = Kassos
 
 P_Term0	clr.w	-(SP)
 	trap	#1
 	
-LookAt_Boot	; On regarde les unit‚es connect‚es
+LookAt_Boot	; On regarde l'unit‚e de Boot
 
-	move.w	#10,-(SP)	; - DRVMAP -
-	trap	#13	; *** BIOS ***
-	addq.l	#2,SP
+	pea	Booted_Drive
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
 	
-	btst.l	#2,D0
-	BNE	HD_Boot
+	move.w	D0,Boot_Drive
 	
-	move.w	#0,Boot_Drive
-	
-	BRA	Next_Boot
+	BSR	Correct_RSC
 
-HD_Boot	move.w	#2,Boot_Drive
-
-Next_Boot	; On regarde l'unit‚e courante (celle … l'execution de ce programme)
+	; On regarde l'unit‚e courante (celle … l'execution de ce programme)
 	
 	move.w	#$19,-(SP)	; - D_GETDRV -
 	trap	#1	; *** GEMDOS ***
@@ -253,7 +278,7 @@ Next_Boot	; On regarde l'unit‚e courante (celle … l'execution de ce programme)
 		
 	; On cherche si le programme SSAVCALL.PRG existe
 	; (n'oubliez pas que si cette partie est execut‚e,
-	; c'est que SSAVCALL n'est pas en m‚moire)
+	; c'est que SSAVCALL.PRG n'est pas en m‚moire)
 		
 	lea	SSAV_Type,A0
 	move.b	#"G",(-2,A0)		
@@ -272,6 +297,10 @@ Next_Boot	; On regarde l'unit‚e courante (celle … l'execution de ce programme)
 	; S'il n'a pas ‚t‚ trouv‚, on l'installe
 	
 	BRA	Install_New
+	
+Booted_Drive	move.w	$446.w,D0	; _BootDev
+
+	RTS
 	
 AUTO_Folder	dc.b	"\AUTO",0
 SSAV_Name	dc.b	"SSAVCALL.PRx",0
@@ -711,9 +740,9 @@ Reset	move.l	4.w,-(SP)	; Init
 
 Aff_Form	; FORM_CENTER, pour centrer
 
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$36000501,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.l	TreeToDo,Addr_In	; L'adresse de l'arbre
 	
@@ -726,9 +755,9 @@ Aff_Form	; FORM_CENTER, pour centrer
 	; FORM_DIAL, pour r‚server
 	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$33090100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	clr.w	(A0)
@@ -739,9 +768,9 @@ Aff_Form	; FORM_CENTER, pour centrer
 
 	; OBJC_DRAW, pour tracer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$2A060101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	move.l	#4,(A0)+	; Depuis l'objet 0, sur 4 niveaux
@@ -754,9 +783,9 @@ Aff_Form	; FORM_CENTER, pour centrer
 	
 	; FORM_DO, pour gerer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$32010101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	#-1,Int_In	; Pas de champs ‚ditables
 	
@@ -771,9 +800,9 @@ Aff_Form	; FORM_CENTER, pour centrer
 	
 Clr_Form	; FORM_DIAL, pour effacer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$33090100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	move.w	#3,(A0)+
@@ -785,7 +814,42 @@ Clr_Form	; FORM_DIAL, pour effacer
 	BSR	AES_Call
 
 	RTS
+	
+Correct_RSC	; La correction de fait ici dans tous les formulaires,
+	; et de fa‡on s‚quentielle pour permettre la
+	; traduction dans une autre langue
 
+	move.w	#68,D7	; Nombre de TEDINFO
+	
+	move.w	Boot_Drive,D6
+	add.w	#$41,D6
+	
+	lea	Rs_tedinfo,A1
+
+Look_For_Teddy	move.w	D7,D4
+	mulu.w	#28,D4
+	
+	move.l	(A1,D4.w),A0	; Adresse TE_PTEXT
+	move.w	(24,A1,D4.w),D5	; TE_TXTLEN
+
+	subq.w	#1,D5
+	
+Look_For_Drv	move.b	(A0,D5.w),D0
+	
+	cmpi.b	#"$",D0
+	BNE	Next_Drv
+
+	move.b	D6,(A0,D5.w)
+
+Next_Drv	DBF	D5,Look_For_Drv
+	
+Next_Teddy	DBF	D7,Look_For_Teddy
+
+	lea	Control,A0	; ATTENTION … RSRC_GADDR
+	clr.w	(8,A0)
+	
+	RTS
+	
 AES_Call	move.l	#200,D0
 	move.l	#AES_Params,D1
 	trap	#2	; *** AES/VDI ***

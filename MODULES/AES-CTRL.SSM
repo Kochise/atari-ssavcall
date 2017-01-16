@@ -9,8 +9,8 @@
 
 	lea	AES_JUMP,A2	; Le fun...
 	
-	move.l	([4,A2,D0.w*8]),D1
-	move.l	(8,A1),A0	; Control
+	move.l	(4,A2,D0.w*8),D1
+	move.l	(A1),A0	; Control
 	addq.l	#1,A0
 	movep.l	D1,(A0)
 	
@@ -244,19 +244,19 @@ Appl_Find	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
 	
 ; /// AES  14 : APPL_TPLAY ///
 
-Appl_TPlay	move.w	(14,SP),([8,A1])	; Nombre dans Int_In0
+Appl_TPlay	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Nombre dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Vitesse dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
-
+	
 	JSR	AES_Call
 	
 	RTS
 	
 ; /// AES  15 : APPL_TRECORD ///
 
-Appl_TRecord	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
-
+Appl_TRecord	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
+	
 	JSR	AES_Call
 
 	move.w	([12,A1]),D0	; R‚sultat
@@ -397,8 +397,8 @@ UnDefAES29
 
 ; /// AES  30 : MENU_BAR ///
 
-Menu_Bar	move.w	(12,SP),([8,A1])	; Mode dans Int_In0 
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Menu_Bar	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Mode dans Int_In0 
 	
 	JSR	AES_Call
 
@@ -408,9 +408,9 @@ Menu_Bar	move.w	(12,SP),([8,A1])	; Mode dans Int_In0
 	
 ; /// AES  31 : MENU_ICHECK ///
 
-Menu_ICheck	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+Menu_ICheck	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -420,9 +420,9 @@ Menu_ICheck	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  32 : MENU_IENABLE ///
 
-Menu_IEnable	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+Menu_IEnable	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -432,9 +432,9 @@ Menu_IEnable	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  33 : MENU_TNORMAL ///
 
-Menu_TNormal	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+Menu_TNormal	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -444,8 +444,8 @@ Menu_TNormal	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  34 : MENU_TEXT ///
 
-Menu_Text	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
-	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+Menu_Text	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.l	(12,SP),([16,A1],4)	; Adresse du texte dans Addr_In1
 	
 	JSR	AES_Call
@@ -467,9 +467,9 @@ Menu_Register	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  36 : MENU_POPUP ///
 
-Menu_PopUp	move.w	(18,SP),([8,A1])	; X dans Int_In0
+Menu_PopUp	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; X dans Int_In0
 	move.w	(16,SP),([8,A1],2)	; Y dans Int_In1
-	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
 	move.l	(12,SP),([16,A1],4)	; Adresse des donn‚es dans Addr_In1
 	
 	JSR	AES_Call
@@ -481,8 +481,8 @@ Menu_PopUp	move.w	(18,SP),([8,A1])	; X dans Int_In0
 ; /// AES  37 : MENU_ATTACH ///
 
 Menu_Attach	move.w	(24,SP),([8,A1])	; Mode dans Int_In0
-	move.l	(16,SP),([8,A1],2)	; Donn‚es dans Int_In1
 	move.l	(20,SP),([16,A1])	; Adresse dans Addr_in0
+	move.l	(16,SP),([8,A1],2)	; Donn‚es dans Int_In1
 	move.l	(12,SP),([16,A1],4)	; Adresse des donn‚es dans Addr_In1
 	
 	JSR	AES_Call
@@ -494,9 +494,9 @@ Menu_Attach	move.w	(24,SP),([8,A1])	; Mode dans Int_In0
 ; /// AES  38 : MENU_ISTART ///
 
 Menu_IStart	move.w	(20,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(16,SP),([16,SP])	; Adresse dans Addr_In0
 	move.w	(14,SP),([8,A1],2)	; Menu dans Int_In1
 	move.w	(12,SP),([8,A1],4)	; Num‚ro dans Int_In2
-	move.l	(16,SP),([16,SP])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -517,9 +517,9 @@ Menu_Setting	move.w	(16,SP),([8,A1])	; Mode dans Int_In0
 	
 ; /// AES  40 : OBJC_ADD ///
 
-Objc_Add	move.w	(14,SP),([8,A1])	; Parent dans Int_In0
+Objc_Add	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Parent dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Enfant dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -529,8 +529,8 @@ Objc_Add	move.w	(14,SP),([8,A1])	; Parent dans Int_In0
 	
 ; /// AES  41 : OBJC_DELETE ///
 
-Objc_Delete	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Objc_Delete	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 	JSR	AES_Call
 
@@ -540,13 +540,13 @@ Objc_Delete	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  42 : OBJC_DRAW ///
 
-Objc_Draw	move.w	(22,SP),([8,A1])	; Num‚ro dans Int_In0
+Objc_Draw	move.l	(24,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(22,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(20,SP),([8,A1],2)	; Profondeur dans Int_In1
 	move.w	(18,SP),([8,A1],4)	; X dans Int_In2
 	move.w	(16,SP),([8,A1],6)	; Y dans Int_In3
 	move.w	(14,SP),([8,A1],8)	; Largeur dans Int_In4
 	move.w	(12,SP),([8,A1],10)	; Hauteur dans Int_In5
-	move.l	(24,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -556,11 +556,11 @@ Objc_Draw	move.w	(22,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  43 : OBJC_FIND ///
 
-Objc_Find	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
+Objc_Find	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(16,SP),([8,A1],2)	; Profondeur dans Int_In1
 	move.w	(14,SP),([8,A1],4)	; X dans Int_In2
 	move.w	(12,SP),([8,A1],6)	; Y dans Int_In3
-	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -570,8 +570,8 @@ Objc_Find	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  44 : OBJC_OFFSET ///
 
-Objc_OffSet	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Objc_OffSet	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 	JSR	AES_Call
 
@@ -586,9 +586,9 @@ Exit_AES44	RTS
 	
 ; /// AES  45 : OBJC_ORDER ///
 
-Objc_Order	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+Objc_Order	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Position dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -598,11 +598,11 @@ Objc_Order	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  46 : OBJC_EDIT ///
 
-Objc_Edit	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
+Objc_Edit	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(16,SP),([8,A1],2)	; CaractŠre dans Int_In1
 	move.w	(14,SP),([8,A1],4)	; Index dans Int_In2
 	move.w	(12,SP),([8,A1],6)	; Mode dans Int_In3
-	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -615,7 +615,8 @@ Exit_AES46	RTS
 	
 ; /// AES  47 : OBJC_CHANGE ///
 
-Objc_Change	move.w	(24,SP),([8,A1])	; Num‚ro dans Int_In0
+Objc_Change	move.l	(26,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(24,SP),([8,A1])	; Num‚ro dans Int_In0
 	clr.w	([8,A1],2)	; 0 dans Int_In1
 	move.w	(22,SP),([8,A1],4)	; X dans Int_In2
 	move.w	(20,SP),([8,A1],6)	; Y dans Int_In3
@@ -623,7 +624,6 @@ Objc_Change	move.w	(24,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(16,SP),([8,A1],10)	; Hauteur dans Int_In5
 	move.w	(14,SP),([8,A1],12)	; Etat dans Int_In6
 	move.w	(12,SP),([8,A1],14)	; Mode dans Int_In7
-	move.l	(26,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -636,7 +636,7 @@ Objc_Change	move.w	(24,SP),([8,A1])	; Num‚ro dans Int_In0
 Objc_SysVar	move.w	(18,SP),([8,A1])	; Mode dans Int_In0
 	move.w	(16,SP),([8,A1],2)	; Num‚ro dans Int_In1
 	move.w	(14,SP),([8,A1],4)	; Donn‚e1 dans Int_In2
-	move.l	(12,SP),([8,A1],6)	; Donn‚e2 dans Int_In3
+	move.w	(12,SP),([8,A1],6)	; Donn‚e2 dans Int_In3
 	
 	JSR	AES_Call
 
@@ -651,8 +651,8 @@ UnDefAES49
 	
 ; /// AES  50 : FORM_DO ///
 
-Form_Do	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Form_Do	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 	JSR	AES_Call
 
@@ -712,10 +712,10 @@ Form_Center	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
 	
 ; /// AES  55 : FORM_KEYBD ///
 
-Form_KeyBd	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
+Form_KeyBd	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(14,SP),([8,A1],2)	; Prochain Objet dans Int_In1
 	move.w	(12,SP),([8,A1],4)	; CaractŠre dans Int_In2
-	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -725,9 +725,9 @@ Form_KeyBd	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 ; /// AES  56 : FORM_BUTTON ///
 
-Form_Button	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+Form_Button	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
 	move.w	(12,SP),([8,A1],2)	; Nombre de clics dans Int_In1
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -890,10 +890,10 @@ Graf_ShrinkBox	move.w	(26,SP),([8,A1])	; X Fin dans Int_In0
 ; /// AES  75 : GRAF_WATCHBOX ///
 
 Graf_WatchBox	clr.w	([8,A1])		; 0 dans Int_In0
+	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
 	move.w	(16,SP),([8,A1],2)	; Num‚ro dans Int_In1
 	move.w	(14,SP),([8,A1],4)	; Aspect Interne dans Int_In2
 	move.w	(12,SP),([8,A1],6)	; Aspect Externe dans Int_In3
-	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -903,10 +903,10 @@ Graf_WatchBox	clr.w	([8,A1])		; 0 dans Int_In0
 	
 ; /// AES  76 : GRAF_SLIDEBOX ///
 
-Graf_SlideBox	move.w	(16,SP),([8,A1])	; Parent dans Int_In0
+Graf_SlideBox	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Parent dans Int_In0
 	move.w	(14,SP),([8,A1],2)	; Num‚ro dans Int_In1
 	move.w	(12,SP),([8,A1],4)	; Direction dans Int_In2
-	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
 	
 	JSR	AES_Call
 
@@ -921,13 +921,7 @@ Exit_AES76	RTS
 	
 ; /// AES  77 : GRAF_HANDLE ///
 
-Graf_Handle	move.w	#77,([A1])	; OpCode dans Control0
-	clr.w	([A1],2)	; Control1
-	move.w	#5,([A1],4)	; Control2
-	clr.w	([A1],6)	; Control3
-	clr.w	([A1],8)	; Control4
-
-	JSR	AES_Call
+Graf_Handle	JSR	AES_Call
 
 	move.l	(12,A1),D0	; Int_Out
 
@@ -1253,8 +1247,8 @@ Rsrc_SAddr	move.w	(18,SP),([8,A1])	; Mode dans Int_In0
 	
 ; /// AES 114 : RSRC_OBFIX ///
 
-Rsrc_ObFix	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
-	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+Rsrc_ObFix	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
 	
 	JSR	AES_Call
 
@@ -1317,8 +1311,8 @@ Shel_Write	move.w	(24,SP),([8,A1])	; Commande dans Int_In0
 	
 ; /// AES 122 : SHEL_GET ///
 
-Shel_Get	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Shel_Get	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
 	
 	JSR	AES_Call
 
@@ -1328,8 +1322,8 @@ Shel_Get	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
 	
 ; /// AES 123 : SHEL_PUT ///
 
-Shel_Put	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
-	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+Shel_Put	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
 	
 	JSR	AES_Call
 

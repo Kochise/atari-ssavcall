@@ -4,3 +4,23 @@ Bienvenue dans le monde de SSAVCALLL. Vous etes novice ou pro du GEM, et vous
 avez toujours refusez d'utiliser l'assembleur pour ‡a? Vous AVIEZ raison.
 Mais aujourd'hui, SSAVCALL va vous permettre de gerer une interface GEM en
 assembleur, et ce plus facilement qu'en C.
+
+                                                   Kochise Of STALLION SOFTWARE
+
+ATTENTION: NE COMPRESSEZ JAMAIS LE FICHIER SSAVCALL.PRG.
+           Les installateurs v‚rifient la versions directement dans le fichier,
+           … un endroit pr‚cis. Si vous compressez, l'endroit sera chang‚, et
+           les installateur ne pourrons v‚rifier la version, ou planterons...
+
+SSAVCALL n'est en rien une experience d'alchimie! Vous mettez le programme
+SSAVCALL dans le dossier auto, et rebbotez. Une rotuine va s'installer un
+memoire. Vous pouvez connaitre son adresse par le TRAP 2 ou un cookie. Pour
+utiliser SSAVCALL, empilez les infos du GEM comme vous l'auriez fait pour le
+GEMDOS, BIOS ou XBIOS, et sautez … l'adresse que vous avez obtenu. La SSAVCALL
+s'occupe pour vous de mettre les infos aux bons endroits dans les tableaux du
+GEM, s'(occupe d'appeler l'AES ou le VDI, et s'il le faut, vous renvoi une
+r‚ponse dans les registres de donn‚es.
+Mais rien ne vous empeche d'utiliser en meme temps la facon normale d'appeler
+le GEM, car SSAVCALL ne fait presque que ‡a (en dehors de ses fonctions
+avanc‚es qui le rende indispensable pour qui veux programmer le GEM sans y
+passer la moiti‚ de son planning). Bwa, ma foi, lisez donc la doc...

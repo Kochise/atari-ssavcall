@@ -1,8 +1,9 @@
 ; /// INSTALLATEUR Version >Normale< DE SSAV POUR VOTRE APPLICATION ///
 ;
-; Taille incompressible : 4833 octets.
+; Taille incompressible : 4833 octets (assembl‚ tel quel, et STRIP‚)
 ;
 ; Veuillez suivre les conseils...
+; TAB=24 SCREEN=768/576
 
 	SECTION	TEXT	; Le programme
 	
@@ -50,9 +51,9 @@ Not_Installed	movea.l	4(SP),A6	; Adresse de la BasePage
 		
 	; APPL_INIT	
 
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$A000100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	BSR	AES_Call
 	
@@ -64,9 +65,9 @@ Not_Installed	movea.l	4(SP),A6	; Adresse de la BasePage
 
 	; GRAF_MOUSE, pour rendre l'aspect normal … la souris
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$4E010100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	#0,Int_In
 	
@@ -78,9 +79,9 @@ Not_Installed	movea.l	4(SP),A6	; Adresse de la BasePage
 	move.w	#13,D7
 	clr.w	D6
 	
-Reloc_RSC	lea	Control+1,A0
+Reloc_RSC	lea	Control,A0
 	move.l	#$72010101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	D6,Int_In
 	move.l	Rs_trindex,Addr_In
@@ -93,9 +94,9 @@ Reloc_RSC	lea	Control+1,A0
 
 	; FORM_CENTER, pour centrer
 
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$36000501,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.l	Rs_trindex,Addr_In	; L'adresse de l'arbre
 	
@@ -108,9 +109,9 @@ Reloc_RSC	lea	Control+1,A0
 	; FORM_DIAL, pour r‚server
 	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$33090100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	clr.w	(A0)
@@ -121,9 +122,9 @@ Reloc_RSC	lea	Control+1,A0
 
 	; OBJC_DRAW, pour tracer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$2A060101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	move.l	#4,(A0)+	; Depuis l'objet 0, sur 4 niveaux
@@ -136,9 +137,9 @@ Reloc_RSC	lea	Control+1,A0
 	
 	; FORM_DO, pour gerer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$32010101,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	move.w	#-1,Int_In	; Pas de champs ‚ditables
 	
@@ -148,9 +149,9 @@ Reloc_RSC	lea	Control+1,A0
 	
 	; FORM_DIAL, pour effacer
 	
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$33090100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	lea	Int_In,A0
 	move.w	#3,(A0)+
@@ -165,9 +166,9 @@ Reloc_RSC	lea	Control+1,A0
 
 	; APPL_EXIT
 
-	lea	Control+1,A0
+	lea	Control,A0
 	move.l	#$13000100,D0
-	movep.l	D0,(A0)
+	movep.l	D0,(1,A0)
 	
 	BSR	AES_Call
 
