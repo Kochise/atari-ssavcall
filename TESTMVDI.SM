@@ -1,0 +1,559 @@
+; /// TESTSSAV : Module de gestion du menu VDI ///
+	
+	move.l	#Messag_Tab,D0
+	BSR	EVNT_MESAG		; Attend un Mess-Age
+	
+	lea	Messag_Tab,A0
+	move.w	(A0),D0		; Le type
+	cmpi.w	#10,D0		; Un evenement Menu?
+	BNE	Wait_VDI
+	
+	BSR	VDI_Loop
+	tst.w	D0
+	BMI	Exit_VDI		; Quoi que ce soit d'autre
+	
+	BRA	Wait_VDI		; Qui a dit que l'on voulait sortir?
+
+Exit_VDI	RTS
+
+VDI_Loop	pea	VDI_Return		; On se pr‚pare au retour
+
+	lea	Messag_Tab,A0
+	move.w	(8,A0),D0		; Le num‚ro de l'Entr‚e
+	cmpi.w	#137,D0		
+	BGE	VDI_Exit		; Oups...
+	lea	VDI_Jump,A1
+	JMP	(A1,D0.w*4)		; Warp (un BRA prend 4 octets)
+	RTS			; On met un filet, au cas ou
+
+VDI_Jump	BRA	VDI_Exit		; c'est quoi l'Objet 0?
+	BRA	VDI_Exit		; Et le 1?
+	BRA	VDI_Exit		; Et le 2?
+	BRA	VDI_Exit		; VDI
+	BRA	VDI_Exit		; Control
+	BRA	VDI_Exit		; Edit
+	BRA	VDI_Exit		; Escape
+	BRA	VDI_Exit		; Graph
+	BRA	VDI_Exit		; AddFunct
+	BRA	VDI_Exit		; Quad
+	BRA	VDI_Exit		; Enter
+	BRA	VDI_Exit		; Status
+	BRA	VDI_Exit		; I-Box
+	BRA	VDI_Exit		; La boite "VDI"
+	BRA	Return_From_VDI		; Menu Principal
+	BRA	VDI_Exit		; La ligne
+	BRA	VDI_Exit		; Acc 1
+	BRA	VDI_Exit		; Acc 2
+	BRA	VDI_Exit		; Acc 3
+	BRA	VDI_Exit		; Acc 4
+	BRA	VDI_Exit		; Acc 5
+	BRA	VDI_Exit		; Acc 6
+	BRA	VDI_Exit		; La boite "Control"
+	BRA	FormV_OpnWk		; 1
+	BRA	FormV_ClsWk		; 2
+	BRA	FormV_OpnVWk		; 100
+	BRA	FormV_ClsVWk		; 101
+	BRA	FormV_ClrWk		; 3
+	BRA	FormV_UpdWk		; 4
+	BRA	FormVS_Clip		; 129
+	BRA	VDI_Exit		; - Text -
+	BRA	FormVST_Load_Fonts	; 119
+	BRA	FormVST_UnLoad_Fonts	; 120
+	BRA	VDI_Exit		; La boite "Edit"
+	BRA	FormV_PLine		; 6
+	BRA	FormV_PMarker		; 7
+	BRA	FormV_GText		; 8
+	BRA	FormV_FillArea		; 9
+	BRA	FormV_CellArray		; 10
+	BRA	FormV_ContourFill	; 103
+	BRA	FormVR_RectFill		; 114
+	BRA	VDI_Exit		; La boite "Escape"
+	BRA	FormEsc1		; 5, 1
+	BRA	FormEsc2		; 5, 2
+	BRA	FormEsc3		; 5, 3
+	BRA	FormEsc4		; 5, 4
+	BRA	FormEsc5		; 5, 5
+	BRA	FormEsc6		; 5, 6
+	BRA	FormEsc7		; 5, 7
+	BRA	FormEsc8		; 5, 8
+	BRA	FormEsc9		; 5, 9
+	BRA	FormEsc10		; 5,10
+	BRA	FormEsc11		; 5,11
+	BRA	FormEsc12		; 5,12
+	BRA	FormEsc13		; 5,13
+	BRA	FormEsc14		; 5,14
+	BRA	FormEsc15		; 5,15
+	BRA	FormEsc16		; 5,16
+	BRA	FormEsc17		; 5,17
+	BRA	FormEsc18		; 5,18
+	BRA	FormEsc19		; 5,19
+	BRA	VDI_Exit		; La boite "Graph"
+	BRA	FormV_Bar		; 11,1
+	BRA	FormV_Arc		; 11,2
+	BRA	FormV_PieSlice		; 11,3
+	BRA	FormV_Circle		; 11,4
+	BRA	FormV_Ellipse		; 11,5
+	BRA	FormV_EllArc		; 11,6
+	BRA	FormV_EllPie		; 11,7
+	BRA	FormV_RBox		; 11,8
+	BRA	FormV_RFBox		; 11,9
+	BRA	FormV_Justified		; 11,10
+	BRA	VDI_Exit		; La boite "AddFunct"
+	BRA	FormV_Color		; 14
+	BRA	FormVSWr_Mode		; 32
+	BRA	VDI_Exit		; - Text -
+	BRA	FormVST_Height		; 12
+	BRA	FormVST_Rotation	; 13
+	BRA	FormVST_Font		; 21
+	BRA	FormVST_Color		; 22
+	BRA	FormVST_Effects		; 106
+	BRA	FormVST_Points		; 107
+	BRA	VDI_Exit		; - Line -
+	BRA	FormVSL_Type		; 15
+	BRA	FormVSL_Width		; 16
+	BRA	FormVSL_Color		; 17
+	BRA	FormVSL_Ends		; 108
+	BRA	FormVSL_UDSty		; 113
+	BRA	VDI_Exit		; - Marker -
+	BRA	FormVSM_Type		; 18
+	BRA	FormVSM_Height		; 19
+	BRA	FormVSM_Color		; 20
+	BRA	VDI_Exit		; - Fill -
+	BRA	FormVSF_Interior	; 23
+	BRA	FormVSF_Style		; 24
+	BRA	FormVSF_Color		; 25
+	BRA	FormVSF_Perimeter	; 104
+	BRA	FormVSF_UDPat		; 112
+	BRA	VDI_Exit		; La boite "Quad"
+	BRA	FormV_GetPixel		; 105
+	BRA	FormVRO_CpyFm		; 109
+	BRA	FormV_TrnFm		; 110
+	BRA	FormVRT_CpyFm		; 121
+	BRA	VDI_Exit		; La boite "Enter"
+	BRA	VDI_Exit		; - KeyBd -
+	BRA	FormVSIn_Mode		; 33
+	BRA	FormVVRq_Locator	; 28
+	BRA	FormVRq_Valuator	; 29
+	BRA	FormVRq_Choice		; 30
+	BRA	FormVRq_String		; 31
+	BRA	VDI_Exit		; - Cursor -
+	BRA	FormV_Show_C		; 122
+	BRA	FormV_Hide_C		; 123
+	BRA	VDI_Exit		; - Mouse -
+	BRA	FormVSC_Form		; 111
+	BRA	FormVQ_Mouse		; 124
+	BRA	VDI_Exit		; - Vector Ex -
+	BRA	FormVEx_TimV		; 118
+	BRA	FormVEx_ButV		; 125
+	BRA	FormVEx_MoTV		; 126
+	BRA	FormVEx_CurV		; 127
+	BRA	VDI_Exit		; La boite "Status"
+	BRA	FormVQ_Color		; 26
+	BRA	FormVQ_Extnd		; 102
+	BRA	VDI_Exit		; - Line -
+	BRA	FormVQL_Attributes	; 35
+	BRA	VDI_Exit		; - Marker -
+	BRA	FormVQM_Attributes	; 36
+	BRA	VDI_Exit		; - Fill -
+	BRA	FormVQF_Attributes	; 37
+	BRA	VDI_Exit		; - Text -
+	BRA	FormVQT_Array		; 27
+	BRA	FormVQT_Attributes	; 38
+	BRA	FormVQT_InPut		; 115
+	BRA	FormVQT_Extent		; 116
+	BRA	FormVQT_Width		; 117
+	BRA	FormVQT_Name		; 130
+	BRA	FormVQT_FontInfo	; 131
+	                
+VDI_Return	move.w	D0,-(SP)
+	lea	Messag_Tab,A0
+	move.w	(6,A0),D0       
+	BSR	MENU_TNORMAL
+	move.w	(SP)+,D0
+
+VDI_Exit	RTS			; On sort de la gestion
+
+Return_From_VDI	move.w	#-1,D0
+	RTS
+
+; /// La gestion des diff‚rents formulaires ///
+
+FormV_OpnWk
+
+	RTS
+
+FormV_ClsWk
+
+	RTS
+
+FormV_OpnVWk
+
+	RTS
+
+FormV_ClsVWk
+
+	RTS
+
+FormV_ClrWk
+
+	RTS
+
+FormV_UpdWk
+
+	RTS
+
+FormVS_Clip
+
+	RTS
+
+FormVST_Load_Fonts
+
+	RTS
+
+FormVST_UnLoad_Fonts
+
+	RTS
+
+FormV_PLine
+
+	RTS
+
+FormV_PMarker
+
+	RTS
+
+FormV_GText
+
+	RTS
+
+FormV_FillArea
+
+	RTS
+
+FormV_CellArray
+
+	RTS
+
+FormV_ContourFill
+
+	RTS
+
+FormVR_RectFill
+
+	RTS
+
+FormEsc1
+
+	RTS
+
+FormEsc2
+
+	RTS
+
+FormEsc3
+
+	RTS
+
+FormEsc4
+
+	RTS
+
+FormEsc5
+
+	RTS
+
+FormEsc6
+
+	RTS
+
+FormEsc7
+
+	RTS
+
+FormEsc8
+
+	RTS
+
+FormEsc9
+
+	RTS
+
+FormEsc10
+
+	RTS
+
+FormEsc11
+
+	RTS
+
+FormEsc12
+
+	RTS
+
+FormEsc13
+
+	RTS
+
+FormEsc14
+
+	RTS
+
+FormEsc15
+
+	RTS
+
+FormEsc16
+
+	RTS
+
+FormEsc17
+
+	RTS
+
+FormEsc18
+
+	RTS
+
+FormEsc19
+
+	RTS
+
+FormV_Bar
+
+	RTS
+
+FormV_Arc
+
+	RTS
+
+FormV_PieSlice
+
+	RTS
+
+FormV_Circle
+
+	RTS
+
+FormV_Ellipse
+
+	RTS
+
+FormV_EllArc
+
+	RTS
+
+FormV_EllPie
+
+	RTS
+
+FormV_RBox
+
+	RTS
+
+FormV_RFBox
+
+	RTS
+
+FormV_Justified
+
+	RTS
+
+FormV_Color
+
+	RTS
+
+FormVSWr_Mode
+
+	RTS
+
+FormVST_Height
+
+	RTS
+
+FormVST_Rotation
+
+	RTS
+
+FormVST_Font
+
+	RTS
+
+FormVST_Color
+
+	RTS
+
+FormVST_Effects
+
+	RTS
+
+FormVST_Points
+
+	RTS
+
+FormVSL_Type
+
+	RTS
+
+FormVSL_Width
+
+	RTS
+
+FormVSL_Color
+
+	RTS
+
+FormVSL_Ends
+
+	RTS
+
+FormVSL_UDSty
+
+	RTS
+
+FormVSM_Type
+
+	RTS
+
+FormVSM_Height
+
+	RTS
+
+FormVSM_Color
+
+	RTS
+
+FormVSF_Interior
+
+	RTS
+
+FormVSF_Style
+
+	RTS
+
+FormVSF_Color
+
+	RTS
+
+FormVSF_Perimeter
+
+	RTS
+
+FormVSF_UDPat
+
+	RTS
+
+FormV_GetPixel
+
+	RTS
+
+FormVRO_CpyFm
+
+	RTS
+
+FormV_TrnFm
+
+	RTS
+
+FormVRT_CpyFm
+
+	RTS
+
+FormVSIn_Mode
+
+	RTS
+
+FormVVRq_Locator
+
+	RTS
+
+FormVRq_Valuator
+
+	RTS
+
+FormVRq_Choice
+
+	RTS
+
+FormVRq_String
+
+	RTS
+
+FormV_Show_C
+
+	RTS
+
+FormV_Hide_C
+
+	RTS
+
+FormVSC_Form
+
+	RTS
+
+FormVQ_Mouse
+
+	RTS
+
+FormVEx_TimV
+
+	RTS
+
+FormVEx_ButV
+
+	RTS
+
+FormVEx_MoTV
+
+	RTS
+
+FormVEx_CurV
+
+	RTS
+
+FormVQ_Color
+
+	RTS
+
+FormVQ_Extnd
+
+	RTS
+
+FormVQL_Attributes
+
+	RTS
+
+FormVQM_Attributes
+
+	RTS
+
+FormVQF_Attributes
+
+	RTS
+
+FormVQT_Array
+
+	RTS
+
+FormVQT_Attributes
+
+	RTS
+
+FormVQT_InPut
+
+	RTS
+
+FormVQT_Extent
+
+	RTS
+
+FormVQT_Width
+
+	RTS
+
+FormVQT_Name
+
+	RTS
+
+FormVQT_FontInfo
+
+	RTS

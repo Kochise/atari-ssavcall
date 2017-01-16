@@ -1,0 +1,174 @@
+; /// TESTSSAV : Module des macros ///
+
+APPL_INIT	pea	AES_Params		; Pour que le GEM puisse travailler
+	move.w	#10,-(SP)		; - APPL_INIT -
+	move.w	#200,-(SP)		; *** AES ***
+	jsr	([SSAV_Adr])		; SSAV
+	addq.l	#8,SP		; H‚ oui, coco, c'est comme ‡a maintenant...
+	
+	move.w	D0,AES_Handle		; Le Handle dont le GEM nous gratifie
+	
+	RTS
+
+GRAF_HANDLE	pea	AES_Params
+	move.w	#77,-(SP)		; - GRAF_HANDLE -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	addq.l	#8,SP
+
+	RTS
+
+RSRC_GADDR	move.l	D0,-(SP)		; Type - Num‚ro
+	pea	AES_Params
+	move.w	#112,-(SP)		; - RSRC_GADDR -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(12,SP),SP
+	
+	RTS
+
+FORM_CENTER	move.l	D0,-(SP)
+	pea	AES_Params
+	move.w	#54,-(SP)		; - FORM_CENTER -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(12,SP),SP
+	
+	RTS
+	
+FORM_DIAL	move.w	D1,-(SP)		; Action
+	movea.l	D0,A0
+	move.w	(A0),-(SP)
+	move.w	(2,A0),-(SP)
+	move.w	(4,A0),-(SP)
+	move.w	(6,A0),-(SP)
+	move.w	(A0),-(SP)
+	move.w	(2,A0),-(SP)
+	move.w	(4,A0),-(SP)
+	move.w	(6,A0),-(SP)
+	pea	AES_Params
+	move.w	#51,-(SP)		; - FORM_DIAL -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(26,SP),SP
+	
+	RTS
+	
+FORM_DO	move.l	D0,-(SP)
+	move.w	#-1,-(SP)
+	pea	AES_Params
+	move.w	#50,-(SP)		; - FORM_DO -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(14,SP),SP
+	
+	RTS
+
+FORM_ALERT	move.w	#1,-(SP)		; Premier Bouton
+	move.l	D0,-(SP)
+	pea	AES_Params
+	move.w	#52,-(SP)		; - FORM_DO -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(14,SP),SP
+
+	RTS
+
+OBJC_DRAW	move.l	Tree_Adr,-(SP)
+	clr.w	-(SP)		; Racine
+	move.w	#4,-(SP)
+	move.l	D0,A0		; Int_Out1-...
+	move.w	(A0)+,-(SP)		; X
+	move.w	(A0)+,-(SP)		; Y
+	move.w	(A0)+,-(SP)		; Largeur
+	move.w	(A0)+,-(SP)		; Hauteur
+	pea	AES_Params
+	move.w	#42,-(SP)		; - OBJC_DRAW
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(24,SP),SP
+
+	RTS
+
+OBJC_CHANGE	move.l	Tree_Adr,-(SP)
+	move.w	D0,-(SP)		; L'objet
+	move.l	D7,A0		; Int_Out1-...
+	move.w	(A0)+,-(SP)		; X
+	move.w	(A0)+,-(SP)		; Y
+	move.w	(A0)+,-(SP)		; Largeur
+	move.w	(A0)+,-(SP)		; Hauteur
+	clr.w	-(SP)		; Que dalle...
+	clr.w	-(SP)		; Et pis quoi encore...
+	pea	AES_Params
+	move.w	#47,-(SP)		; - OBJC_CHANGE -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(26,SP),SP
+	
+	RTS
+	
+MENU_BAR	move.l	D0,-(SP)
+	move.w	D1,-(SP)
+	pea	AES_Params
+	move.w	#30,-(SP)		; - MENU_BAR -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(14,SP),SP
+	
+	RTS
+
+MENU_TNORMAL	move.l	Menu_Adr,-(SP)
+	move.w	D0,-(SP)
+	move.w	#1,-(SP)		; Normal
+	pea	AES_Params
+	move.w	#33,-(SP)		; - MENU_TNORMAL -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(16,SP),SP
+	
+	RTS
+
+GRAF_MOUSE	move.w	D0,-(SP)
+	clr.l	-(SP)		; Au fond, on s'en fout...
+	pea	AES_Params
+	move.w	#78,-(SP)		; - GRAF_MOUSE -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(14,SP),SP
+	
+	RTS
+
+EVNT_MESAG	move.l	D0,-(SP)
+	pea	AES_Params
+	move.w	#23,-(SP)		; - EVNT_MESAG -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	lea	(12,SP),SP
+	
+	RTS
+
+RSRC_FREE	pea	AES_Params
+	move.w	#111,-(SP)		; - RSRC_FREE -
+	move.w	#200,-(SP)		; *** AES ***
+	JSR	([SSAV_Adr])
+	addq.l	#8,SP
+	
+	RTS
+
+APPL_EXIT 	pea	AES_Params		; Pour que le GEM puisse travailler
+	move.w	#19,-(SP)		; - APPL_EXIT -
+	move.w	#200,-(SP)		; *** AES ***
+	jsr	([SSAV_Adr])		; SSAV
+	addq.l	#8,SP		; Zoup...
+	
+	RTS
+
+VQ_EXTND	move.w	D0,-(SP)		; VDI Handle
+	clr.w	-(SP)		; Infos Standart
+	pea	VDI_Params		; Pour que le VDI puisse travailler
+	move.w	#102,-(SP)		; - VQ_EXTND -
+	move.w	#115,-(SP)		; *** VDI ***
+	jsr	([SSAV_Adr])		; SSAV
+	lea	(12,SP),SP		; Zoup...
+
+	RTS

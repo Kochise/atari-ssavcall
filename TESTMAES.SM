@@ -1,0 +1,493 @@
+; /// TESTSSAV : Module de Gestion du menu AES ///
+
+	move.l	#Messag_Tab,D0
+	BSR	EVNT_MESAG		; Attend un Mess-Age
+	
+	lea	Messag_Tab,A0
+	move.w	(A0),D0		; Le type
+	cmpi.w	#10,D0		; Un evenement Menu?
+	BNE	Wait_AES
+	
+	BSR	AES_Loop		; On part en croisade
+	
+	tst.w	D0
+	BMI	Exit_AES		; Quoi que ce soit d'autre
+	
+	BRA	Wait_AES		; Qui a dit que l'on voulait sortir?
+
+Exit_AES	RTS
+
+AES_Loop	pea	AES_Return		; On se pr‚pare au retour
+
+	lea	Messag_Tab,A0
+	move.w	(8,A0),D0		; Le num‚ro de l'Entr‚e
+	cmpi.w	#129,D0		
+	BGE	AES_Exit		; Oups...
+	lea	AES_Jump,A1
+	JMP	(A1,D0.w*4)		; Warp (un BRA prend 4 octets)
+	RTS			; On met un filet, au cas ou
+
+AES_Jump	BRA	AES_Exit		; c'est quoi l'Objet 0?
+	BRA	AES_Exit		; Et le 1?
+	BRA	AES_Exit		; Et le 2?
+	BRA	AES_Exit		; ATARI
+	BRA	AES_Exit		; Appl
+	BRA	AES_Exit		; Evnt
+	BRA	AES_Exit		; Menu
+	BRA	AES_Exit		; Objc
+	BRA	AES_Exit		; Form
+	BRA	AES_Exit		; Graf
+	BRA	AES_Exit		; Scrp
+	BRA	AES_Exit		; FSel
+	BRA	AES_Exit		; Wind
+	BRA	AES_Exit		; Rsrc
+	BRA	AES_Exit		; Shel
+	BRA	AES_Exit		; I-Box
+	BRA	AES_Exit		; La Box "AES"
+	BRA	Return_From_AES		; Menu Principal
+	BRA	AES_Exit		; La ligne
+	BRA	AES_Exit		; Acc 1
+	BRA	AES_Exit		; Acc 2
+	BRA	AES_Exit		; Acc 3
+	BRA	AES_Exit		; Acc 4
+	BRA	AES_Exit		; Acc 5
+	BRA	AES_Exit		; Acc 6
+	BRA	AES_Exit		; La boite "Appl"
+	BRA	FormAppl_Init
+	BRA	FormAppl_Read
+	BRA	FormAppl_Write
+	BRA	FormAppl_Find
+	BRA	FormAppl_TPlay
+	BRA	FormAppl_TRecord
+	BRA	FormAppl_Search
+	BRA	FormAppl_Exit
+	BRA	FormAppl_GetInfo
+	BRA	FormAppl_Memory
+	BRA	AES_Exit		; La boite "Evnt"
+	BRA	FormEvnt_KeyBd
+	BRA	FormEvnt_Button
+	BRA	FormEvnt_Mouse
+	BRA	FormEvnt_Mesag
+	BRA	FormEvnt_Timer
+	BRA	FormEvnt_Multi
+	BRA	FormEvnt_DClick
+	BRA	AES_Exit		; La boite "Menu" 
+	BRA	FormMenu_Bar
+	BRA	FormMenu_ICheck
+	BRA	FormMenu_IEnable
+	BRA	FormMenu_TNormal
+	BRA	FormMenu_Text
+	BRA	FormMenu_Register
+	BRA	FormMenu_PopUp
+	BRA	FormMenu_Attach
+	BRA	FormMenu_IStart
+	BRA	FormMenu_Setting
+	BRA	AES_Exit		; La boite "Objc"
+	BRA	FormObjc_Add
+	BRA	FormObjc_Delete
+	BRA	FormObjc_Draw
+	BRA	FormObjc_Find
+	BRA	FormObjc_OffSet
+	BRA	FormObjc_Order
+	BRA	FormObjc_Edit
+	BRA	FormObjc_Change
+	BRA	FormObjc_SysVar
+	BRA	FormObjc_Search
+	BRA	AES_Exit		; La boite "Form"
+	BRA	FormForm_Do
+	BRA	FormForm_Dial
+	BRA	FormForm_Alert
+	BRA	FormForm_Error
+	BRA	FormForm_Center
+	BRA	FormForm_KeyBd
+	BRA	FormForm_Button
+	BRA	FormSSX2Form_Do
+	BRA	FormSSForm_Process
+	BRA	FormSSForm_Sound
+	BRA	AES_Exit		; La boite "Graf"
+	BRA	FormGraf_RubberBox
+	BRA	FormGraf_DragBox
+	BRA	FormGraf_MoveBox
+	BRA	FormGraf_GrowBox
+	BRA	FormGraf_ShrinkBox
+	BRA	FormGraf_WatchBox
+	BRA	FormGraf_SlideBox
+	BRA	FormGraf_Handle
+	BRA	FormGraf_Mouse
+	BRA	FormGraf_MkState
+	BRA	AES_Exit		; La boite "Scrp"
+	BRA	FormScrp_Read
+	BRA	FormScrp_Write
+	BRA	AES_Exit		; La boite "FSel"
+	BRA	FormFSel_Input
+	BRA	FormFSel_ExInput
+	BRA	AES_Exit		; La boite "Wind"
+	BRA	FormWind_Create
+	BRA	FormWind_Open
+	BRA	FormWind_Close
+	BRA	FormWind_Delete
+	BRA	FormWind_Get
+	BRA	FormWind_Set
+	BRA	FormWind_Find
+	BRA	FormWind_UpDate
+	BRA	FormWind_Calc
+	BRA	FormWind_New
+	BRA	AES_Exit		; La boite "Rsrc"
+	BRA	FormRsrc_Load
+	BRA	FormRsrc_Free
+	BRA	FormRsrc_GAddr
+	BRA	FormRsrc_SAddr
+	BRA	FormRsrc_ObFix
+	BRA	FormRsrc_RcFix
+	BRA	AES_Exit		; La boite "Shel"
+	BRA	FormShel_Read
+	BRA	FormShel_Write
+	BRA	FormShel_Get
+	BRA	FormShel_Put
+	BRA	FormShel_Find
+	BRA	FormShel_Envrn
+               
+AES_Return	move.w	D0,-(SP)
+	lea	Messag_Tab,A0
+	move.w	(6,A0),D0       
+	BSR	MENU_TNORMAL
+	move.w	(SP)+,D0
+
+AES_Exit	RTS			; On sort de la gestion
+
+Return_From_AES	move.w	#-1,D0
+	RTS
+
+; /// La gestion des diff‚rents formulaires ///
+
+FormAppl_Init				; AES  10
+
+	RTS
+
+FormAppl_Read				; AES  11
+
+	RTS
+
+FormAppl_Write				; AES  12
+
+	RTS
+
+FormAppl_Find				; AES  13
+
+	RTS
+
+FormAppl_TPlay				; AES  14
+
+	RTS
+
+FormAppl_TRecord			; AES  15
+
+	RTS
+
+FormAppl_Search				; AES  18
+
+	RTS
+
+FormAppl_Exit				; AES  19
+
+	RTS
+
+FormEvnt_KeyBd				; AES  20
+
+	RTS
+
+FormEvnt_Button				; AES  21
+
+	RTS
+
+FormEvnt_Mouse				; AES  22
+
+	RTS
+
+FormEvnt_Mesag				; AES  23
+
+	RTS
+
+FormEvnt_Timer				; AES  24
+
+	RTS
+
+FormEvnt_Multi				; AES  25
+
+	RTS
+
+FormEvnt_DClick				; AES  26
+
+	RTS
+
+FormMenu_Bar				; AES  30
+
+	RTS
+
+FormMenu_ICheck				; AES  31
+
+	RTS
+
+FormMenu_IEnable			; AES  32
+
+	RTS
+
+FormMenu_TNormal			; AES  33
+
+	RTS
+
+FormMenu_Text				; AES  34
+
+	RTS
+
+FormMenu_Register			; AES  35
+
+	RTS
+
+FormMenu_PopUp				; AES  36
+
+	RTS
+
+FormMenu_Attach				; AES  37
+
+	RTS
+
+FormMenu_IStart				; AES  38
+
+	RTS
+
+FormMenu_Setting			; AES  39
+
+	RTS
+
+FormObjc_Add				; AES  40
+
+	RTS
+
+FormObjc_Delete				; AES  41
+
+	RTS
+
+FormObjc_Draw				; AES  42
+
+	RTS
+
+FormObjc_Find				; AES  43
+
+	RTS
+
+FormObjc_OffSet				; AES  44
+
+	RTS
+
+FormObjc_Order				; AES  45
+
+	RTS
+
+FormObjc_Edit				; AES  46
+
+	RTS
+
+FormObjc_Change				; AES  47
+
+	RTS
+
+FormObjc_SysVar				; AES  48
+
+	RTS
+
+FormObjc_Search				; AES  49
+
+	RTS
+
+FormForm_Do				; AES  50
+
+	RTS
+
+FormForm_Dial				; AES  51
+
+	RTS
+
+FormForm_Alert				; AES  52
+
+	RTS
+
+FormForm_Error				; AES  53
+
+	RTS
+
+FormForm_Center				; AES  54
+
+	RTS
+
+FormForm_KeyBd				; AES  55
+
+	RTS
+
+FormForm_Button				; AES  56
+
+	RTS
+
+FormSSX2Form_Do				; AES  57
+
+	RTS
+
+FormSSForm_Process			; AES  58
+
+	RTS
+
+FormSSForm_Sound			; AES  59
+
+	RTS
+
+FormGraf_RubberBox			; AES  70
+
+	RTS
+
+FormGraf_DragBox			; AES  71
+
+	RTS
+
+FormGraf_MoveBox			; AES  72
+
+	RTS
+
+FormGraf_GrowBox			; AES  73
+
+	RTS
+
+FormGraf_ShrinkBox			; AES  74
+
+	RTS
+
+FormGraf_WatchBox			; AES  75
+
+	RTS
+
+FormGraf_SlideBox			; AES  76
+
+	RTS
+
+FormGraf_Handle				; AES  77
+
+	RTS
+
+FormGraf_Mouse				; AES  78
+
+	RTS
+
+FormGraf_MkState			; AES  79
+
+	RTS
+
+FormScrp_Read				; AES  80
+
+	RTS
+
+FormScrp_Write				; AES  81
+
+	RTS
+
+FormFSel_Input				; AES  90
+
+	RTS
+
+FormFSel_ExInput			; AES  91
+
+	RTS
+
+FormWind_Create				; AES 100
+
+	RTS
+
+FormWind_Open				; AES 101
+
+	RTS
+
+FormWind_Close				; AES 102
+
+	RTS
+
+FormWind_Delete				; AES 103
+
+	RTS
+
+FormWind_Get				; AES 104
+
+	RTS
+
+FormWind_Set				; AES 105
+
+	RTS
+
+FormWind_Find				; AES 106
+
+	RTS
+
+FormWind_UpDate				; AES 107
+
+	RTS
+
+FormWind_Calc				; AES 108
+
+	RTS
+
+FormWind_New				; AES 109
+
+	RTS
+
+FormRsrc_Load				; AES 110
+
+	RTS
+
+FormRsrc_Free				; AES 111
+
+	RTS
+
+FormRsrc_GAddr				; AES 112
+
+	RTS
+
+FormRsrc_SAddr				; AES 113
+
+	RTS
+
+FormRsrc_ObFix				; AES 114
+
+	RTS
+
+FormRsrc_RcFix				; AES 115
+
+	RTS
+
+FormShel_Read				; AES 120
+
+	RTS
+
+FormShel_Write				; AES 121
+
+	RTS
+
+FormShel_Get				; AES 122
+
+	RTS
+
+FormShel_Put				; AES 123
+
+	RTS
+
+FormShel_Find				; AES 124
+
+	RTS
+
+FormShel_Envrn				; AES 125
+
+	RTS
+
+FormAppl_GetInfo			; AES 130
+
+	RTS
+
+FormAppl_Memory				; AES 131
+
+	RTS
