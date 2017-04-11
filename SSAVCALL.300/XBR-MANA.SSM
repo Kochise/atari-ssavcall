@@ -1,0 +1,273 @@
+; /// SSAVCALL Project - XBRA Manager - KOSS 1999 ///
+
+	dc.b	"ðSPI"	; Plug-In Signature
+	dc.b	"SSAV"	; Plug-In Valid
+	dc.b	"XBR-MANA"	; Plug-In Name
+	dc.w	8	; Plug-In Number	
+	ds.l	1	; Plug-In Next
+	ds.l	1	; Plug-In FuncList
+	dc.l	-1	; Plug-In Boot
+	dc.l	-1	; Plug-In Code
+	dc.l	XBRA_Jump	; Plug-In JumpTable
+	dc.w	0	; Plug-In Minimal
+	dc.w	3	; Plug-In Maximal
+	dc.l	-1	; Plug-In Public
+	dc.l	-1	; Plug-In Private
+	dc.w	$102	; Plug-In Version
+	dc.w	$0	; Plug-In Date
+	dc.l	"KOSS",0	; Plug-In Author
+
+XBRA_Jump	dc.l	Xbra_Add,0	; XBRA  0
+	dc.l	Xbra_Change,0	; XBRA  1
+	dc.l	Xbra_Find,0	; XBRA  2
+	dc.l	Xbra_Scan,0	; XBRA  3
+	dc.l	UnDefXBRA4,0
+	dc.l	UnDefXBRA5,0
+	dc.l	UnDefXBRA6,0
+	dc.l	UnDefXBRA7,0
+	dc.l	UnDefXBRA8,0
+	dc.l	UnDefXBRA9,0
+	
+; /// XBRA  0 : XBRA_ADD ///
+; LONG : Start_Addr
+; LONG : NewXBRA_Address
+; Return : D0.w = Result of XBRAInstallation
+;                 0 : Well Done
+;                -1 : Error Occured
+;                -2 : Already Done
+;
+; Used Registers : D0/A0
+
+Xbra_Add	; 14 LONG : Start_Addr
+	; 10 LONG : NewXBRA_Address
+	;  8 WORD : - XBRA_ADD - (0)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	move.l	([14,SP]),-(SP)	; Start_Addr
+	
+	cmpi.l	#"XBRA",([14,SP],-12)	; NewShort
+	BEQ	Xbra0_NewShort
+	
+	cmpi.l	#"XBRA",([14,SP],-16)	; NewLong
+	BNE	Xbra0_Error
+	
+	move.l	([14,SP],-12),-(SP)	; NewXBRA_Name (Long)
+	
+	BRA	Xbra0_LookUp
+	
+Xbra0_NewShort	move.l	([14,SP],-8),-(SP)	; NewXBRA_Name (Short)
+
+Xbra0_LookUp	move.w	#2,-(SP)	; - XBRA_FIND -
+	move.w	(16,SP),-(SP)	; *** XBRAFACT ***
+	trap	#3
+	lea	(12,SP),SP
+	
+	BNE	Xbra0_Already	; D0<>0, XBRA existe
+	
+	move.l	([14,SP]),([10,SP],-4)	; OldXBRA_Address
+	
+	move.l	(10,SP),([14,SP])	; NewXBRA_Address	
+	; C'‚tait juste ‡a!
+	
+	clr.w	D0
+	
+	RTS
+	
+Xbra0_Error	move.w	#-1,D0
+	RTS
+
+Xbra0_Already	move.w	#-2,D0
+	RTS
+
+; /// XBRA  1 : XBRA_CHANGE ///
+; LONG : OldXBRA_Entry Pointer
+; LONG : NewXBRA_Entry Pointer
+; Return : D0.w = Result of XBRAChange
+;                 0 : Well Done
+;                -1 : Error Occured
+;
+; Used Registers : D0/A0
+
+Xbra_Change	; 14 LONG : OldXBRA_Entry
+	; 10 LONG : NewXBRA_Entry
+	;  8 WORD : - XBRA_CHANGE - (1)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+
+	move.l	(14,SP),A0	; OldXBRA_Entry
+	
+	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra1_Check1
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra1_Check1
+	
+	move.w	#-1,D0
+
+	RTS
+	
+Xbra1_Check1	move.l	([14,SP],-4),A0	; Previous XBRA
+
+	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra1_Check2
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra1_Check2
+
+	move.l	(10,SP),(A0)	; NewXBRA
+	
+	BRA	Xbra1_OK
+	
+Xbra1_Check2	move.l	(10,SP),(-4,A0)	; NewXBRA
+
+Xbra1_OK	clr.w	D0
+
+	RTS
+
+; /// XBRA  2 : XBRA_FIND ///
+; LONG : Start_Addr
+; LONG : XBRA_Name
+; Return : D0.l = 0 if Error
+;                 else Addr of the XBRA_Entry
+;
+; Used Registers : D0/A0
+
+Xbra_Find	; 14 LONG : Start_Addr
+	; 10 LONG : XBRA_Name
+	;  8 WORD : - XBRA_FIND - (2)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+
+	move.l	(14,SP),A0	; Start_Addr
+	
+Xbra2_Loop	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra2_CheckShort
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra2_CheckLong
+	
+	clr.l	D0
+
+	RTS
+	
+Xbra2_CheckShort	move.l	(-8,A0),D0
+	cmp.l	(10,SP),D0	; XBRA_Name
+	BEQ	Xbra2_OK
+
+	BRA	Xbra2_Next
+
+Xbra2_CheckLong	move.l	(-12,A0),D0
+	cmp.l	(10,SP),D0
+	BEQ	Xbra2_OK
+
+Xbra2_Next	move.l	(-4,A0),A0
+	
+	BRA	Xbra2_Loop
+
+Xbra2_OK	move.l	A0,D0
+
+	RTS
+
+; /// XBRA  3 : XBRA_SCAN ///
+; LONG : Start address (EVEN)
+; LONG : End address (EVEN)
+; Return : D0.l = 0 if error
+;                 else Pointer on the first entry found
+;                 
+;
+; Used Registers : D0/A0-1
+
+Xbra_Scan	; 14 LONG : Start_Addr
+	; 10 LONG : End Addr
+	;  8 WORD : - XBRA_SCAN - (3)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	move.l	(14,SP),D0
+	andi.l	#-2,D0
+	movea.l	D0,A0
+	
+	move.l	(10,SP),D0
+	andi.l	#-2,D0
+	movea.l	D0,A1
+	
+Xbra3_Loop	cmpi.l	#"XBRA",([A0],-12)
+	BEQ	Xbra3_Match
+	
+	cmpi.l	#"XBRA",([A0],-16)
+	BEQ	Xbra3_Match
+	
+	addq.l	#2,A0
+	
+	cmp.l	A1,A0
+	BLT	Xbra3_Loop
+	
+	clr.l	D0
+	
+	RTS
+	
+Xbra3_Match	move.l	A0,D0
+
+	RTS
+
+; /// XBRA  4 : Non D‚finit ///
+
+UnDefXBRA4	;  8 WORD : - XBRA_ - (4)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// XBRA  5 : Non D‚finit ///
+
+UnDefXBRA5	;  8 WORD : - XBRA_ - (5)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// XBRA  6 : Non D‚finit ///
+
+UnDefXBRA6	;  8 WORD : - XBRA_ - (6)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// XBRA  7 : Non D‚finit ///
+
+UnDefXBRA7	;  8 WORD : - XBRA_ - (7)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// XBRA  8 : Non D‚finit ///
+
+UnDefXBRA8	;  8 WORD : - XBRA_ - (8)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+
+; /// XBRA  9 : Non D‚finit ///
+
+UnDefXBRA9	;  8 WORD : - XBRA_ - (9)
+	;  6 WORD : *** XBRAFACT ***
+	;  2 LONG : PC
+	;  0 WORD : SR
+
+	RTS
+

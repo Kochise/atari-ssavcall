@@ -1,0 +1,29 @@
+/// Indices de pr‚sence de SSAVCALL... ////////////////////////////////////////
+
+Il y a trois indices pour trouver SSAVCALL:
+
+1-Le Cookie SSAV
+  0 LONG : "SSAV"
+  4 LONG : Adresse du Tableau ProgInfo de SSAVCALL
+
+2-Le Cookie NULL
+  C'est une particularit‚ de SSAVCALL...
+  Je d‚place tous les Cookies, et place en premier le Cookie "NULL"
+  0 LONG : "NULL"
+           ATTENTION, v‚ritable nom "NULL" ($4E554C4C), et pas un LONG nul
+           (NULL).
+           Permet imm‚diatement de savoir combien de Cookies composent le
+           Cookie-Jar, sans avoir … en chercher la fin. Le fait que ce
+           premier Cookie porte un vrai Nom, et pas un LONG … 0 permet aux
+           routines de recherches de ne pas planter en croyant etre … la fin
+           du Cookie-Jar.
+  4 LONG : Le nombres de Cookies
+
+3-Le d‚tournement XBRA du TRAP #3
+  ($88) : Adresse de l'XBRA de SSAVCALL
+  -12 LONG : "XBRA"
+   -8 LONG : "SSAV" (ShortXBRA)
+   -4 LONG : Ancienne adresse du TRAP #3
+    0 .... : SSAVCALL
+             N'oubliez pas la Fonction SSAV_Init (PIN -1) pour Initialiser
+             votre Programme

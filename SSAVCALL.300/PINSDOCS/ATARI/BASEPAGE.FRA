@@ -1,0 +1,141 @@
+/// Le ProgHeader et la BasePage //////////////////////////////////////////////
+
+Il y a deux structures:
+
+Le fichier programme, et le programme relog‚ en m‚moire
+
+  Le Fichier                                 En M‚moire
+
+OffSet   0 ProgHead -> --------          Offset   0 BasePage -> --------
+                       |      |--,                              |      |---,
+                       |      |--+,                             |      |---+,
+                       |      |--++,                            |      |---++,
+                       |      |--+++,                           |      |   |||
+                       |      |  ||||                           |      |   |||
+OffSet  28 SectTEXT -> --------  ||||                           --------   |||
+                       |      |}-'|||                                      |||
+OffSet XXX SectDATA -> --------   |||    OffSet XXX SectTEXT -> -------- <-'||
+                       |      |}--'||                           |      |}--'||
+OffSet XXX TablSymb -> --------    ||                           --------    ||
+                       |      |}---'|                                       ||
+OffSet XXX TabReloc -> --------     |    OffSet XXX SectDATA -> -------- <--'|
+                       |      |}----'                           |      |}---'|
+                       --------                                 --------     |
+                                                                             |
+                                         OffSet XXX SectBSS  -> -------- <---'
+                                                                |      |}----'
+                                                                --------
+
+Lorsque le systeme d'exploitation charge un programme, il opere un peu de la
+facon suivante:
+  -Lecture du ProgHeader
+  -Calcul de la m‚moire … r‚server
+   Taille Section TEXT+DATA+BSS+BasePage
+  -R‚servation de la m‚moire
+  -Chargement de la Section TEXT+DATA
+  -Effacement de la Section BSS (suivant valeur dans le TPA)
+  -Utilisation de la table de relocation pour reloger la Section TEXT
+  -Remplissage de la BasePage
+  -Saut au d‚but du programme
+
+Le d‚buggeur opere presque de la meme facon. Seulement o— l'OS n'utilise pas la
+table symbolique, le d‚buggeur la charge et l'utilise.
+
+1-ProgHeader
+
+  Ce sont les tailles des diff‚rents ‚l‚ments formants le programmes. Vu que le
+  fichier les contients les uns … la suite des autres, seules les tailles sont
+  utiles.
+   0 WORD : $601A - Instruction BRA PC+$1A
+            Pointe le d‚but de la SECTION TEXT
+   2 LONG : Longueur de la SECTION TEXT
+            C'est le programme en lui mˆme, avec les diff‚rentes routines.
+            Il n'y a ici que ce qui est executable.
+   6 LONG : Longueur de la SECTION DATA
+            Ce sont les donn‚es dont le programme a besoin.
+            Ce peut etre des tables de Sinus, ou autres...
+  10 LONG : Longueur de la SECTION BSS
+            Ce sont les variables.
+            Cette partie n'existe pas dans le fichier.
+            Au d‚part du programme, de la m‚moire est r‚serv‚e par le systeme
+            d'exploitation, et effac‚e.
+            Cette partie existe dans uniquement en m‚moire, et contient 0
+            partout, au d‚part donc.
+  14 LONG : Longueur du tableau symbolique
+            C'est pas toujours le cas, mais cette partie peu exister. Elle suit
+            la SECTION DATA dans le fichier.
+            Ici se trouve le nom des labels utilis‚s dans l'assembleur. C'est
+            utilis‚ essentiellement par les d‚buggeur quand c'est possible.
+  18 LONG : Table de relocation
+  22 LONG : Header Bits - Bits de chargement, dans les TOS r‚cents...
+            BIT  0 : Fast Load
+                     A 1, au chargement de votre programme, la m‚moire n'est
+                     pas completement effac‚e.
+                     Seule la SECTION BSS est mise … z‚ro. C'est utile si on a
+                     14Mo de m‚moire. Dans ce cas, le chargement est bien plus
+                     long que si l'on a que 4Mo, car 14Mo, c'est plus long …
+                     effacer que 4Mo.
+                 1 : TT-Ram Load
+                     >SI< il y a assez de TT-Ram disponible, le programme y
+                     sera charg‚. L'execution sera donc plus rapide.
+                     Fonctionne en combinaison avec TPA Field (BIT 28).
+                 2 : TT-Ram Malloc
+                     Les r‚servations m‚moires avec - M_ALLOC - (GEMDOS $48)
+                     seront effectu‚es en priorit‚ en TT-Ram
+                     Les r‚servations avec - M_XALLOC - (GEMDOS $44) ne sont
+                     pas affect‚es, car on y d‚finit d‚j… o— l'on veut que la
+                     r‚servation se fasse...
+                28 : TPA Field0\
+                29 : TPA Field1 \TPA Field
+                30 : TPA Field2 /
+                31 : TPA Field3/
+                     >SI< TT-Ram Load=1
+                     ALORS Votre programme est charg‚ en TT-RAM avec une zone
+                     TPA pr‚d‚finie (et non pas TOUTE la TT-Ram) par :
+                       (TPA Field+1)*128Ko
+                     Par exemple : TPA Field=3
+                                   Au chargement en TT-Ram, vous aurez votre
+                                   programme et (3+1)*128Ko, soit 512Ko de TPA
+                     S'il n'y … pas assez de m‚moire en TT-Ram pour votre
+                     programme et le petit bout de m‚moire, le tout est plac‚
+                     en ST-Ram...
+
+2-BasePage
+
+  Correspond un peu au ProgHeader, mais plus complet.
+  Les diff‚rentes section ne sont pas automatiquement les unes … la suites des
+  autres, aussi la BasePage contient les adresses de d‚part des diff‚rentes
+  sections, ainsi que leurs tailles.
+  L'adresse de la BasePage se trouve au d‚part du programme … (4,SP). En (SP)
+  se trouve un LONG nul.
+
+    0 LONG : Adresse de la TPA
+    4 LONG : Adresse de fin de TPA (exclu, fin de TPA+1)
+             La zone TPA est la m‚moire utilisateur laiss‚e … votre programme.
+             Vue qu'au chargement de votre programme toute la m‚moire est
+             consid‚r‚e comme TPA, vous ne pouvez faire de MALLOC. Pour cela,
+             il faut dabord r‚duire la m‚moire … la taille de votre programme
+             (+ la nouvelle StackFrame, la Pile quoi...), et alors seulement
+             vous pourrez demander de la m‚moire, et savoir o— est r‚serv‚ le
+             bloc...
+    8 LONG : Adresse de la Section TEXT
+   12 LONG : Taille de la Section TEXT
+   16 LONG : Adresse de la Section DATA
+   20 LONG : Taille de la Section DATA
+   24 LONG : Adresse de la Section BSS
+   28 LONG : Taille de la Section BSS
+   32 LONG : Adresse de la DTA
+   36 LONG : Adresse de la BasePage du processus pŠre
+             Dans le cas d'un systeme multitache, la BasePage du programme PŠre
+             Dans le cas d'un accessoire, 0
+   44 LONG : Adresse d'une chaine d'environnement
+  128 BYTE : Taille de la ligne de Commande
+       ... : La ligne de commande au format C (termin‚e par un octet nul)
+
+La ligne de commande est celle que l'on peut ecrire dans une boite pr‚vue
+lorsque l'on d‚marre un TTP ou GTP, ou que l'on donne au systeme d'exploitation
+lorsqu'on lui demande d'executer un programme.
+Dans la BasePage, elle a un double format, format Pascal (longueur sur un octet
+puis la chaine elle meme) et format C (la chaine elle meme termin‚e par un
+octet nul), ce qui est tres utile.
+
