@@ -1,0 +1,95 @@
+; /// SSAV AutoInstaller v1.74 - KOSS 1998-2004 ///
+
+	move.l	SP,D0
+	BNE	SSAV_TUI_MEM_SHRINK
+
+	lea	SSAV_BDB_ACC_STACK,SP	; Si ACC, SP=0
+
+SSAV_TUI_MEM_SHRINK:	move.w	#$100,-(SP)	; 100 LongWord for the NewStackFrame
+	clr.w	-(SP)	; SHRINK
+	pea	SSAV_BDB_TAB_START
+	pea	SSAV_DAT_AES_PARAMS
+	move.l	#-1,-(SP)	; "BOOT Only" if AES
+	move.l	#-1,-(SP)	; "BOOT Only" if ACC
+	pea	SSAV_TUI_MEM_INIT
+	clr.w	-(SP)	; - PROG_INIT -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	SSAV_TUM_DISPATCH
+	lea	(28,SP),SP
+
+	clr.w	-(SP)	; - P_TERM0 -
+	TRAP	#1	; *** GEMDOS ***
+
+	; L… on ne passe plus!
+
+SSAV_TUI_MEM_INIT:	clr.w	-(SP)	; SAVE
+	pea	SSAV_BDB_TAB_START
+	pea	SSAV_DDA_TXT_TITLE
+	pea	SSAV_BDB_TKR_BUFF
+	pea	SSAV_TUM_INFO_TAB
+	pea	SSAV_TUI_BOOT_START
+	move.w	#2,-(SP)	; - PROG_BOOTER -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	SSAV_TUM_DISPATCH
+
+	; L… on n'y passe plus!
+
+SSAV_TUI_BOOT_START:	move.w	#10,-(SP)	; - COOK_NULL -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	SSAV_TUM_DISPATCH
+	addq.l	#4,SP
+
+	tst.w	D0
+	BNE	SSAVBOOT_Error
+
+	move.l	#"SSAV",-(SP)
+	pea	SSAV_TUM_DISPATCH
+	move.w	#13,-(SP)	; - COOK_ADD -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	SSAV_TUM_DISPATCH
+	lea	(12,SP),SP
+
+	cmpi.w	#-2,D0
+	BEQ	SSAV_TUI_BOOT_ALREADY
+
+	cmpi.w	#-1,D0
+	BEQ	SSAV_TUI_BOOT_ERROR
+
+	move.l	#$88,-(SP)	; TRAP #2
+	pea	SSAV_TSS_XBRA_NEW
+	move.w	#20,-(SP)	; - XBRA_ADD -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	SSAV_TUM_DISPATCH
+	lea	(12,SP),SP
+
+	; - CONF_INIT -
+
+	pea	SSAV_DDA_TXT_OK
+	BRA	SSAV_TUI_BOOT_PRINT
+
+SSAV_TUI_BOOT_ERROR:	pea	SSAV_DDA_TXT_NO
+	BRA	SSAV_TUI_BOOT_CLEAR
+
+SSAV_TUI_BOOT_ALREADY:	pea	SSAV_DDA_TXT_AR
+
+SSAV_TUI_BOOT_CLEAR:	clr.l	START_Tab+2
+
+SSAV_TUI_BOOT_PRINT:	move.w	#9,-(SP)	; - C_CONWS -
+	TRAP	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	RTS
+
+; *** Le XBRA de SSAVCALL - on y passe que par un TRAP #2 ***
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+SSAV_TSS_XBRA_OLD:	ds.l	1
+
+SSAV_TSS_XBRA_NEW:	cmpi.l	#"SSAV",D0
+	BNE	SSAV_TSS_XBRA_BAD
+
+	move.l	#SSAV_TUM_DISPATCH,D0
+	RTE
+
+SSAV_TSS_XBRA_BAD:	JMP	([SSAV_TSS_XBRA_OLD])
