@@ -1,0 +1,114 @@
+/// XBRA - Le d‚tournement OFFICIEL ///////////////////////////////////////////
+
+  Le XBRA est une fa‡on ‚l‚gante et propre de d‚tourner un vecteur.
+Voici la Structure d'un d‚tournement XBRA :
+  -12 LONG : "XBRA"
+   -8 LONG : XBRA_Name (ShortXBRA)
+   -4 LONG : OldXBRA_Vector
+    0 .... : Routine XBRA
+
+ATTENION : Les noms des XBRA sur un LONG sont appel‚s ShortXBRA, en comparaison
+           … certains noms longs sur 2 LONGs, les LongXBRA. Ceux-ci NE SONT PAS
+           SUPORTES par SSAVCALL. ATARI n'a reconnu que les ShortXBRA, les
+           LongXBRA ‚tant des rebus, produits par des programmeurs mal
+           inform‚s. Ne les utilisez JAMAIS.
+
+Structure des LongXBRA :
+  -16 LONG : "XBRA"
+  -12 LONG : XBRA_Name (LongXBRA)
+   -4 LONG : OldXBRA_Vector
+    0 .... : Routine XBRA
+
+  Pour utiliser un XBRA, il sagit d‚j… d'avoir besoin de faire un d‚tournement
+de vecteur. C'est utile si vous voulez ajouter, ou corriger une fonction au
+systŠme d'exploitation.
+  Pour proc‚der, voici que faire :
+1. Ecrire une petite routine qui v‚rifiera si le num‚ro de fonction emPil‚ nous
+   concerne ou pas
+   - Si le num‚ro est celui de la fonction … corriger ou … ajouter, sauter …
+     votre fonction, et terminer avec un RTE si vous d‚tournez un TRAP.
+   - Si le num‚ro de la fonction ne vous regarde pas, sautez … l'ancienne
+     adresse du vecteur que vous d‚tournez : Un JMP([OldXBRA_Verctor]) suffit
+2. Pour installer le XBRA, voici quoi faire :
+
+--- Installation du XBRA "SSAV" de SSAVCALL 2.31 ------------------------------
+
+; Ici, il sagit de d‚tourner le TRAP #2 pour installer une petite routine que
+; vous devriez bien connaitre … pr‚sent : Si je met "SSAV" dans D0.l, que je
+; TRAP #2, et si SSAVCALL est install‚ (le XBRA dumoins), j'obtiens dans D0.l
+; l'adresse de d‚part de SSAVCALL...
+
+               movea.l         $88.w,A0        ; TRAP #2
+
+XBRA_Verify    ; On regarde si en -12 y'a XBRA (ShortXBRA)
+               ; Sinon on v‚rifie pour un LongXBRA
+
+               cmpi.l          #"XBRA",(-12,A0)
+               BEQ             XBRA_Match      ; Y'a un ShortXBRA
+
+               ; Les LongXBRA existent mais sont rares
+               ; Ces XBRA ont un nom de 8 octets
+               ; Il ne faut JAMAIS les utiliser, car ils ne
+               ; sont pas reconnus officiellement, et sont plus
+               ; chiant d'utilisation
+
+               cmpi.l          #"XBRA",(-16,A0)
+               BNE             XBRA_Install
+
+               ; On regarde si SSAVCALL est d‚j… install‚
+               ; J'm'en fout de v‚rifier en -12 s'il sagissait d'un LongXBRA
+               ; car je sais que le XBRA de SSAVCALL est un ShortXBRA,
+               ; donc je ne v‚rifie qu'en -8...
+
+XBRA_Match     cmpi.l          #"SSAV",(-8,A0)
+
+               ; On prend le XBRA suivant, et on recommence
+               ; tant que l'on a pas trouv‚ "SSAV"
+
+               movea.l         (-4,A0),A0
+               ; N'affecte pas les indicateurs! Malin...
+
+               BNE             XBRA_Verify     ; Par rapport au "cmpi" du haut
+
+               move.w          #-2,D0
+
+               RTS
+
+XBRA_Install   ; Si on arrive l…, c'est que le XBRA suivant n'est pas trouv‚,
+               ; donc que la routine suivante est le systŠme d'exploitation.
+               ; Il arrive cependant que cette routine s'arrŠte avant, car il
+               ; existe des vieux programmes datant de la p‚riode o— ATARI
+               ; n'avait pas encore officialis‚ le XBRA...
+               ; Ne r‚pondant pas … la norme XBRA, cette routine croit donc
+               ; ˆtre arriv‚e au systŠme d'exploitation, et installe le XBRA.
+               ; Cela ne pose AUCUN problŠme … l'utilisation, sauf qu'au moment
+               ; du d‚buggage, il faudra un peu tracer ces vieilles routines
+               ; pour savoir o— se trouve le prochain XBRA (ou le systŠme
+               ; d'exploitation, ENFIN !)...
+
+               move.l          $88.l,Old_TRAP2 ; Voyez plus loin, SVP...
+               move.l          #New_TRAP2,$88.l
+
+               clr.w D0
+
+               RTS
+
+               dc.b            "XBRA"
+               dc.b            "SSAV"
+Old_TRAP2      ds.l            1
+New_TRAP2      cmpi.l          #"SSAV",D0
+               BNE             Bad_TRAP2
+
+               move.l          #Start_SSAV,D0
+
+               RTE             ; Ben oui, un RTE. On passe ici par une
+                               ; Exception TRAP (#2)
+
+Bad_TRAP2      JMP             ([Old_TRAP2])
+
+               ; Voil… comment j'installais le XBRA de SSAVCALL 2.31
+               ; A pr‚sent, vu qu'il existe une fonction pour, je l'exploite
+               ; jusque dans l'installation mˆme de SSAVCALL.
+
+-------------------------------------------------------------------------------
+

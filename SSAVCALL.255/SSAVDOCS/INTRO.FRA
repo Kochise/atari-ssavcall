@@ -1,0 +1,712 @@
+/// STALLION SOFTWARE's AES/VDI CALLø Version 2.53 ////////////////////////////
+
+CONVERTISEUR DE FORMAT D'APPELS A L'AES/VDI PAR STALLION SOFTWARE
+
+PROGRAMMê PAR KOCH DAVID (IDFRAKOCH-9508851003894DAVID-7803118M5)
+          EN ASSEMBLEUR 68030 AVEC DEVPAC V3.1 DE HISOFT
+          SUR UN ATARI FALCON030 (Y44A02-4005369) 16Mo/540MegIDE/CD4xIDE/FPU82
+
+PREMIERE VERSION FONCTIONNELLE LE LUNDI 14 JUILLET 1997
+
+THANKS TO : ATARI FOR THE FALCON, GREATEST COMPUTER OF THE WORLD
+            MOTOROLA FOR THEIR POWERFULL 68000 CHIPS FAMILLY
+            DIGITAL RESEARCH FOR THEIR FAILING BUT GOOD TOS 4.04
+            HISOFT FOR THEIR EXCELLENT DEVPAC 3.1 AND DSP
+
+/// ATTENTION /////////////////////////////////////////////////////////////////
+
+SSAV est un Hexa_Ware, c'est Ö dire qu'il y a six faáons de s'enregistrer.
+  ARTE_Ware, supporter audimatement la meilleure chaåne TV du monde et essayer
+             de lui faire passer le cap des 4% d'audimat largement mÇritÇs
+  Bugs_Ware, m'envoyer une liste de Bugs que VOUS avez trouvÇ
+  Disk_Ware, m'envoyer une boite de 10 disquettes HD sans erreurs
+  Info_Ware, m'envoyer des informations relatives Ö la programmation sur ATARI
+  Prog_Ware, m'envoyer un programme de votre crÇation (utilisant ou non SSAV)
+  SSAV_Ware, utiliser SSAV, tout simplement...
+
+  Pour vous enregistrer, il faut que vous choisissiez au moins deux modes
+diffÇrents parmi ceux de la liste prÇcÇdente. J'estime que ce n'est pas trop
+demandÇ...
+  Ceux qui m'envoie des informations sur le GEM afin que je corrige certains
+dÇfauts de SSAV, je le considäre comme un enregistrement complet (Bugs_Ware et
+Info_Ware).
+
+/// Contacts //////////////////////////////////////////////////////////////////
+
+Si vous voulez par exemples ajouter une fonction Ö la routine, reporter un bug,
+me donner des informations sur le GEM (et MultiTOS surtout), me parler, bref,
+me contacter, voici mon adresse :
+
+KOCH David
+29 Rue de GENEVE
+85200 FONTENAY LE COMTE
+FRANCE
+
+et facultativement, ...
+EUROPA (Allemagne, Belgique, Hollande, Italie, Luxembourg, Danemark, Irelande,
+        Royaume Unis, Grece, Espagne, Portugal, Autriche, Finlande, Suede)
+EARTH (North America, South America, Australia, Asia, Africa)
+SOL (Mercure, Venus, Mars, Jupiter, Saturne, Uranus, Neptune, Pluton)
+CORE SYSTEM (Proxima Centauri, Alpha Centauri, Barnard Star, Ross 154, Lalande
+             21185, Lyuten 727-8, Sirius, Wolf 359, Ross 248, Epsilon Eridani,
+             Ross 128, Luyten 789-6, Groombridge 34, Epsilon Indi, 61 Cygni,
+             Sigma 2398, Tau Ceti, Procyon, Lacaille 9352, G 51-15, Van Maanen
+             Star, Formalhaut, ...)
+(Ces systämes solaires existent vÇritablement et ne font pas partis du dÇlire
+ spatial de Sir BRABEN David, concepteur des fabuleux VIRUS (ZARCH sur
+ Archimädes d'Acorn (Regardez l'Çmission du màme nom sur ARTE, elle est
+ (presque) parfaite)) et FRONTIER - ELITE 2)
+VOIE LACTEE (Notre galaxie, c'est comme áa qu'elle s'appelle)
+LOCAL GROUP (M 31 (Andromeda), M 33 (Triangulum), NGC 205, M 32, Leo 1, Leo 2,
+             NGC 6503 (Draco), Ursa Minor, SMC (Tucuna), LMC (Dorado), NGC 253
+             (Sculptor), NGC 1365 (Fornax), NGC 185, NGC 147, IC 1613, NGC 6822,
+             ...)
+...
+                                          Kochise Of STALLION SOFTWARE
+
+E-Mail: Kochise@CaraMail.Com
+
+/// Doc Çcrite sur... /////////////////////////////////////////////////////////
+
+Cette Çnorme documentation Ö ÇtÇ Çcrite sous le monstrueux 7UP V2.03f
+(TheoSoft, Michael TÑnitz, francisÇ par LWING). Ch'u pas enrÇgistrÇ, mais áa va
+pas tarder, car un soft aussi ergonomique pour Çcrire les docs, c'est pas
+courant.
+
+/// Merci pour leurs encouragements Ö... //////////////////////////////////////
+
+A-HA (October, Cry Wolf, Maybe Maybe, Soft Rains Of April, The Swing Of Things)
+BASSLINE BOYS (On se calme)
+BELAFONTE Harry (Paradise In Gazankulu, Sisiwami, Skin 2 Skin, Global Carnival)
+BLACK BOX (EveryBody, Ride On Time)
+BROWN Bobby (On Your Own)
+CAUET ("Je m'excuse")
+CHERRY Neneh (7 Seconds, Mame Bamba)
+CONFETTI'S (The Sound Of C, The House of C, Jingle Bells)
+D.J. BOBO (There Is A Party)
+EURYTHMIC (Missionary Man, A Little Of You, The Miracle Of Love)
+FURYO (La B.O. du film du màme nom, avec BOWIE David (EKO, vot' DMO, pas pigÇ))
+GENERATION DISCO (Generation Disco)
+ICE Mc (Easy)
+INNOCENTS (Les) (Un Homme Extraordinaire, L'autre Finistere, Fous Ö Lier)
+JARRE Jean-Michel (Oxygen 5, EthniColor, Equinox, Rendez Vous)
+LATINO PARTY (The Party, Tequila)
+LILICUB (Voyage en Italie, J'ai croisÇ Ton Regard)
+LORDS OF ACID (Voodoo-U, Marijuana In Your Brain, The Wet Dream, Dirty Willy)
+MIND EVOLUTIONS (Trancelate, Quantum Beats, The Sun, NetWork 303, Pulstar)
+M-PEOPLE (Moving On Up, Just For You)
+OLDFIELD Mike ([Earth Moving], [QE2], [Crises], [Tubular Bells])
+PUBLIC ENEMY (Give It Up, I Ain't Mad At All, Stop In The Name, Hitler Day)
+SASH (Encore Une Fois, Oxygen 10, Ecuador)
+S-EXPRESS (The Theme)
+SNAP (The Power, Rythm Is A Dancer, Cult Of Snap, The First The Last Eternity)
+SNOW Marc (X-Files Theme)
+SPAWN (La B.O. du film du màme nom)
+SPICE GIRLS (Wanna Be, Bumper To Bumper)
+SPIN DOCTORS (Two Princes, Off My Line)
+TECHNOTRONIC (Pump Up The Jam)
+et tous les autres, insignifiants ou moins (Bjork, France Gall, Treponem Pal,
+OffSpring, etc...) qui passent en fond sonore, mais que je n'oublie pas pour
+autant.
+
+/// Je recherche... ///////////////////////////////////////////////////////////
+
+Appel Ö l'AIDE : - J'ai besoin de toutes les informations possible
+                   (HardWare et SoftWare) sur : 68020, 68030, 68040, 68060,
+                   68881/2, 6800/2/9, 6502, DSP 56000/1/2, DSP 96000/1/2,
+                   8086/7,8, 80186/7, 80188, 80286/7, 80386/7, 80486, 80586,
+                   80686, PowerPC, ColdFire5307.
+                 - Toutes les informations possible sur la programmation de
+                   TOUS les ATARI (du ST au Falcon030, en passant par le TT, le
+                   Stacy, le STBook, l'ATW800, les ABC, le PortFolio, les VCS
+                   2600, 5200, 7800, Lynx, Panther (si quelqu'un a quelque
+                   chose dessus), Jaguar, et autres si j'en oublie...
+
+/// Bibliographie /////////////////////////////////////////////////////////////
+
+CLEFS POUR ATARI ST Tome 2 "GEM" par MARTIN Daniel aux Editions du P.S.I.
+ ISBN 2-86595-374-2 CodBar 9-782865-953745 1986
+GEM FöR DEN ATARI 520 ST par STEINER Joseph et Gerhard Ö Markt&Technik
+ ISBN 3-89090-230-8 CodBar 4-001057-902305 1985-1986
+DEVELOPPER EN GFA BASIC par l'auteur OSTROWSKI Frank Ö Micro Application
+ ISBN 2-86899-103-3 CodBar X-XXXXXX-XXXXXX ISSN 0980-1928 Code 281 Ref ML295
+LE LIVRE DU DEVELOPPEUR TOME 1 aux Editions Micro Application
+ ISBN 2-86899-402-4 CodBar 9-782868-994028 ISSN 0980-1928
+ASSEMBLEUR 68000 DE L'ATARI ST par HARD Olivier Ö Cedic/Nathan
+ ISBN 2-86699-527-9 CodBar 9-782866-995270
+AES LIBRARY & VDI LIBRARY par HiSoft
+ ISBN 0-948517-59-X CodBar 5-024100-000192 1988-1992
+PowerPC - Microprocessor Developer's Guide chez SAMS PUBLISHING (USA)
+ ISBN 0-672-30543-7 CodBar 9-780672-305436 90000
+Implantation des fonctions usuelles en 68000 par BRET Franáois chez MASSON
+ ISBN 2-225-82017-1 CodBar 9-782225-820175
+ (si vous cherchez des infos sur les nombres en Virgules Flottantes, ce bouquin
+  est une vÇritable rÇfÇrence... disponible via la FNAC (239Frs))
+MathÇmatiques pour Micro-Informatiques par BARDEN W. chez MicroDUNOD
+ ISBN 2-04-015604-6 CodBar 9-782040-156046 F65/84-04
+Assembleur (8086) Le Calcul NumÇrique par PADJASEK Laurent chez SYBEX
+ ISBN 2-7361-0295-9 CodBar 9-782736-102951
+
+Une Çnorme part provient de "Professional GEM" by OREN Tim (PROFGEM.ASC Dir)
+Pour info, Tim est l'un des concepteurs du GEM, ayant travaillÇ chez DRI
+(Digital Research Inc.). Il dÇmissionna ensuite et travailla pour une StartUp
+nommÇ Activenture, travaillant elle aussi sur ST. La suite, je ne la connait
+pas. Cela pour dire que de sa part, on peut esperer un certain serieux pour la
+justesse des informations. Si vous comprennez l'anglais, je vous invite Ö lire
+la documentation incluse Çcrite par ses soins.
+
+De nombreux articles sur la chose parus dans ATARI Magazine, Start Micro
+Magazine, et ST Magazine, et StraTOS.
+
+De träs nombreuses explications de Maitre ATTARD, gÇnie en la matiere,
+concepteur de BIG, une bibliotheque de gestion d'interface, en C, elle.
+
+/// Pourquoi SSAVCALL /////////////////////////////////////////////////////////
+
+  C'est une longue histoire, dont je ne vous conterais pas en dÇtail les
+tribulations. Cependant, lecteur, lectrice, sachez que ce fut dur et difficile
+d'obtenir ce rÇsultat, tout cela Ö cause de...
+
+  J'ai, malgrÇ mon petit moignon de vie dÇjÖ bien entamÇe, une experience des
+ordinateurs assez importante. Mon premier, je me souvient, me fut donnÇ en
+1887, erreur: 1987. Ce fut un Vic20 de Commodore, le grand fräre du C64. Ha le
+pied, interprÇteur Basic, 4Ko de mÇmoire, lecteur de cassettes, une tÇlÇ N/B
+comme Çcran... Bref, une aventure succulente. Mon suivant, qui ne m'appartenait
+pas, mais que j'utilisait abusivement chez un ami, fut un CPC6128. Une
+rÇvolution, pensez: Çcran couleur, lecteur de disquette double face (qu'il
+fallait retourner comme une cassette pour acceder Ö l'autre face),
+imprimante... Spectaculaire. C'est ici que je commenáa rÇellement Ö programmer.
+Oh pas grand chose, quelques shell, ainsi qu'un tout petit jeu en Basic, sans
+utiliser les possibilitÇes de la machine via de nombreux POKEs. Je m'en
+souvient, ces heures qu'on pouvait passer devant, jouant Ö BoulderDash ou Bob
+Winner. Fabuleux. Puis, mon cousin me prÇsenta l'opportunitÇ de m'acheter un
+1040 STf. J'avais bien un ou deux (pour leur malheur) copains qui en disposait
+aussi. Aussi, je decida d'acquerir cette machine de reve, en 1990. Je n'en
+avait jamais rÇellement entendu parler de cette machine, seulement jouer
+occasionellement dessus. En ces temps reculÇs, je la voyait comme ultime. 1Mo,
+lecteur double densitÇ, Çcran monochrome (la couleur me vint bien plus tard
+hÇlas), pas de problemes de configuration. Au dÇbut, j'avoue, mon activitÇ
+premiere fut le jeu. J'y repense maintenant, toutes ces disquettes
+d'utilitaires que j'ai effacÇes pour y mettre des jeux. Je me dÇgoute rien que
+d'y penser. Bweark, des jeux, ces oeuvres stÇriles rapidement vaincus par la
+sagacitÇ d'un joueur tenace. J'ai perdu deux, non, trois ans avant de revenir Ö
+la programmation. Trois ans oó j'ai vÇgÇtÇ, glandÇ, rien branlÇ...
+  Puis le dÇclic, je ne sais pourquoi... En fait si. Le prÇcÇdent maitre de mon
+1040 ne m'avais pas refilÇ la disquette du GFA, mais le bouquin oui. Ce n'est
+seulement qu'apräs une pÇriode d'ennui profond, et de besoin de nouveautÇs que
+je me procura sans peine une copie du GFA chez un copain, contre deux jeux. Et
+c'est Ö partir de lÖ que tout dÇmarra. Au dÇbut, ce ne fut pas joyeux. Mes
+souvenirs avaient ternis, et ma faible expÇrience c'Çtait envolÇe. De plus,
+manquant cruellement de documents pour une machine aussi complete, j'eus
+beaucoup de difficulter Ö en maitriser les arcanes. Je fis bon nombres
+d'erreurs, qui aujourd'hui m'ont ÇtÇs bÇnÇfiques. Mais j'Çtait seul.
+Fini la communion par le jeu. J'Çtait vu un peu comme une bete Çtrange Ö
+chercher la maitrise de mon engin manuellement (n'ayez donc pas toujours les
+idÇes mal placÇes). Ce n'est que plus tard, au bout de deux ans, Ö l'aube
+naissante de l'acquisition de mon Falcon030 apräs le premier ATARI Show de
+Levallois-Perret en 1995 (merci Joel) que deux de mes amis se mirent Ö la
+programmation. Ils firent en GFA un jeu qui aurait mÇritÇ la diffision. Mais il
+n'abouti hÇlas jamais. C'est aussi un peu avant ce moment lÖ que j'entra en
+possetion d'un 130XE, que je garde uniquement par collection.
+  Vint enfin le Falcon030. Apräs un passage Ö TurtleBay, j'eus donc chez moi
+ce drole d'oiseau, que j'eus un peu de mal Ö apprivoiser. Un disque dur mes
+amis. Pas croyable. On y goute, et l'on se demande comment on faisait avant. Oh
+vous savez, j'Çtait organisÇ. Dans ma boite, deux rangÇs de disquettes. L'une
+contenant les divers programmes, l'autres les donnÇes correspondantes. Je
+piochait dans la promiere rangÇe, puis le chargement effectuÇ, dans la seconde.
+Les chargement long et bruyants s'eternisaient parfois, me laissant souvent le
+temps d'aller faire mes besoins. Mais maintenant, je crains les calculs ou un
+cancer de la prostate par une retention prolongÇe. N'y voyez rien de scato,
+c'est juste pour vous faire imaginer le boulversement subi dans ma facon de
+travailler avec ma machine. N'ayant jamais utiliser XControl, j'avais un peu de
+mal. Oó regle t'on le son? Bref, un temps d'adapation fut necessaire, alors que
+je l'avais esperÇ nul car successeur du ST.
+  A prÇsent, j'ai une configuration d'une stabilitÇ affligeante. Rien ne
+plante, sauf si on le cherche. NE METTEZ JAMAIS SNAPSHOT (de Dieter Fiebelkorn)
+ET CLOGGE ENSEMBLE. C'est Ö partir de lÖ que je me lanáa timidement, mais non
+sans espoir, Ö l'assembleur. J'eus beaucoup de difficultÇs, car cela n'est pas
+evident de passer d'un langage oó l'on se fout totalement de savoir comment le
+processeur fonctionne, du moment oó l'on Ö quelque chose Ö l'Çcran apräs un
+PRINT, Ö un langage oó il faut dire au processeur ce qu'il doit faire, pas Ö
+pas, jusqu'au rÇsultat escomptÇ. Les docs techniques ne sont pas tutoriales
+pour les neophytes, et la pseudo initiation reprise plusieurs fois par ST Mag
+(surtout celle Ö partir du n¯63) n'Çtait pas ce qu'il existait de plus clair.
+Jusqu'au jours oó Start Micro et son SÇbastien ROHAUT eu l'intelligence de se
+pencher sur le probleme. Ah miracle, quelqu'un savait expliquer comment faire.
+La brume nÇbuleuse se dissipa progressivement, et j'entrevoyait dÇjÖ de future
+production fabuleuses. Mais un obstacle fut de taille. L'interface...
+  En GFA, j'avais fait un petit noyau que je rÇutilisait rÇgulierement, un noyau
+qui me donnait autant de libertÇ qu'une interface textuelle sous DOS sur PC. On
+se dÇplacait avec les fleche, et la position choisie etait mise en video
+inverse. Mais j'eus la mauvaise idÇe de me pencher sur l'autre, cette fabuleuse
+interface que j'utilisait quotidiennement, le GEM. J'acheta mon premier livre,
+et j'eus la nausÇe. J'eus l'impression de revenir quelques annÇes en arrieres,
+du temps oó je ne savais rien de l'assembleur, et que je tombait rÇgulierement
+sur des ouvrages indigestes, juste bon Ö servir d'aide mÇmoire, mais jamais rien
+d'educatif. Horreur rÇsumait ma situation. Cela semblait compliquÇ, hors de
+portÇ, et limitÇ au langage C. Comment m'en sortir, une question que mon esprit
+se faisait un plaisir de ressacer continuellement, me plongeant dans une torpeur
+intellectuelle indescriptible. Mais j'en avait vu d'autres, et je me souvint
+alors de mes efforts pour maitriser l'assembleur. Et je trouva en la personne de
+Maitre ATTARD celle qui me demystifia le GEM comme Maitre ROHAUT avait su le
+faire pour l'assembleur. Et je compris...
+  Trop bien a mon grand regret. Non que cela fut hors de portÇ comme je l'avais
+dabord cru, mais plutot reservÇ au C. Je vais tacher de vous exposer le probleme
+sans etre, je l'espere, soporifique. Pour programmer, en Basic par exemple, vous
+utiliser une instruction comme PRINT, mais qui en reprÇsente plusieurs en
+assembleur. Ces instructions en code machine vont indiquer au processeur comment
+faire progressivement pour afficher le texte Ö l'Çcran. Ce texte, c'est une
+suite d'octets dont chaqu'un reprÇsentes une lettre. Pour cela, il va falloir
+acceder Ö l'Çcran, et y envoyer le texte dÇsirÇ. Mais cela n'est pas simple.
+Chaque programme peut s'en occuper, Ö la main, comme beaucoup font sur PC pour
+eviter d'avoir Ö payer les royalties pour utilisations des bibliotheques
+copyrightÇes de Borland ou autres (ce qui explique la taille parfois hilarante
+de certains programme). Mais une solutions consiste Ö ecrire des routines que
+l'on met Ö disposition de tout Ö chaqu'un via le systeme d'exploitation. Celui
+ci, c'est le GEM, le GEMDOS, le BIOS ou l'XBIOS. Toutes ces routines sont
+Çcrites une fois pour toutes, et chaque programmeur peu les utiliser. Cela
+rÇduit la taille des programmes, ainsi que le temps de programmation. Voyez,
+pour ecrire quelque chose Ö l'Çcran, il faut utiliser le matÇriel de la machine
+Ö un niveau träs bas. Pour cela, l'assembleur est utilisÇ. Oó je veut en venir,
+c'est que lorsqu'on dialogue avec le GEMDOS, le BIOS ou l'XBIOS, vous empilez
+les informations dans un certains ordre, puis faites un TRAP. Le TOS se
+dÇbrouille, et rÇutilise les donnÇes que l'on lui Ö fournit. En retour, votre
+texte Ö l'Çcran. Et votre petite amis de siffler d'admiration devant votre
+excellence...
+  Mais y'a un os (O.S.). Le GEM se "contente" de GERER une interface, et ne fait
+pas appel Ö la machine (sauf pour dessiner l'interface). Or cela aurait demandÇ
+un travail titanesque Ö faire en assembleur, et la couille dans l'histoire,
+c'est justement que le GEM Ö ÇtÇ Çcrit en C, pour faciliter la tache de Digital
+Research, mais pas la notre. Oh, les programmeur en C n'en ont rien Ö foutre de
+nos problemes. Voyez vous, oó dans l'autre partie du TOS, ecrite en assembleur
+pour coller de pret Ö la machine, il fallait simplement empiler les infos et
+TRAPer, ici, il faut faire des petits tableaux, c'est Ö dire des successions de
+deux octets, dans lesquels vous metterez vos informations, ou lirez. L'os, c'est
+qu'en assembleur 68000, c'est hyper chier de faire áa, et les programmeur en C
+de s'exclafer, et d'en profiter pour vanter leur langage fÇtiche Ö juste titre
+(n'est ce pas Mr ATTARD). Le 68030 a ÇtÇ concu en tenant compte du fait que le C
+est tres utilisÇ de part le monde, et propose de spendides modes d'adressages
+qui nous mettent Ö ÇgalitÇ avec les utilisateurs de C (merci Motorola de votre
+clairvoyance). Mais lÖ encore, faut toujours s'occuper de ces fichus tableaux
+hÇritÇs du C, màme si cela est plus convivial avec les nouveaux modes
+d'adressages. C'est enfin lÖ que vous allez savoir Ö quoi sert SSAVCALL.
+  En fait, c'est une sorte de convertisseur d'appel. Vous empilez les infos,
+appelez SSAVCALL, et c'est lui qui va ENTIEREMENT s'occuper de ces tableaux,
+les remplir, ou vous retourner le rÇsultat dans un registre. Oh, certains (bien
+connus et mÇdiatisÇs) n'y voient "AUCUN INTERET". Mais IMAGINEZ le gain de
+temps, n'ayant plus Ö vous occuper des tableaux, mais juste Ö empiler,
+basiquement. NON, il n'y a pas de triche, le GEM fonctionne ENCORE avec des
+tableaux, votre programme doit toujours en avoir sous la main, mais CE N'EST
+PLUS A VOUS DE VOUS EN OCCUPER. Evidement, on aurait pus y songer plus tot, le
+principe est simple Ö chialer, mais voila, c'etait peut etre trop simple, ou
+alors "vraiment sans interet" (n'est ce pas Centek). Bref, SSAVCALL rend de
+fier services sans manger beaucoup de pain.
+  Dans les premiers versions, SSAVCALL n'occupait que 15Ko bien tassÇs, Çtait
+relativement simple (uniquement conversion). Mais il s'avera qu'a chaque
+programme, j'avais toujours les boites de dialogue Ö gerer, les menus, et
+autres... Et puis surtout, Stabylo en sait quelque chose, les chiffres Ö
+convertir. En Basic, l'interpreteur dispose de routines de convertions, mais en
+assembleur, c'est l'enfer pour afficher de facon lisible un chiffre flottant
+(arg, toutes ces soirÇe Ö chercher comment faire). N'y tenant plus, tout áa
+c'est dans SSAVCALL.
+  Les changements majeurs par rapport aux premieres versions, c'est donc dÇjÖ
+cette fonction de convertion numÇrique, des bibliotheques
+integrÇes de gestion d'interface, mais avant tout, un nouveau style de
+programmation. Les premieres versions n'Çtaient pas optimisÇe; màme pas
+seulement pour faciliter la recherche des bugs, mais parce que mon experience
+n'avais pas encore atteinte mon niveau actuel. J'ai bien commencÇ un
+generateur de montagnes fractales pour NeoN (t'en pense quoi Stabylo?), un
+driver de disque dur incluant driver de cdrom et utilitaires Ö la checkdisk, un
+pseudo Basic melant assembleur dans le genre modula 2, une routine 3d au copro,
+et divers trucs, mais mon experience SSAVCALL m'a permise de m'amÇliorer
+considÇrablement, surtout avec ma politique de programmation.
+  En effet, lorsque je ne suit pas fier de quelque chose, je l'efface sans
+remors, màme si j'y ais passÇ deux mois. Je veux oublier les erreurs, n'ont pas
+pour les refaire, en fait je les connait, mais pour eviter de les reutiliser par
+fleme, en repompant des truc pas clean. De nature assez maniaque, je deteste les
+progs mal concu. Cela vient en outre du fait d'avoir programmÇ sous GFA, qui
+permet de structurer ses programmes comme seul le GFA est capable de le faire
+(procedures enroulables essentiellement). Aussi, cette habitude, je l'ai gardÇe
+en assembleur, et je ne crains pas d'avoir Ö reprendre deux mois de boulot
+(habituÇ que je suis de perdre mon disque dur lorsque je teste mon driver). Cela
+me permet Ö chaque fois de m'essayer dans un autre style, et de dÇcouvrir de
+nouvelles facons de travailler, me permettant de gagner du temps ou de l'espace,
+voire de rendre un source assembleur plus comprehensible (le pied quoi...).
+  SSAVCALL, dans sa version 2, bÇnÇficie donc d'atout important. Une
+programmation irrÇprochable, une vitesse d'execution imbattable par
+l'utilisation des modes d'adressages du 68030, une profusion de routines toutes
+plus utiles les unes que les autres. Bref du grand art. NON, je ne suis pas
+modeste, comme vous pouvez le lire. Je sais que SSAVCALL est un grand projet,
+et je refuse la fausse modestie qui ne vise qu'Ö s'attirer les compliments
+d'une foule subjugÇe par votre crÇation. Si vous avez fait quelque chose de
+gÇnial, reconnaissez le, un point c'est tout, et epargnez moi "on en sait
+quelque chose du GEM, et tant que crÇateur (repompeur) d'OS, alors ton truc,
+c'est VRAIMENT SANS INTERET". Je cire les pompes ou pas?
+  Actuellement, je suis a l'ecoute de toute proposition CONSTRUCTIVE. Apres
+tout, SSAVCALL est avant tout (Apres? Avant?) Ö votre service. S'il y a quelque
+chose Ö corriger, modifier, ajouter (pas retrancher, comme CALLM, n'est ce pas
+Mr CONTER), faites le moi savoir, par pitie. Mais de toute maniere, SSAVCALL va
+evoluer, car s'il existe, c'est comme chaque fois et pour chaque programmeur, Ö
+cause d'un besoin personnel. Tous les programmes ayant un but purement
+commercial ne valent rien, car n'ayant pas ete concu de facon ergonomique pour
+repondre Ö un besoin. L'OS (c'est le cas de le dire) principal du PC en est la
+meilleur preuve. Bien qu'il soit parmis les plus mauvais, coute une fortune
+(deguisÇe aux yeux du consommateur), qu'il existe des alternatives stables et
+gratuite (Linux par exemple), ou commerciale comme QNX, il s'est rÇpandu tout
+autant que son moulin Ö cafÇ de support. Mais bon, je ne vais pas m'en plaindre,
+du moment qu'on nous foute la paix, et que l'on n'essaye pas de venir veroler le
+fragile monde ATARI avec des merdes de ce genre. C'est entre autre pour cela que
+le 68030 Ö put se permettre de ne plus etre totalement compatible avec le 68000
+(ah oui? le Pentium est compatible avec le 8086? Pourtant mes anciens softs ne
+marchent plus, et les societes sont tout de màme obligÇes d'acheter les mises Ö
+jour, malgrÇ que l'on leur ait fait miroiter la possibilitÇ de reutiliser leurs
+anciennes acquisitions, alors que sur mon Falcon030, j'utilise sans probleme
+parmis les premiers softs du ST), et d'adopter des revolutions comme les modes
+d'adressages genre C, ou autre. Motorola n'est TELLEMENT PAS PRISONIER de son
+succes, qu'il se permet le loisir de revoir sa copie, et de clore la famille
+68000 pour pondre le ColdFire, un Risc Ö 68000 transistors qui fait presque
+aussi bien qu'un 68040 Ö frÇquence Çgale, pour 50 fois moins cher. Gniark...
+  Mais bon, je m'egare, et tout cela n'est qu'affaire de gout. Y'a ceux qui,
+intelligent, savent utiliser des outils de bonne facture, ou d'autres qui pour
+rompre leur sollitude utilise l'alibi d'avoir un PC et d'organiser des colloques
+pour mieux apprendre Ö savoir dÇjouer les pieges afin de ne pas planter des le
+premier fremissement de souris, ou lancer un soft de 576Ko sous DOS, limitÇ Ö
+640Ko (vous fendez donc pas la gueule, et compatissez dans la douleur). Marrant,
+j'ai une archive pondu via STZIP, autoextractable, 11Mo, et pas de probleme.
+Pourtant mon Falcon ne coute que 5 fois moins cher que leurs daubes (donc aussi
+5 fois moins de souáis). Mais il me semble qu'il faille de tout pour faire le
+monde, meme des masos.
+  Bref, je ne vais pas m'etaler d'avantage sur une documentation par dÇjÖ trop
+imposante. Sachez qu'ici vous trouverez, EXPLIQUE par quelqu'un de competent en
+la matiere (Ö prÇsent), les informations les plus prÇcises jamais diffusÇes (je
+l'espere, mais en tant qu'homme, je ne suis pas Ö l'abri d'une ou deux erreurs).
+Je ne me suis pas contentÇ de traduire la doc d'ATARI, mais bien de rechercher
+comment faire dÇcouvrir le GEM Ö un nÇophyte, tout en Çtant prÇcis. Aussi, bon
+trip, et sachez exploiter correctement SSAVCALL. Respectez les conseils, SVP, il
+en va de l'evolutivitÇ du systeme. Sur ces bonnes paroles, bon amusement...
+
+/// Philosophie du GEM ////////////////////////////////////////////////////////
+
+  Je vais (peut etre Ö votre grand regret), introduire le GEM, et sa faáon de
+l'aborder. J'eviterais aussi un titre du genre "le GEM pour le nul" et
+d'arborer avec une fiertÇe non dÇguisÇe le nombre de nuls me lisant. Ca me
+dÇprime de le savoir. Et puis le but est que vous ne le soyez plus, alors bon,
+soit, un bon titre, flatteur, serait "le GEM pour les Dieux".
+  Alors? Qu'en pense votre ego? C'est y pas mieux comme áa? Non non, ce n'est
+pas une pub mensongere. Une fois arrivÇ Ö la fin de ce bouquin, vous serez des
+dieux du GEM. Je ne garanti pas la mÇthode, mais j'ai confiance en moi. C'est
+dÇjÖ un bon dÇbut. Bien, allons z'y...
+  Peut etre vous aussi avez construit un programme avec son interface sous TOS,
+n'ayant pas le savoir (nul n'est omniscient) d'utiliser le GEM. Vous aussi avez
+peut etre pestÇ contre ces fichus editeur qui espere que vous achetiez toute la
+serie sur le GEM pour que vous finissiez par vous rendre compte que vous n'etes
+en fait pas plus avancÇ. De traduction gerbatoire Ö fausse explications, on
+navigue entre deux eaux, et pas les meilleures. Meme certaines docs issuent
+d'ATARI ne sont pas totalement fiables. Bref, le pied. Et il est vrai que
+lorsqu'on aborde le GEM, c'est aussi difficile que lorsque l'on aborde
+l'assembleur. Mais soyez courageux, vous verrez, vous en viendrez meme plus
+vite Ö bout.
+  Sous TOS, lorsque vous concevez votre interface, vous associez un ecran Ö une
+procedure. Par exemple, le programme FICHIERS. Page d'acceuil, une liste de
+numÇro. C'est une procedure qui attent de vous d'entrer un numÇro pour executer
+la procedure correspondante. Vous avez peut etre fait plus elaborÇ, et lÖ vous
+vous dÇplacez avec les fleches. Le rÇsultat au fond est le meme. Mais
+regardons de plus pret ce que vous avez fait.
+  Vous avez fait une sorte de procedure qui rÇagie suivant le bon vouloir de
+l'utilisateur. Cette procedure renvoie un rÇsultat suivant le choix fait. Tout
+ceci ressemble Çnormement au GEM, sachez le. Mais la grande diffÇrence, c'est
+qu'ici, vous vous etes occupÇ des deux aspect de votre programme. L'interface,
+et la partie qui travaille dans l'ombre. Aussi, afin de vous eviter une prise
+de tete inutile, vous avez limite les procedure Ö ce qui est strictement
+necessaire, sans chercher Ö en faire plus. Bravo, vous avez pondu un code
+optimisÇ. SÇrieusement, c'est du bon boulot, vous savez subvenir Ö vos besoin.
+Mais il se trouve, ce n'est pas du tout un reproche, que votre interface colle
+exactement Ö votre programme. Celle ci Ö ÇtÇ taillÇe sur mesure pour
+l'utilisation que vous voulez en faire. Et vous l'avez programmÇe du meme
+accabit que le reste, sachant ce que vous desiriez. A chaque programme, vous
+recommencerez et rÇecrirez une nouvelle interface qui collera Ö votre besoin.
+Or en GEM, c'est presque
+totalement diffÇrent.
+  D'une certaine maniere, ce n'est plus vous qui vous occupez de l'interface.
+Je m'explique. Le GEM Ö ÇtÇ concu pour rÇpondre Ö tout les cas de figure,
+malgrÇ les lacunes que l'on lui connait (SSAVCALL sert entre autre Ö les
+combler). Des plus simples aux plus exigentes, le GEM doit servir Ö tout, mais
+surtout Ö TOUS. Aussi, le GEM est une sorte d'interlocuteur avec lequel on
+dialogue en rÇsaux. Ne vous attendez pas Ö voir un jour sa tete, mais sachez
+qu'il s'occupe de toute la gestion de l'interface. Il vous reste juste Ö
+programmer la rÇaction de VOTRE PROGRAMME par rapport aux diffÇrents evenements
+qui se produisent sur l'interface. Justement, le GEM ne fonctionne qu'avec des
+evenement. Vous avez une fenetre ouverte sur le bureau (mais oui, vous y
+arriverez un jour, ne deseperez donc pas), et vous, ou un utilisateur, cliquez
+sur le bouton de fermeture. Tout cela, ce n'est pas Ö vous de vous en occuper,
+le GEM le fait. Cependant, il faudra prÇvoir dans votre programme une rÇaction
+au cas oó Mr GEM vous contacte pour vous apprendre que l'on Ö cliquez sur le
+bouton de fermeture de telle ou telle fenetre. A vous de savoir ce que vous
+comptez en faire, de la fenetre. Car elle ne se ferme pas toute seule. Imaginez
+que dans cette fenetre il y ait un texte. Vous fermez, certe, mais il faut
+dabord demander Ö l'utilisateur s'il veut sauver son texte, l'abandonner, ou
+continuer Ö Çcrire. Vous verrez, le GEM est un Monsieur träs polit, träs träs
+compÇtent, qui fait du träs bon travail, mais qui ne fait pas le programme Ö
+votre place. Mais n'ayez pas peur. D'utiliser cette interface toute prete est
+vraiment formidable, car elle l'est tout autant, vous verrez...
+  Mais avant de voir ce que peut faire SSAVCALL dans ce sens, on va dÇjÖ
+aprendre ensemble Ö se servir du GEM comme tout le monde l'a fait jusque lÖ,
+juste en empilant simplement au lieu de s'amuser Ö remplir des tableaux (alors,
+le tableau INT_IN, il se trouve oó dÇjÖ? INT_IN2, c'est donc 6 octets apräs, et
+l'adresses du dÇbut du tableau Int_In est contenu 8 octets apräs le dÇbut du
+tableau Params... Petit dÇlire histoire de vous faire peur). Mais cela
+n'empeche pas de vous expliquer comment áa marche sans SSAVCALL. Vous
+comprendrez ainsi mieux ses avantages.
+
+/// Plusieurs choses, ... /////////////////////////////////////////////////////
+
+  Evidement, si vous utilisez cette routine dans un de vos programmes, ce serait
+cool Ö vous de l'indiquer quelque part dans votre interface. Merci encore...
+  Lorsque j'installe SSAVCALL en mÇmoire (donc ne pas l'inclure dans votre
+code), j'installe un Cookie du doux nom de "SSAV". Son information (les quatre
+octets suivant le nom du Cookie) n'est autre que l'adresse de la routine (la
+routine, et pas les octets d'informations). Utilisez une Çtiquette oó vous
+stockerez son adresse. Comme la routine n'est pas elle-màme multi-tache,
+chaqu'une (des tÉches) doit avoir ses propres variables d'Çchange avec le GEM
+(voir SSAVINIT.SS, qu'il fait bon inclure, par contre, dans vos programmes).
+  Je voudrait aussi demander Ö ceux qui ont, qui font, ou qui vont faire des
+interfaces sous GEM de ne pas trop travailler dans leurs coins. Il serait bon
+qu'il existe une sorte de "standard esthÇtique" pour homogÇnÇiser l'aspect du
+GEM suivant le programme. Il est Çvident que chacun essaye de se dÇmarquer par
+tous les moyens possibles son programme d'un autre, mais de l'extÇrieur, pour
+quelqu'un habituÇ Ö travailler sous WinDaube ou System 7 et leurs interfaces
+aseptisÇes, c'est le fouillis et le bordel le plus total, oó une impression
+d'anarchie et de non dialogue rägne sur ATARI (peu àtre une cause de la mauvaise
+image que l'ont portes comme un terrible PC..., pardon, fardeau). Je ne vous
+demande pas de suivre mon style d'interface, quoique j'essaye de le rendre le
+plus agrÇable possible pour l'oeil.
+  Bien, Ö vous les programmeurs...
+
+/// Le GEM, comment áa marche ////////////////////////////////////////////////
+
+  N'etant pas Ö l'abri de l'effet bonaldi, il sagit d'avancer prudement. Comme
+promis donc, je vais vous conter comment dans des temps tres anciens les sages
+utilisaient le GEM.
+  Donc pour le GEMDOS, le BIOS ou l'XBIOS, vous empilez les infos, puis
+terminez par le numÇro de la fonction. Le numÇro du TRAP dÇtermine lequel du
+GEMDOS, Bios ou XBIOS (1, 13, 14 respectivement) vous voulez.
+  L'AES et le VDI se trouvent tous les deux au TRAP 2.
+
+Bon, je vous avait parlÇ de tableaux. Le premier s'appelle Params. Il rÇunit
+dans UN CERTAIN ORDRE les adresses des autres tableaux. Il existe deux tableaux
+Params, l'un pour l'AES, l'autre pour la VDI.
+
+Tableau AES_Params :  0 LONG : Adresse du tableau Control
+                      4 LONG : Adresse du tableau Global
+                      8 LONG : Adresse du tableau Int_In
+                     12 LONG : Adresse du tableau Int_Out
+                     16 LONG : Adresse du tableau Addr_In
+                     20 LONG : Adresse du tableau Addr_Out
+
+Tableau VDI_Params :  0 LONG : Adresse du tableau Contrl
+                      4 LONG : Adresse du tableau Intin
+                      8 LONG : Adresse du tableau Ptsin
+                     12 LONG : Adresse du tableau Intout
+                     16 LONG : Adresse du tableau Ptsout
+
+ATTENTION: Pour l'AES, la structure du tableau est In, Out, In, Out
+                  VDI                              In, In, Out, Out
+           Ce n'est pas une erreur de ma part.
+
+Comme vous pouvez le voir, les deux tableaux Params sont lÇgerements
+diffÇrents. Pour l'installation, rÇutilisez le fichier SSAVINIT.SS. Il contient
+le dÇmarrage d'un programme et l'installation des diffÇrents pointeurs.
+Voyons maintenant les diffÇrents tableaux, et leur utilisation.
+Chaque ÇlÇments des tableaux fait un WORD.
+
+--- Les tableaux de l'AES ---
+
+Tableau Control : Ce tableau sert Ö indiquer Ö l'AES le nombre de parametres Ö
+Longueur 5 WORDS  utiliser.
+                   0 WORD : Control0 : NumÇro de la fonction AES. C'est ici que
+                                       l'on la met, et pas l'empiler en dernier
+                                       comme dans les fonctions du GEMDOS, BIOS
+                                       ou autre XBIOS.
+                   2 WORD : Control1 : Nombre de WORDs Int_In Ö utiliser.
+                   4 WORD : Control2 : Nombre de WORDs Int_Out en sortie.
+                   6 WORD : Control3 : Nombre de LONGs Addr_In Ö utiliser.
+                   8 WORD : Control4 : Nombre de LONGs Addr_Out sortie.
+
+ATTENTION: Les nombres de parametres Out, comme Int_Out ou Addr_Out ne sont pas
+           donnÇes
+           par l'AES. Ce sont le nombre de rÇponses que l'AES doit vous
+           envoyer. Si vous mettez 0 dans Control2, vous n'aurez pas de rÇponse
+           de l'AES. Si la doc d'ATARI vous dit de mettre 2, pour avoir deux
+           rÇponses, dans Int_Out0 et Int_Out1, mettez 2 comme demandÇ dans
+           Control2. C'est extremement important, et c'est une cause de
+           nombreuses erreurs. C'est utiles dans certains cas pour ne pas
+           ecraser certaines donnÇes qui peuvent etres rÇutilisÇes (Form_Dial
+           par exemple).
+           Certaines docs indiquent que Control2 et Control4 sont donnÇs en
+           retour, pour savoir combien de rÇponses renvoi l'AES. C'EST
+           TOTALEMENT FAUX. Il faut mettre ces nombres AVANT d'appeler l'AES.
+
+Tableau Global   : Ce tableau sert Ö obtenir divers renseignements sur le GEM
+Longueur 15 WORDs  et le systeme d'exploitation.
+                    0 WORD : Global0 : Ap_Version : Version de l'AES utilisÇ
+                    2 WORD : Global1 : Ap_Count : Nombre d'application pouvant
+                                                  etre executÇes simultanÇment.
+                                                  UtilisÇ avec les systemes
+                                                  multitaches.
+                    4 WORD : Global2 : Ap_ID : Le numÇro obtenu apräs APPL_INIT.
+                    6 LONG : Global3-4 : Ap_Private : Peu vous servir, mais ne
+                                                      sert pas Ö l'AES.
+                   10 LONG : Global5-6 : Ap-PTree : Adresse de la ressource
+                                                    apräs un RSCS_LOAD.
+                   14 LONG : Global7-8 : Ap_1Resv : RÇservÇ
+                   18 LONG : Global9-A : Ap_2Resv : RÇservÇ
+                   22 LONG : GlobalB-C : Ap_3Resv : RÇservÇ
+                   26 LONG : GlobalD-E : Ap_4Resv : RÇservÇ
+
+Tableau Int_In   : Ce tableau sert Ö dialoguer directement avec l'AES. Vous y
+Longueur 16 WORDs  passez les parametres utilisÇs par les fonctions. N'oubliez
+                   pas d'indiquer dans Control1 combien de parametres il doit
+                   utiliser.
+
+Tableau Int_Out  : Ce tableau permet Ö l'AES de vous rÇpondre. C'est ici
+Longueur 8 WORDs   que vous obtenez les rÇsultats.
+
+Tableau Addr_In  : Ce tableau sert Ö donner des adresses Ö l'AES. DÇpend de la
+Longueur 3 LONGs   fonction. N'oubliez pas d'indiquer combien d'adresses
+                   utiliser dans Control3.
+
+Tableau Addr_Out : Ce tableau, composÇ d'un seul ÇlÇment, permet Ö l'AES de
+Longueur 1 LONG    vous donner une adresse.
+
+--- Les tableaux du VDI ---
+
+Tableau Contrl   : Ce tableau remplit la meme fonction que le tableau Control
+Longueur 12 WORDs  de l'AES. Il permet d'indiquer au VDI ce que l'on lui veut.
+                    0 WORD : Contrl0 : NumÇro de la fonction VDI.
+                    2 WORD : Contrl1 : Nombre de couples PstIn Ö utiliser.
+                    4 WORD : Contrl2 : Nombre de couples PtsOut en sortie.
+                    6 WORD : Contrl3 : Nombre de LONGs IntIn Ö utiliser.
+                    8 WORD : Contrl4 : Nombre de LONGs IntOut sortis.
+
+Ici, les longueur des tableaux ne sont pas fixes, ATTENTION.
+
+Tableau IntIn    : Meme utilisation, globalement, que pour l'AES.
+Longueur Minimum
+30 WORDs
+
+Tableau PtsIn    : Ce tableau contient des coordonnÇes de points. Chacune
+Longueur Minimum   deux WORDs, l'un pour l'abscisse X, l'autre pour l'ordonnÇe
+45 WORDs           Y. Les couples se suivent.
+
+Tableau IntOut   : Ce tableau ressemble Ö celui de l'AES, car permet au VDI de
+Longueur Minimum   vous rÇpondre en vous envoyant des informations.
+30 WORDs
+
+Tableau PtsOut   : Ce tableau sert au VDI pour vous envoyer des couples de
+Longueur minimum   coordonnÇes.
+12 WORDs
+
+Voila, c'est fini de la description des tableaux du GEM. Je vous l'avait dit
+que c'Çtait chiant.
+Pour mettre D0.W dans Int_In3, en assembleur 68000, voilÖ ce qu'il faut faire:
+                lea             AES_Params,A0   ; Les adresses des tableaux
+                move.l          8(A0),A0        ; dÇbut du tableau Int_In
+                move.w          D0,6(A0)        ; D0.W dans Int_In3
+
+La meme chose en assembleur 68030 :
+                move.l          AES_Params,A0   ; Les adresses des tableaux
+                move.w          D0,([8,A0],6)   ; D0.W dans (A0+8)+6, Int_In3
+
+Vous le voyez par vous meme, c'est assez lourd Ö digerer. C'est ici pour
+remplir un seul element, alors pour plusieurs...
+
+Pour selectionner l'AES, ou le VDI, il faut mettre un numero dans D0, et
+l'adresse du tableau PARAMS correspondant dans D1.
+Ainsi, vos tableaux sont remplis comme il faut, et vous voulez l'AES:
+                move.l          #200,D0
+                move.l          #AES_Params,D1
+                trap            #2
+
+Il n'y a pas Ö restaurer la pile, vu qu'ici on ne l'utilise pas. Dans
+l'utilisation via SSAVCALL, il faudra le faire car tout se passera via la pile.
+Pour le VDI, cela aurait donnÇ:
+                move.l          #115,D0
+                move.l          #VDI_Params,D1
+                trap            #2
+
+Maintenant, on passe Ö l'offensive, et l'on oublie un peu le cauchemar que l'on
+vient de passer. Tout ce que je vais vous expliquer Ö prÇsent utilise la faáon
+de proceder de SSAVCALL. Si vous voulez savoir comment faire sans,
+achetez un bouquin sur le GEM et un tube d'aspirine Ö 500mg (la paracetamol
+marche mieux).
+
+/// Informations... ///////////////////////////////////////////////////////////
+
+Lorsque vous faites appel Ö SSAVCALL, vous obtenez une adresse. Celle ci est le
+dÇbut de la routine, oó il faut sauter par un JSR (voyez IVx-SSAV.S). Mais
+juste avant cette adresse, il y a 6 BYTEs d'informations...
+
+-6 WORD : NumÇro de la version au format BCD HexaDÇcimal.
+            Ex: 0136 est la routine de version 1.36.
+-4 WORD : Date d'Assemblage (histoire de se repÇrer dans ses archivages...).
+          Màme format que la date systäme (obtenue par T_GETDATE (GEMDOS $2A)).
+            BITS  4-0: Le jour (de 0 Ö 31).
+            BITS  8-5: Le mois (de 0 Ö 15).
+            BITS 15-9: L'annÇe (de 0 Ö 127) plus 1980 (dÇbut du comptage).
+                       Donc 2107 au maximum.
+            Par exemple, le 11 Mars 1997: BIT  4-0=%01011  (11)
+                                          BIT  8-5=%0011   (03)
+                                          BIT 15-9=%001001 (17+1980=1997)
+-2 WORD : Compteur de tÉches (de 0 Ö 65535)
+          Avec ce compteur, vous pouvez savoir combien de tÉches sont en train
+          d'exploiter SSAV.
+ 0 : The Routine.
+
+/// Appel de SSAVCALL /////////////////////////////////////////////////////////
+
+  Pour utiliser SSAVCALL, il faut connaitre l'adresse de la routine principale.
+Pour cela, soit vous cherchez le Cookie (voyez en fin de doc l'explication sur
+les Cookies), soit vous le demandez via le TRAP 2.
+
+Vous savez dÇjÖ que pour appeler l'AES, il faut mettre 200 dans D0.
+                                   VDI                 115
+Pour connaitre l'adresse de SSAVCALL, il faut mettre "SSAV" ($53534156) dans D0.
+                move.l          #"SSAV",D0
+                trap            #2
+
+Si vous avez toujours "SSAV" dans D0 au retour, c'est que SSAVCALL n'est pas
+installÇ, sinon vous avez l'adresse de la routine principale de SSAVCALL
+dans D0.
+
+ATTENTION: On utilise SSAVCALL en sautant par un JSR Ö une adresse donnÇe par
+le Cookie "SSAV" ou le TRAP 2 avec "SSAV" dans D0.
+Si j'ai choisi ce systeme, ce n'est pas par fleme de faire passer les appels
+via un TRAP (le 3 par exemple). D'un TRAP, on ne peut pas faire un autre TRAP.
+Or on appel l'AES/VDI via un TRAP, et c'est SSAVCALL qui s'en occupe pour vous.
+Donc si je glisse SSAVCALL derriere un TRAP, il ne pourra pas se permettre
+d'appeler l'AES/VDI sans planter. Or c'est son role, d'appeler l'AES/VDI (pas
+de planter, tÇ...). De plus, pour le debugage de SSAVCALL, c'est plus simple.
+Essayez sous MonST 3 de mettre l'option "Follow TRAP" (Suivre TRAP dans le
+panneau options appelable par [Control]+P). Au premier RTE, ZAM! Format
+Error... Bien vu! De plus, SSAVCALL etant appelable par un simple JSR, sous un
+systeme multitache, vous leurrez tout le monde (si pas protection mÇmoire). La
+routine semblera appartenir a chaque tache qui l'utilisera, car semblera etre
+une sous routine comme une autre perdue dans l'ocÇan de mÇmoire digitale de
+votre ordinateur (c'est beau, snif....). Bref, SSAVCALL ne semblera etre qu'un
+bout exilÇ de votre programme. Sa particularitÇ sera d'etre utilisÇe par
+plusieures taches en meme temps.
+Ce stratageme n'est possible quand jouant moi aussi la carte des tableau. En
+fait, vous aurez rien Ö remplir, ce sera toujours Ö SSAVCALL de s'en occuper
+(meme pour ses fonctions propres), mais il faudra lui reserver de la place dans
+votre programme pour qu'il puisse travailler. Je ne peut mettre un buffer
+unique dans SSAVCALL, car si sous un systeme multitache, deux programmes
+travaillent en meme temps sur SSAVCALL, l'un risque de corrompre les donnÇes du
+premier programme en y ecrivant les siennes. C'est pour cela que chaque
+programme doit obligatoirement avoir des places reservÇes pour laisser SSAVCALL
+y travailler. Le systeme multitache, en passant d'un programme Ö l'autre,
+change les registres pour que le programme puisse retrouver la machine dans
+l'etat ou elle etait avant que le systeme multitache decide de stopper
+temporairement la tache en cours pour laisser s'exprimer un peu une autre
+tache. Un peut lourd a saisir, mais au final, SSAVCALL est d'une stabilitÇ Ö
+toute epreuve, n'etant qu'une sorte de recette miracle consultable par chaque
+application qui dispose des ingrÇdients necessaires. Bonne cuisine...

@@ -1,0 +1,95 @@
+; /// SSAV AutoInstaller v1.73 - KOSS 1998 ///
+	
+	move.l	SP,D0
+	BNE	SSAVBOOT_Shrink
+	
+	lea	AccStack,SP	; Si ACC, SP=0
+	
+SSAVBOOT_Shrink	move.w	#$100,-(SP)	; 100 LongWord for the NewStackFrame
+	clr.w	-(SP)	; SHRINK
+	pea	START_Tab
+	pea	AES_Params
+	move.l	#-1,-(SP)	; "BOOT Only" if AES
+	move.l	#-1,-(SP)	; "BOOT Only" if ACC
+	pea	SSAVBOOT_Init
+	clr.w	-(SP)	; - PROG_INIT -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	Start_SSAV
+	lea	(28,SP),SP
+	
+	clr.w	-(SP)	; - P_TERM0 -
+	trap	#1	; *** GEMDOS ***
+	
+	; L… on ne passe plus!
+	
+SSAVBOOT_Init	clr.w	-(SP)	; SAVE
+	pea	START_Tab
+	pea	SSAV_Title
+	pea	TKR_Buffer
+	pea	SSAV_Info
+	pea	SSAVBOOT_Booting
+	move.w	#2,-(SP)	; - PROG_BOOTER -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	Start_SSAV
+		
+	; L… on n'y passe plus!		
+
+SSAVBOOT_Booting	move.w	#10,-(SP)	; - COOK_NULL -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	Start_SSAV
+	addq.l	#4,SP
+	
+	tst.w	D0
+	BNE	SSAVBOOT_Error
+
+	move.l	#"SSAV",-(SP)
+	pea	Start_SSAV
+	move.w	#13,-(SP)	; - COOK_ADD -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	Start_SSAV
+	lea	(12,SP),SP
+	
+	cmpi.w	#-2,D0
+	BEQ	SSAVBOOT_Already
+	
+	cmpi.w	#-1,D0
+	BEQ	SSAVBOOT_Error
+	
+	move.l	#$88,-(SP)	; TRAP #2
+	pea	New_TRAP2
+	move.w	#20,-(SP)	; - XBRA_ADD -
+	clr.w	-(SP)	; *** SYS ***
+	JSR	Start_SSAV
+	lea	(12,SP),SP
+			
+	; - CONF_INIT -
+	
+	pea	SSAVBOOT_OKTxt
+	BRA	SSAVBOOT_PrintStatut
+	
+SSAVBOOT_Error	pea	SSAVBOOT_NOTxt
+	BRA	SSAVBOOT_Unsave
+
+SSAVBOOT_Already	pea	SSAVBOOT_ARTxt
+
+SSAVBOOT_Unsave	clr.l	START_Tab+2
+
+SSAVBOOT_PrintStatut	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	RTS
+		
+; *** Le XBRA de SSAVCALL - on y passe que par un TRAP #2 ***
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+Old_TRAP2	ds.l	1
+
+New_TRAP2	cmpi.l	#"SSAV",D0
+	BNE	Bad_TRAP2
+
+	move.l	#Start_SSAV,D0
+	RTE
+
+Bad_TRAP2	JMP	([Old_TRAP2])

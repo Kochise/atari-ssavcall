@@ -1,0 +1,26 @@
+/// RŠgles de pr‚sentation pour un programme en AUTO //////////////////////////
+
+Afin d'avoir quelque chose de propre … l'‚cran lors du Boot, il sagit de:
+
+1- Passez … la ligne 1x pour s‚parer votre Titre du programme pr‚c‚dent
+   Ecrire sur la premiere ligne, pen vid‚o inverseq:
+   - Le titre du logiciel
+   - Sa version
+   - Son programmeur
+   - Sa date d'assemblage
+Par exemple, pour SSAVCALL:
+p SSAVCALL  2.54 - KOSS Prod  (06/01/99) q
+   Limitez le titre … 40 caractŠres pour les boot en basse r‚solution.
+2- Ecrire les informations utiles au logiciel
+   Utilisez le nombre de lignes dont vous avez besoin, pas de limitation
+3- Terminer par une ligne "TKR" avec:
+   - 0 si l'on ne garde rien en m‚moire
+   - La taille du code gard‚ en m‚moire le cas ‚ch‚ant
+Par exemple "TKR: Keep 0 byte in memory."
+         ou "TKR: Keep 21865 bytes in memory."
+   Notez la mise au pluriel de byte si la taille n'est pas nulle...
+
+La fonction - PROG_BOOTER - fait tout cela. Voyez le fichier SYS.FRA. Pour
+l'utiliser dans vos programmes Boot, il est donc souhaitable de placer SSAVCALL
+le plus haut possible dans la liste des programmes en AUTO. Utilisez AUTOSORT
+(inclus) pour cela...

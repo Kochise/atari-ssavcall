@@ -1,0 +1,1394 @@
+; /// SSAVCALL Project - AES Control - KOSS 1998 ///
+; C'est parfait, n'y touche plus...
+
+	move.w	(6,SP),D0
+	cmpi.w	#130,D0
+	BGT	AES_ERROR	; Au dessus de AES 130, y'a rien
+	move.l	(8,SP),A1	; AES_PARAMS
+
+	clr.l	([A1])	; Control0-1, Pour etre certain
+	clr.l	([A1],4)	; Control2-3, de l'hygiene
+	clr.w	([A1],8)	; Control4
+
+	lea	AES_JUMP,A2	; Le fun...
+
+	move.l	(4,A2,D0.w*8),D1
+	move.l	(A1),A0	; Control
+	addq.l	#1,A0
+	movep.l	D1,(A0)
+
+	JMP	([A2,D0.w*8])	; On saute
+
+AES_ERROR	RTS
+
+AES_JUMP	dc.l	UnDefAES0,0
+	dc.l	UnDefAES1,0
+	dc.l	UnDefAES2,0
+	dc.l	UnDefAES3,0
+	dc.l	UnDefAES4,0
+	dc.l	UnDefAES5,0
+	dc.l	UnDefAES6,0
+	dc.l	UnDefAES7,0
+	dc.l	UnDefAES8,0
+	dc.l	UnDefAES9,0
+	dc.l	Appl_Init,$A000100	; AES  10
+	dc.l	Appl_Read,$B020101	; AES  11
+	dc.l	Appl_Write,$C020101	; AES  12
+	dc.l	Appl_Find,$D000101	; AES  13
+	dc.l	Appl_TPlay,$E020101	; AES  14
+	dc.l	Appl_TRecord,$F010101	; AES  15
+	dc.l	UnDefAES16,0
+	dc.l	UnDefAES17,0
+	dc.l	Appl_Search,$12010301	; AES  18
+	dc.l	Appl_Exit,$13000100	; AES  19
+	dc.l	Evnt_KeyBd,$14000100	; AES  20
+	dc.l	Evnt_Button,$15030500	; AES  21
+	dc.l	Evnt_Mouse,$16050500	; AES  22
+	dc.l	Evnt_Mesag,$17000101	; AES  23
+	dc.l	Evnt_Timer,$18020100	; AES  24
+	dc.l	Evnt_Multi,$19100701	; AES  25
+	dc.l	Evnt_DClick,$1A020100	; AES  26
+	dc.l	UnDefAES27,0
+	dc.l	UnDefAES28,0
+	dc.l	UnDefAES29,0
+	dc.l	Menu_Bar,$1E010101	; AES  30
+	dc.l	Menu_ICheck,$1F020101	; AES  31
+	dc.l	Menu_IEnable,$20020101	; AES  32
+	dc.l	Menu_TNormal,$21020101	; AES  33
+	dc.l	Menu_Text,$22010102	; AES  34
+	dc.l	Menu_Register,$23010101	; AES  35
+	dc.l	Menu_PopUp,$24020102	; AES  36
+	dc.l	Menu_Attach,$25020102	; AES  37
+	dc.l	Menu_IStart,$26030101	; AES  38
+	dc.l	Menu_Setting,$27010101	; AES  39
+	dc.l	Objc_Add,$28020101	; AES  40
+	dc.l	Objc_Delete,$29010101	; AES  41
+	dc.l	Objc_Draw,$2A060101	; AES  42
+	dc.l	Objc_Find,$2B040101	; AES  43
+	dc.l	Objc_OffSet,$2C010301	; AES  44
+	dc.l	Objc_Order,$2D020101	; AES  45
+	dc.l	Objc_Edit,$2E040201	; AES  46
+	dc.l	Objc_Change,$2F080201	; AES  47
+	dc.l	Objc_SysVar,$30040300	; AES  48
+	dc.l	UnDefAES49,0
+	dc.l	Form_Do,$32010101	; AES  50
+	dc.l	Form_Dial,$33090100	; AES  51
+	dc.l	Form_Alert,$34010101	; AES  52
+	dc.l	Form_Error,$35010100	; AES  53
+	dc.l	Form_Center,$36000501	; AES  54
+	dc.l	Form_KeyBd,$37030301	; AES  55
+	dc.l	Form_Button,$38020201	; AES  56
+	dc.l	UnDefAES57,0
+	dc.l	UnDefAES58,0
+	dc.l	UnDefAES59,0
+	dc.l	UnDefAES60,0
+	dc.l	UnDefAES61,0
+	dc.l	UnDefAES62,0
+	dc.l	UnDefAES63,0
+	dc.l	UnDefAES64,0
+	dc.l	UnDefAES65,0
+	dc.l	UnDefAES66,0
+	dc.l	UnDefAES67,0
+	dc.l	UnDefAES68,0
+	dc.l	UnDefAES69,0
+	dc.l	Graf_RubberBox,$46040300; AES  70
+	dc.l	Graf_DragBox,$47080300	; AES  71
+	dc.l	Graf_MoveBox,$48060100	; AES  72
+	dc.l	Graf_GrowBox,$49080100	; AES  73
+	dc.l	Graf_ShrinkBox,$4A080100; AES  74
+	dc.l	Graf_WatchBox,$4B040101	; AES  75
+	dc.l	Graf_SlideBox,$4C030101	; AES  76
+	dc.l	Graf_Handle,$4D000500	; AES  77
+	dc.l	Graf_Mouse,$4E010101	; AES  78
+	dc.l	Graf_MkState,$4F000500	; AES  79
+	dc.l	Scrp_Read,$50000101	; AES  80
+	dc.l	Scrp_Write,$51000101	; AES  81
+	dc.l	UnDefAES82,0
+	dc.l	UnDefAES83,0
+	dc.l	UnDefAES84,0
+	dc.l	UnDefAES85,0
+	dc.l	UnDefAES86,0
+	dc.l	UnDefAES87,0
+	dc.l	UnDefAES88,0
+	dc.l	UnDefAES89,0
+	dc.l	FSel_Input,$5A000202	; AES  90
+	dc.l	FSel_ExInput,$5B000203	; AES  91
+	dc.l	UnDefAES92,0
+	dc.l	UnDefAES93,0
+	dc.l	UnDefAES94,0
+	dc.l	UnDefAES95,0
+	dc.l	UnDefAES96,0
+	dc.l	UnDefAES97,0
+	dc.l	UnDefAES98,0
+	dc.l	UnDefAES99,0
+	dc.l	Wind_Create,$64050100	; AES 100
+	dc.l	Wind_Open,$65050100	; AES 101
+	dc.l	Wind_Close,$66010100	; AES 102
+	dc.l	Wind_Delete,$67010100	; AES 103
+	dc.l	Wind_Get,$68020500	; AES 104
+	dc.l	Wind_Set,$69060100	; AES 105
+	dc.l	Wind_Find,$6A020100	; AES 106
+	dc.l	Wind_UpDate,$6B010100	; AES 107
+	dc.l	Wind_Calc,$6C060500	; AES 108
+	dc.l	Wind_New,$6D000000	; AES 109
+	dc.l	Rsrc_Load,$6E000101	; AES 110
+	dc.l	Rsrc_Free,$6F000100	; AES 111
+	dc.l	Rsrc_GAddr,$70020100	; AES 112
+	dc.l	Rsrc_SAddr,$71020101	; AES 113
+	dc.l	Rsrc_ObFix,$72010101	; AES 114
+	dc.l	Rsrc_RcFix,$73000101	; AES 115
+	dc.l	UnDefAES116,0
+	dc.l	UnDefAES117,0
+	dc.l	UnDefAES118,0
+	dc.l	UnDefAES119,0
+	dc.l	Shel_Read,$78000102	; AES 120
+	dc.l	Shel_Write,$79030102	; AES 121
+	dc.l	Shel_Get,$7A010101	; AES 122
+	dc.l	Shel_Put,$7B010101	; AES 123
+	dc.l	Shel_Find,$7C000101	; AES 124
+	dc.l	Shel_Envrn,$7D000103	; AES 125
+	dc.l	UnDefAES126,0
+	dc.l	UnDefAES127,0
+	dc.l	UnDefAES128,0
+	dc.l	UnDefAES129,0
+	dc.l	Appl_GetInfo,$8201050000; AES 130
+
+; /// AES   0 : Non d‚finit ///
+
+UnDefAES0
+	RTS
+
+; /// AES   1 : Non d‚finit ///
+
+UnDefAES1
+	RTS
+
+; /// AES   2 : Non d‚finit ///
+
+UnDefAES2
+	RTS
+
+; /// AES   3 : Non d‚finit ///
+
+UnDefAES3
+	RTS
+
+; /// AES   4 : Non d‚finit ///
+
+UnDefAES4
+	RTS
+
+; /// AES   5 : Non d‚finit ///
+
+UnDefAES5
+	RTS
+
+; /// AES   6 : Non d‚finit ///
+
+UnDefAES6
+	RTS
+
+; /// AES   7 : Non d‚finit ///
+
+UnDefAES7
+	RTS
+
+; /// AES   8 : Non d‚finit ///
+
+UnDefAES8
+	RTS
+
+; /// AES   9 : Non d‚finit ///
+
+UnDefAES9
+	RTS
+
+; /// AES  10 : APPL_INIT ///
+
+Appl_Init	JSR	AES_Call
+
+	move.w	([12,A1]),D0		; APP_ID
+
+	RTS
+
+; /// AES  11 : APPL_READ ///
+
+Appl_Read	move.w	(16,SP),([8,A1])	; APP_ID dans Int_In0
+	move.w	(14,SP),([8,A1],2)	; Longeur dans Int_In1
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0		; R‚sultat
+
+	RTS
+
+; /// AES  12 : APPL_WRITE ///
+
+Appl_Write	move.w	(16,SP),([8,A1])	; APP_ID dans Int_In0
+	move.w	(14,SP),([8,A1],2)	; Longeur dans Int_In1
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0		; R‚sultat
+
+	RTS
+
+; /// AES  13 : APPL_FIND ///
+
+Appl_Find	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; AP_ID
+
+	RTS
+
+; /// AES  14 : APPL_TPLAY ///
+
+Appl_TPlay	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Nombre dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Vitesse dans Int_In1
+
+	JSR	AES_Call
+
+	RTS
+
+; /// AES  15 : APPL_TRECORD ///
+
+Appl_TRecord	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  16 : Non D‚finit ///
+
+UnDefAES16
+	RTS
+
+; /// AES  17 : Non D‚finit ///
+
+UnDefAES17
+	RTS
+
+; /// AES  18 : APPL_SEARCH ///
+
+Appl_Search	move.w	(16,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; R‚sultat
+
+	RTS
+
+; /// AES  19 : APPL_EXIT ///
+
+Appl_Exit	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  20 : EVNT_KEYBD ///
+
+Evnt_KeyBd	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; Code de la touche
+
+	RTS
+
+; /// AES  21 : EVNT_BUTTON ///
+
+Evnt_Button	move.w	(16,SP),([8,A1])	; Nombre dans Int_In0
+	move.w	(14,SP),([8,A1],2)	; Masque dans Int_In1
+	move.w	(12,SP),([8,A1],4)	; Statut dans Int_In2
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+
+	RTS
+
+; /// AES  22 : EVNT_MOUSE ///
+
+Evnt_Mouse	move.w	(20,SP),([8,A1])	; Masque dans Int_In0
+	move.w	(18,SP),([8,A1],2)	; X dans Int_In1
+	move.w	(16,SP),([8,A1],4)	; Y dans Int_In2
+	move.w	(14,SP),([8,A1],6)	; Largeur dans Int_In3
+	move.w	(12,SP),([8,A1],8)	; Hauteur dans Int_In4
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+
+	RTS
+
+; /// AES  23 : EVNT_MESAG ///
+
+Evnt_Mesag	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	RTS
+
+; /// AES  24 : EVNT_TIMER ///
+
+Evnt_Timer	move.w	(14,SP),([8,A1])	; Temps Bas dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Temps Haut dans Int_In1
+
+	JSR	AES_Call
+
+	RTS
+
+; /// AES  25 : EVNT_MULTI ///
+
+Evnt_Multi	move.w	(46,SP),([8,A1])	; Type dans Int_In0
+	move.w	(44,SP),([8,A1],2)	; Nombre dans Int_In1
+	move.w	(42,SP),([8,A1],4)	; Masque dans Int_In2
+	move.w	(40,SP),([8,A1],6)	; Statut dans Int_In3
+	move.w	(38,SP),([8,A1],8)	; Masque1 dans Int_In4
+	move.w	(36,SP),([8,A1],10)	; X1 dans Int_In5
+	move.w	(34,SP),([8,A1],12)	; Y1 dans Int_In6
+	move.w	(32,SP),([8,A1],14)	; Largeur1 dans Int_In7
+	move.w	(30,SP),([8,A1],16)	; Hauteur1 dans Int_In8
+	move.w	(28,SP),([8,A1],18)	; Masque2 dans Int_In9
+	move.w	(26,SP),([8,A1],20)	; X2 dans Int_In10
+	move.w	(24,SP),([8,A1],22)	; Y2 dans Int_In11
+	move.w	(22,SP),([8,A1],24)	; Largeur2 dans Int_In12
+	move.w	(20,SP),([8,A1],26)	; Hauteur2 dans Int_In13
+	move.w	(18,SP),([8,A1],28)	; Temps Bas dans Int_In14
+	move.w	(16,SP),([8,A1],30)	; Temps Haut dans Int_In15
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+
+	RTS
+
+; /// AES  26 : EVNT_DCLICK ///
+
+Evnt_DClick	move.w	(14,SP),([8,A1])	; Vitesse dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; Vitesse
+
+	RTS
+
+; /// AES  27 : Non D‚finit ///
+
+UnDefAES27
+	RTS
+
+; /// AES  28 : Non D‚finit ///
+
+UnDefAES28
+	RTS
+
+; /// AES  29 : Non D‚finit ///
+
+UnDefAES29
+	RTS
+
+; /// AES  30 : MENU_BAR ///
+
+Menu_Bar	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Mode dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  31 : MENU_ICHECK ///
+
+Menu_ICheck	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  32 : MENU_IENABLE ///
+
+Menu_IEnable	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  33 : MENU_TNORMAL ///
+
+Menu_TNormal	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Mode dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  34 : MENU_TEXT ///
+
+Menu_Text	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.l	(12,SP),([16,A1],4)	; Adresse du texte dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  35 : MENU_REGISTER ///
+
+Menu_Register	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  36 : MENU_POPUP ///
+
+Menu_PopUp	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; X dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; Y dans Int_In1
+	move.l	(12,SP),([16,A1],4)	; Adresse des donn‚es dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  37 : MENU_ATTACH ///
+
+Menu_Attach	move.w	(24,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(20,SP),([16,A1])	; Adresse dans Addr_in0
+	move.l	(16,SP),([8,A1],2)	; Donn‚es dans Int_In1
+	move.l	(12,SP),([16,A1],4)	; Adresse des donn‚es dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  38 : MENU_ISTART ///
+
+Menu_IStart	move.w	(20,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(16,SP),([16,SP])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1],2)	; Menu dans Int_In1
+	move.w	(12,SP),([8,A1],4)	; Num‚ro dans Int_In2
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  39 : MENU_SETTING ///
+
+Menu_Setting	move.w	(16,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  40 : OBJC_ADD ///
+
+Objc_Add	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Parent dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Enfant dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  41 : OBJC_DELETE ///
+
+Objc_Delete	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  42 : OBJC_DRAW ///
+
+Objc_Draw	move.l	(24,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(22,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(20,SP),([8,A1],2)	; Profondeur dans Int_In1
+	move.w	(18,SP),([8,A1],4)	; X dans Int_In2
+	move.w	(16,SP),([8,A1],6)	; Y dans Int_In3
+	move.w	(14,SP),([8,A1],8)	; Largeur dans Int_In4
+	move.w	(12,SP),([8,A1],10)	; Hauteur dans Int_In5
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  43 : OBJC_FIND ///
+
+Objc_Find	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; Profondeur dans Int_In1
+	move.w	(14,SP),([8,A1],4)	; X dans Int_In2
+	move.w	(12,SP),([8,A1],6)	; Y dans Int_In3
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  44 : OBJC_OFFSET ///
+
+Objc_OffSet	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES44
+
+	move.w	([12,A1],2),D0	; X
+	swap	D0
+	move.w	([12,A1],4),D0	; Y
+
+Exit_AES44	RTS
+
+; /// AES  45 : OBJC_ORDER ///
+
+Objc_Order	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Position dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  46 : OBJC_EDIT ///
+
+Objc_Edit	move.l	(20,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(18,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; CaractŠre dans Int_In1
+	move.w	(14,SP),([8,A1],4)	; Index dans Int_In2
+	move.w	(12,SP),([8,A1],6)	; Mode dans Int_In3
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES46
+
+	move.w	([12,A1],2),D0	; Index
+
+Exit_AES46	RTS
+
+; /// AES  47 : OBJC_CHANGE ///
+
+Objc_Change	move.l	(26,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(24,SP),([8,A1])	; Num‚ro dans Int_In0
+	clr.w	([8,A1],2)	; 0 dans Int_In1
+	move.w	(22,SP),([8,A1],4)	; X dans Int_In2
+	move.w	(20,SP),([8,A1],6)	; Y dans Int_In3
+	move.w	(18,SP),([8,A1],8)	; Largeur dans Int_In4
+	move.w	(16,SP),([8,A1],10)	; Hauteur dans Int_In5
+	move.w	(14,SP),([8,A1],12)	; Etat dans Int_In6
+	move.w	(12,SP),([8,A1],14)	; Mode dans Int_In7
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  48 : OBJC_SYSVAR ///
+
+Objc_SysVar	move.w	(18,SP),([8,A1])	; Mode dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; Num‚ro dans Int_In1
+	move.w	(14,SP),([8,A1],4)	; Donn‚e1 dans Int_In2
+	move.w	(12,SP),([8,A1],6)	; Donn‚e2 dans Int_In3
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; R‚sultat
+
+	RTS
+
+; /// AES  49 : Non D‚finit ///
+
+UnDefAES49
+	RTS
+
+; /// AES  50 : FORM_DO ///
+
+Form_Do	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  51 : FORM_DIAL ///
+
+Form_Dial	move.w	(28,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(26,SP),([8,A1],2)	; X1 Position dans Int_In1
+	move.w	(24,SP),([8,A1],4)	; Y1 dans Int_In2
+	move.w	(22,SP),([8,A1],6)	; Largeur1 dans Int_In3
+	move.w	(20,SP),([8,A1],8)	; Hauteur1 dans Int_In4
+	move.w	(18,SP),([8,A1],10)	; X2 dans Int_In5
+	move.w	(16,SP),([8,A1],12)	; Y2 dans Int_In6
+	move.w	(14,SP),([8,A1],14)	; Largeur2 dans Int_In7
+	move.w	(12,SP),([8,A1],16)	; Hauteur2 dans Int_In8
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  52 : FORM_ALERT ///
+
+Form_Alert	move.w	(16,SP),([8,A1])	; Num‚ro du bouton dans Int_In0
+	move.l	(12,SP),([16,A1])	; Adresse du texte dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  53 : FORM_ERROR ///
+
+Form_Error	move.w	(12,SP),([8,A1])	; Num‚ro de l'erreur dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  54 : FORM_CENTER ///
+
+Form_Center	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+	addq.l	#2,D0	; Int_Out1
+
+	RTS
+
+; /// AES  55 : FORM_KEYBD ///
+
+Form_KeyBd	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(14,SP),([8,A1],2)	; Prochain Objet dans Int_In1
+	move.w	(12,SP),([8,A1],4)	; CaractŠre dans Int_In2
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  56 : FORM_BUTTON ///
+
+Form_Button	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(14,SP),([8,A1])	; Num‚ro dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Nombre de clics dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  57 : Non D‚finit ///
+
+UnDefAES57
+	RTS
+
+; /// AES  58 : Non D‚finit ///
+
+UnDefAES58
+	RTS
+
+; /// AES  59 : Non D‚finit ///
+
+UnDefAES59
+	RTS
+
+; /// AES  60 : Non D‚finit ///
+
+UnDefAES60
+	RTS
+
+; /// AES  61 : Non D‚finit ///
+
+UnDefAES61
+	RTS
+
+; /// AES  62 : Non D‚finit ///
+
+UnDefAES62
+	RTS
+
+; /// AES  63 : Non D‚finit ///
+
+UnDefAES63
+	RTS
+
+; /// AES  64 : Non D‚finit ///
+
+UnDefAES64
+	RTS
+
+; /// AES  65 : Non D‚finit ///
+
+UnDefAES65
+	RTS
+
+; /// AES  66 : Non D‚finit ///
+
+UnDefAES66
+	RTS
+
+; /// AES  67 : Non D‚finit ///
+
+UnDefAES67
+	RTS
+
+; /// AES  68 : Non D‚finit ///
+
+UnDefAES68
+	RTS
+
+; /// AES  69 : Non D‚finit ///
+
+UnDefAES69
+	RTS
+
+; /// AES  70 : GRAF_RUBBERBOX ///
+
+Graf_RubberBox	move.w	(18,SP),([8,A1])	; X dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; Y dans Int_In1
+	move.w	(14,SP),([8,A1],4)	; Largeur dans Int_In2
+	move.w	(12,SP),([8,A1],6)	; Hauteur dans Int_In3
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES70
+
+	move.l	([12,A1],2),D0	; Largeur - Hauteur
+
+Exit_AES70	RTS
+
+; /// AES  71 : GRAF_DRAGBOX ///
+
+Graf_DragBox	move.w	(26,SP),([8,A1])	; Largeur de la boite dans Int_In0
+	move.w	(24,SP),([8,A1],2)	; Hauteur de la boite dans Int_In1
+	move.w	(22,SP),([8,A1],4)	; X de la boite dans Int_In2
+	move.w	(20,SP),([8,A1],6)	; Y de la boite dans Int_In3
+	move.w	(18,SP),([8,A1],8)	; X du rectangle dans Int_In4
+	move.w	(16,SP),([8,A1],10)	; Y du rectangle dans Int_In5
+	move.w	(14,SP),([8,A1],12)	; Largeur du rectangle dans Int_In6
+	move.w	(12,SP),([8,A1],14)	; Hauteur du rectangle dans Int_In7
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES71
+
+	move.w	([12,A1],2),D0	; X
+	swap	D0
+	move.w	([12,A1],4),D0	; Y
+
+Exit_AES71	RTS
+
+; /// AES  72 : GRAF_MOVEBOX ///
+
+Graf_MoveBox	move.w	(22,SP),([8,A1])	; Largeur dans Int_In0
+	move.w	(20,SP),([8,A1],2)	; Hauteur dans Int_In1
+	move.w	(18,SP),([8,A1],4)	; X D‚part dans Int_In2
+	move.w	(16,SP),([8,A1],6)	; Y D‚part dans Int_In3
+	move.w	(14,SP),([8,A1],8)	; X Fin dans Int_In4
+	move.w	(12,SP),([8,A1],10)	; Y Fin dans Int_In5
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  73 : GRAF_GROWBOX ///
+
+Graf_GrowBox	move.w	(26,SP),([8,A1])	; X D‚part dans Int_In0
+	move.w	(24,SP),([8,A1],2)	; Y D‚part dans Int_In1
+	move.w	(22,SP),([8,A1],4)	; Largeur D‚part dans Int_In2
+	move.w	(20,SP),([8,A1],6)	; Hauteur D‚part dans Int_In3
+	move.w	(18,SP),([8,A1],8)	; X Fin dans Int_In4
+	move.w	(16,SP),([8,A1],10)	; Y Fin dans Int_In5
+	move.w	(14,SP),([8,A1],12)	; Largeur Fin dans Int_In6
+	move.w	(12,SP),([8,A1],14)	; Hauteur Fin dans Int_In7
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  74 : GRAF_SHRINKBOX ///
+
+Graf_ShrinkBox	move.w	(26,SP),([8,A1])	; X Fin dans Int_In0
+	move.w	(24,SP),([8,A1],2)	; Y Fin dans Int_In1
+	move.w	(22,SP),([8,A1],4)	; Largeur Fin dans Int_In2
+	move.w	(20,SP),([8,A1],6)	; Hauteur Fin dans Int_In3
+	move.w	(18,SP),([8,A1],8)	; X D‚part dans Int_In4
+	move.w	(16,SP),([8,A1],10)	; Y D‚part dans Int_In5
+	move.w	(14,SP),([8,A1],12)	; Largeur D‚part dans Int_In6
+	move.w	(12,SP),([8,A1],14)	; Hauteur D‚part dans Int_In7
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  75 : GRAF_WATCHBOX ///
+
+Graf_WatchBox	clr.w	([8,A1])		; 0 dans Int_In0
+	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1],2)	; Num‚ro dans Int_In1
+	move.w	(14,SP),([8,A1],4)	; Aspect Interne dans Int_In2
+	move.w	(12,SP),([8,A1],6)	; Aspect Externe dans Int_In3
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  76 : GRAF_SLIDEBOX ///
+
+Graf_SlideBox	move.l	(18,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(16,SP),([8,A1])	; Parent dans Int_In0
+	move.w	(14,SP),([8,A1],2)	; Num‚ro dans Int_In1
+	move.w	(12,SP),([8,A1],4)	; Direction dans Int_In2
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	tst.w	([12,A1],4)	; Mode
+	BEQ	Exit_AES76
+
+	ori.w	#%1000000000000000,D0
+
+Exit_AES76	RTS
+
+; /// AES  77 : GRAF_HANDLE ///
+
+Graf_Handle	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+
+	RTS
+
+; /// AES  78 : GRAF_MOUSE ///
+
+Graf_Mouse	move.w	(16,SP),([8,A1])	; Mode dans Int_In0
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  79 : GRAF_MKSTATE ///
+
+Graf_MkState	JSR	AES_Call
+
+	move.l	(12,A1),D0	; Int_Out
+
+	RTS
+
+; /// AES  80 : SCRP_READ ///
+
+Scrp_Read	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  81 : SCRP_WRITE ///
+
+Scrp_Write	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES  82 : Non D‚finit ///
+
+UnDefAES82
+	RTS
+
+; /// AES  83 : Non D‚finit ///
+
+UnDefAES83
+	RTS
+
+; /// AES  84 : Non D‚finit ///
+
+UnDefAES84
+	RTS
+
+; /// AES  85 : Non D‚finit ///
+
+UnDefAES85
+	RTS
+
+; /// AES  86 : Non D‚finit ///
+
+UnDefAES86
+	RTS
+
+; /// AES  87 : Non D‚finit ///
+
+UnDefAES87
+	RTS
+
+; /// AES  88 : Non D‚finit ///
+
+UnDefAES88
+	RTS
+
+; /// AES  89 : Non D‚finit ///
+
+UnDefAES89
+	RTS
+
+; /// AES  90 : FSEL_INPUT ///
+
+FSel_Input	move.l	(16,SP),([16,A1])	; Adresse du R‚pertoire dans Addr_In0
+	move.l	(12,SP),([16,A1],4)	; Adresse du Fichier dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES90
+
+	swap	D0
+	move.w	([12,A1],2),D0	; Bouton
+	swap	D0
+
+Exit_AES90	RTS
+
+; /// AES  91 : FSEL_EXINPUT ///
+
+FSel_ExInput	move.l	(20,SP),([16,A1])	; Adresse du R‚pertoire dans Addr_In0
+	move.l	(16,SP),([16,A1],4)	; Adresse du Fichier dans Addr_In0
+	move.l	(12,SP),([16,A1],8)	; Adresse du Titre dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES91
+
+	move.w	([12,A1],2),D0	; Bouton
+
+Exit_AES91	RTS
+
+; /// AES  92 : Non D‚finit ///
+
+UnDefAES92
+	RTS
+
+; /// AES  93 : Non D‚finit ///
+
+UnDefAES93
+	RTS
+
+; /// AES  94 : Non D‚finit ///
+
+UnDefAES94
+	RTS
+
+; /// AES  95 : Non D‚finit ///
+
+UnDefAES95
+	RTS
+
+; /// AES  96 : Non D‚finit ///
+
+UnDefAES96
+	RTS
+
+; /// AES  97 : Non D‚finit ///
+
+UnDefAES97
+	RTS
+
+; /// AES  98 : Non D‚finit ///
+
+UnDefAES98
+	RTS
+
+; /// AES  99 : Non D‚finit ///
+
+UnDefAES99
+	RTS
+
+; /// AES 100 : WIND_CREATE ///
+
+Wind_Create	move.w	(20,SP),([8,A1])	; Mode dans Int_In0
+	move.w	(18,SP),([8,A1],2)	; X dans Int_In1
+	move.w	(16,SP),([8,A1],4)	; Y dans Int_In2
+	move.w	(14,SP),([8,A1],6)	; Largeur dans Int_In3
+	move.w	(12,SP),([8,A1],8)	; Hauteur dans Int_In4
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 101 : WIND_OPEN ///
+
+Wind_Open	move.w	(20,SP),([8,A1])	; Handle dans Int_In0
+	move.w	(18,SP),([8,A1],2)	; X dans Int_In1
+	move.w	(16,SP),([8,A1],4)	; Y dans Int_In2
+	move.w	(14,SP),([8,A1],6)	; Largeur dans Int_In3
+	move.w	(12,SP),([8,A1],8)	; Hauteur dans Int_In4
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 102 : WIND_CLOSE ///
+
+Wind_Close	move.w	(12,SP),([8,A1])	; Handle dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 103 : WIND_DELETE ///
+
+Wind_Delete	move.w	(12,SP),([8,A1])	; Handle dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 104 : WIND_GET ///
+
+Wind_Get	move.w	(14,SP),([8,A1])	; Handle dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Commande dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES104
+
+	move.l	(12,A1),D0	; Int_Out
+	addq.l	#2,D0	; Int_Out1
+
+Exit_AES104	RTS
+
+; /// AES 105 : WIND_SET ///
+
+Wind_Set	move.w	(22,SP),([8,A1])	; Handle dans Int_In0
+	move.w	(20,SP),([8,A1],2)	; Commande dans Int_In1
+	move.w	(18,SP),([8,A1],4)	; In1 dans Int_In2
+	move.w	(16,SP),([8,A1],6)	; In2 dans Int_In3
+	move.w	(14,SP),([8,A1],8)	; In3 dans Int_In4
+	move.w	(12,SP),([8,A1],10)	; In4 dans Int_In5
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 106 : WIND_FIND ///
+
+Wind_Find	move.w	(14,SP),([8,A1])	; X dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Y dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 107 : WIND_UPDATE ///
+
+Wind_UpDate	move.w	(14,SP),([8,A1])	; Commande dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 108 : WIND_CALC ///
+
+Wind_Calc	move.w	(22,SP),([8,A1])	; Commande dans Int_In0
+	move.w	(20,SP),([8,A1],2)	; Mode dans Int_In1
+	move.w	(18,SP),([8,A1],4)	; X D‚part dans Int_In2
+	move.w	(16,SP),([8,A1],6)	; Y D‚part dans Int_In3
+	move.w	(14,SP),([8,A1],8)	; Largeur D‚part dans Int_In4
+	move.w	(12,SP),([8,A1],10)	; Hauteur D‚part dans Int_In5
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES108
+
+	move.l	(12,A1),D0	; Int_Out
+	addq.l	#2,D0	; Int_Out1
+
+Exit_AES108	RTS
+
+; /// AES 109 : WIND_NEW ///
+
+Wind_New	JSR	AES_Call
+
+	RTS
+
+; /// AES 110 : RSRC_LOAD ///
+
+Rsrc_Load	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 111 : RSRC_FREE ///
+
+Rsrc_Free	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 112 : RSRC_GADDR ///
+
+Rsrc_GAddr	move.w	(14,SP),([8,A1])	; Mode dans Int_In0
+	move.w	(12,SP),([8,A1],2)	; Num‚ro dans Int_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+	BEQ	Exit_AES112
+
+	move.l	([20,A1]),D0	; Adresse
+
+Exit_AES112	RTS
+
+; /// AES 113 : RSRC_SADDR ///
+
+Rsrc_SAddr	move.w	(18,SP),([8,A1])	; Mode dans Int_In0
+	move.w	(16,SP),([8,A1],2)	; Num‚ro dans Int_In1
+	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 114 : RSRC_OBFIX ///
+
+Rsrc_ObFix	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Num‚ro dans Int_In0
+
+	JSR	AES_Call
+
+	RTS
+
+; /// AES 115 : RSRC_RCFIX ///
+
+Rsrc_RcFix	move.l	(12,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 116 : Non D‚finit ///
+
+UnDefAES116
+	RTS
+
+; /// AES 117 : Non D‚finit ///
+
+UnDefAES117
+	RTS
+
+; /// AES 118 : Non D‚finit ///
+
+UnDefAES118
+	RTS
+
+; /// AES 119 : Non D‚finit ///
+
+UnDefAES119
+	RTS
+
+; /// AES 120 : SHEL_READ ///
+
+Shel_Read	move.l	(16,SP),([16,A1])	; Adresse de la Commande dans Addr_In0
+	move.l	(12,SP),([16,A1],4)	; Adresse de la Commande Supl‚mentaire dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 121 : SHEL_WRITE ///
+
+Shel_Write	move.w	(24,SP),([8,A1])	; Commande dans Int_In0
+	move.w	(22,SP),([8,A1],2)	; Type dans Int_In1
+	move.w	(20,SP),([8,A1],4)	; Mode dans Int_In2
+	move.l	(16,SP),([16,A1])	; Adresse de la Commande dans Addr_In0
+	move.l	(12,SP),([16,A1],4)	; Adresse de la Commande Supl‚mentaire dans Addr_In1
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 122 : SHEL_GET ///
+
+Shel_Get	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 123 : SHEL_PUT ///
+
+Shel_Put	move.l	(14,SP),([16,A1])	; Adresse dans Addr_In0
+	move.w	(12,SP),([8,A1])	; Nombre dans Int_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 124 : SHEL_FIND ///
+
+Shel_Find	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+
+	JSR	AES_Call
+
+	move.w	([12,A1]),D0	; R‚sultat
+
+	RTS
+
+; /// AES 125 : SHEL_ENVRN ///
+
+Shel_Envrn	move.l	(16,SP),([16,A1])	; Adresse dans Addr_In0
+	move.l	(12,SP),([16,A1],4)	; Adresse du Texte recherch‚ dans Addr_In0
+
+	JSR	AES_Call
+
+	RTS
+
+; /// AES 126 : Non D‚finit ///
+
+UnDefAES126
+	RTS
+
+; /// AES 127 : Non D‚finit ///
+
+UnDefAES127
+	RTS
+
+; /// AES 128 : Non D‚finit ///
+
+UnDefAES128
+	RTS
+
+; /// AES 129 : Non D‚finit ///
+
+UnDefAES129
+	RTS
+
+; /// AES 130 : APPL_GETINFO ///
+
+Appl_GetInfo	move.w	(12,SP),([8,A1])	; Type dans Int_In0
+
+	JSR	AES_Call
+
+	move.l	(12,A1),D0	; R‚sultat
+
+	RTS
+
+; /// L'appel … l'AES
+
+AES_Call	move.w	#200,D0	; AES
+	move.l	(12,SP),D1	; AES_PARAMS
+	trap	#2	; *** AES/VDI ***
+
+	RTS
+
+

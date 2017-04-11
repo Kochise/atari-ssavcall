@@ -1,0 +1,1759 @@
+; /// SSAVCALL Project - SYS Control - KOSS 1998 ///
+; C'est BIEN PARTI...
+	
+	move.w	(6,SP),D0
+	cmpi.w	#29,D0
+	BGT	SYS_ERROR	; Au dessus de SYS  89, y'a rien
+
+	lea	SYS_JUMP,A2	; Le fun...
+	
+	JMP	([A2,D0.w*4])	; On saute
+	
+SYS_ERROR	RTS
+	
+SYS_JUMP	dc.l	Prog_Init	; SYS   0
+	dc.l	Prog_Terminate	; SYS   1
+	dc.l	Prog_Booter	; SYS   2
+	dc.l	Prog_Accessory	; SYS   3
+	dc.l	UnDefSYS4
+	dc.l	UnDefSYS5
+	dc.l	UnDefSYS6
+	dc.l	UnDefSYS7
+	dc.l	UnDefSYS8
+	dc.l	UnDefSYS9
+	dc.l	Cook_Null	; SYS  10
+	dc.l	Cook_JarCheck	; SYS  11
+	dc.l	Cook_Find	; SYS  12
+	dc.l	Cook_Add	; SYS  13
+	dc.l	Cook_Change	; SYS  14
+	dc.l	UnDefSYS17
+	dc.l	UnDefSYS16
+	dc.l	UnDefSYS17
+	dc.l	UnDefSYS18
+	dc.l	UnDefSYS19
+	dc.l	Xbra_Add	; SYS  20
+	dc.l	Xbra_Change	; SYS  21
+	dc.l	Xbra_Find	; SYS  22
+	dc.l	Xbra_Scan	; SYS  23
+	dc.l	UnDefSYS24
+	dc.l	UnDefSYS25
+	dc.l	UnDefSYS26
+	dc.l	UnDefSYS27
+	dc.l	UnDefSYS28
+	dc.l	UnDefSYS29
+	dc.l	Memo_Alloc	; SYS  30
+	dc.l	UnDefSYS31
+	dc.l	UnDefSYS32
+	dc.l	UnDefSYS33
+	dc.l	UnDefSYS34
+	dc.l	UnDefSYS35
+	dc.l	UnDefSYS36
+	dc.l	UnDefSYS37
+	dc.l	UnDefSYS38
+	dc.l	UnDefSYS39
+	dc.l	File_Load	; SYS  40
+	dc.l	UnDefSYS41
+	dc.l	UnDefSYS42
+	dc.l	UnDefSYS43
+	dc.l	UnDefSYS44
+	dc.l	UnDefSYS45
+	dc.l	UnDefSYS46
+	dc.l	UnDefSYS47
+	dc.l	UnDefSYS48
+	dc.l	UnDefSYS49
+	dc.l	Math_Convert	; SYS  50
+	dc.l	Math_Evaluate	; SYS  51
+	dc.l	UnDefSYS52
+	dc.l	UnDefSYS53
+	dc.l	UnDefSYS54
+	dc.l	UnDefSYS55
+	dc.l	UnDefSYS56
+	dc.l	UnDefSYS57
+	dc.l	UnDefSYS58
+	dc.l	UnDefSYS59
+	dc.l	Conf_Init	; SYS  60
+	dc.l	UnDefSYS61
+	dc.l	UnDefSYS62
+	dc.l	UnDefSYS63
+	dc.l	UnDefSYS64
+	dc.l	UnDefSYS65
+	dc.l	UnDefSYS66
+	dc.l	UnDefSYS67
+	dc.l	UnDefSYS68
+	dc.l	UnDefSYS69
+	dc.l	Plug_Init	; SYS  70
+	dc.l	UnDefSYS71
+	dc.l	UnDefSYS72
+	dc.l	UnDefSYS73
+	dc.l	UnDefSYS74
+	dc.l	UnDefSYS75
+	dc.l	UnDefSYS76
+	dc.l	UnDefSYS77
+	dc.l	UnDefSYS78
+	dc.l	UnDefSYS79
+	dc.l	Tube_Init	; SYS  80
+	dc.l	UnDefSYS81
+	dc.l	UnDefSYS82
+	dc.l	UnDefSYS83
+	dc.l	UnDefSYS84
+	dc.l	UnDefSYS85
+	dc.l	UnDefSYS86
+	dc.l	UnDefSYS87
+	dc.l	UnDefSYS88
+	dc.l	UnDefSYS89
+
+; ----------------------------
+; --- LIBRAIRIE PROGRAMMES ---
+; ----------------------------
+
+; /// SYS   0 : PROG_INIT ///
+; WORD : Lenght in LongWord of the NewStackFrame
+; WORD : Mode
+;        BIT 0 : MEMORY_SHINKER
+;                0 = SHRINK MEMORY
+;                1 = Doesn't SHRINK MEMORY, but also calculate MEMORY USAGE
+; LONG : START_Tab
+; LONG : AES_Params
+; LONG : GEM_Mode routine
+;        -1 if should display a "Only BOOT program" under DeskTop
+; LONG : ACC_Mode
+;        -1 if should display a "Only BOOT program" under Desktop
+; LONG : BOOT_Mode routine
+;        -1 if should be bypassed during BOOT session
+;        WARNING : In this case, the PROG_INIT function is really exited
+;                  You have to do something if ever it happen
+; WORD : - PROG_INIT - (0)
+; WORD : *** SYS *** (0)
+;
+; START_Tab structure : 0 WORD : AP_ID
+;                               -1 if BOOT_Mode, else the AP_ID given by AES if GEM_Mode
+;                       2 LONG : Size of the program in memory
+;                               WARNING : Ready to be used with P_TERMRES
+;                                BasePage  
+;                               +SECTION TEXT
+;                               +SECTION DATA (if any)
+;                               +SECTION BSS  (if any)
+;                               +NewStackFrame
+;                       6 LONG : End of program AREA (include the NewStackFrame)
+;                       8 LONG : Address of the Memory_DynamicDescriptor
+;
+; Used Registers : D0-2/A0/A6
+
+Prog_Init	; 36 LONG : BasePage Address
+	; 32 LONG : 0
+	; 30 WORD : Lenght
+	; 28 WORD : Mode
+	; 24 LONG : START_Tab
+	; 20 LONG : AES_Params
+	; 16 LONG : GEM_Mode
+	; 12 LONG : ACC_Mode
+	;  8 LONG : BOOT_Mode
+	;  6 LONG : - PROG_INIT - (0)
+	;  4 LONG : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_INIT -)
+
+	; ATTENTION : NE JAMAIS FAIRE DE - M_SHRINK - POUR
+	;             UN ACCESSOIRE
+	
+	bclr.b	#1,(29,SP)	; NoACC
+	
+	; Une Application utilise SSAVCALL
+	
+	addq.w	#1,SSAV_Info+4
+	
+	move.l	A0,D0	; A0<>0, ACC
+	BEQ	Prog0_NoAcc
+
+	move.l	A0,(36,SP)	; ACC's BasePage
+	bset.b	#0,(29,SP)	; DON'T SAVE MEMORY
+	bset.b	#1,(29,SP)	; ACC
+
+Prog0_NoAcc	; APPL_INIT, juste pour voir si l'AES est install‚	
+	
+	move.l	(20,SP),-(SP)	; AES_Params
+	move.w	#10,-(SP)	; - APPL_INIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+	
+	move.w	D0,([24,SP])	; AP_ID
+	
+	; On v‚rifie si l'on est sous le Bureau : AES<>0
+	; ou en phase de Boot                   : AES==0
+	
+	move.l	([20,SP],4),A0	; Global	
+	move.w	(A0),D0	; L'AES est-il install‚?
+	BNE	Prog0_GEM_Mode	; Si OK, on est sous GEM
+
+	cmpi.l	#-1,(8,SP)
+	BNE	Prog0_BOOT_Jump
+	
+	RTS		; Arg...
+	
+Prog0_BOOT_Jump	BSR	Prog0_MemoShrinker
+
+	move.w	#-1,([24,SP])	; -1 : BOOT
+	
+	lea	(32,SP),SP
+	
+	JMP	([-24,SP])	; BOOT_Mode
+
+Prog0_GEM_Mode	; GRAF_MOUSE, pour rendre l'aspect normal … la souris
+
+	clr.w	-(SP)
+	clr.l	-(SP)
+	move.l	(26,SP),-(SP)	; AES_Params
+	move.w	#78,-(SP)	; - GRAF_MOUSE -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+
+	BSR	Prog0_MemoShrinker
+	
+	btst.b	#1,(29,SP)	; Mode
+	BNE	Prog0_ACC_Mode
+
+	cmpi.l	#-1,(16,SP)
+	BEQ	Prog0_BootInterface
+	
+	lea	(32,SP),SP
+
+	JMP	([-16,SP])	; GEM_Mode
+
+Prog0_ACC_Mode	cmpi.l	#-1,(12,SP)
+	BEQ	Prog0_BootInterface
+	
+	lea	(32,SP),SP
+
+	JMP	([-20,SP])	; ACC_Mode
+
+Prog0_MemoShrinker	; 40 LONG : BasePage Address
+	; 36 LONG : 0
+	; 34 WORD : Lenght
+	; 32 WORD : Mode
+	; 28 LONG : START_Tab
+	; 24 LONG : AES_Params
+	; 20 LONG : GEM_Mode
+	; 16 LONG : ACC_Mode
+	; 12 LONG : BOOT_Mode
+	; 10 WORD : - PROG_INIT - (0)
+	;  8 WORD : *** SYS *** (0)
+	;  4 LONG : RTS (- PROG_INIT -)
+	;  0 LONG : (RTS)
+
+	movea.l	(40,SP),A6	; Adresse de la BASEPAGE
+	move.l	($C,A6),D0	; Taille du SEGMENT TEXT
+	add.l	($14,A6),D0	; Additionne la taille du SEGMENT DATA … D0
+	add.l	($1C,A6),D0	; Additionne la taille du SEGMENT BSS … D0
+	addi.l	#$100,D0	; Additionne la taille de la BASEPAGE … D0
+	
+	btst.b	#1,(33,SP)	; Mode
+	BNE	Prog0_MemoSize	; Si Acc, pas de StackFrame
+	
+	clr.l	D1	; Sinon BOUM...
+	move.w	(34,SP),D1	; Taille de la NewStackFrame en LongWord
+	mulu.l	#4,D1	; Taille en octets
+	add.l	D1,D0	; Additionne la taille de la future PILE
+	
+Prog0_MemoSize	move.l	D0,([28,SP],2)	; Taille … r‚server
+	move.l	D0,D1
+	
+	add.l	A6,D1	; Additionne l'adresse du d‚but du programme avec D1 (La taille … r‚server)
+	andi.l	#-2,D1	; Rend D1 pair (Au cas o— il ne l'‚tait pas)
+	move.l	D1,([28,SP],6)	; Fin du programme
+
+	btst.b	#1,(33,SP)	; Mode
+	BNE	Prog0_SkipShrink
+
+	subq.l	#8,D1	; Garde de la place pour l'adresse de la BASEPAGE
+	move.l	(40,SP),D2	; Sauvegarde l'adresse de la BASEPAGE
+	lea	(36,SP),A5	; Pour recopier les infos
+	movea.l	D1,SP	; Installe l'adresse de fin du programme+place nouvelle PILE dans la PILE
+	move.l	D2,(4,SP)	; R‚installe l'adresse de la BASEPAGE
+
+	moveq.w	#8,D2
+	
+Prog0_CopyStackFrame	move.l	-(A5),-(SP)	; 34 WORD : Lenght
+			; 32 WORD : Mode
+			; 28 LONG : START_Tab
+			; 24 LONG : AES_Params
+			; 20 LONG : GEM_Mode
+			; 16 LONG : ACC_Mode
+			; 12 LONG : BOOT_Mode
+			; 10 WORD : - PROG_INIT -
+			;  8 WORD : *** SYS ***
+			;  4 LONG : (RTS)
+			;  0 LONG : (RTS)
+	DBF	D2,Prog0_CopyStackFrame
+	
+	movea.l	([40,SP],16),A5	; DATA Pointer	
+
+	move.l	D0,-(SP)	; EmPILE la taille … r‚server
+	move.l	A6,-(SP)	; EmPILE l'adresse du programme
+	clr.w	-(SP)	; R‚serv‚
+	move.w	#$4A,-(SP)	; - M_SHRINK -
+	trap	#1	; *** GEMDOS ***
+	lea	(12,SP),SP
+
+Prog0_SkipShrink	RTS
+
+Prog0_BootInterface	; 20 LONG : AES_Params
+
+	tst.w	Prog0_ARReloc
+	BNE	Prog0_RelocNext
+
+	; RSRC_OBFIX, on reloge la ressource,
+	; et on corrige les infos
+	
+	move.w	#6,D7	; 7 objets
+	clr.w	D6
+	
+Prog0_RelocRSC	move.l	Prog0_RS_TrIndex,-(SP)
+	move.w	D6,-(SP)
+	move.l	(26,SP),-(SP)	; AES_Params
+	move.w	#114,-(SP)	; - RSRC_OBFIX -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+	
+	addq.w	#1,D6
+	DBF	D7,Prog0_RelocRSC
+	
+	move.w	#-1,Prog0_ARReloc
+	
+	; FORM_CENTER, pour centrer
+	
+Prog0_RelocNext	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	move.l	(24,SP),-(SP)	; AES_Params
+	move.w	#54,-(SP)	; - FORM_CENTER -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(12,SP),SP
+	
+	movea.l	D0,A0
+	move.w	(A0),-(SP)
+	move.w	(2,A0),-(SP)
+	move.w	(4,A0),-(SP)
+	move.w	(6,A0),-(SP)
+	
+	; FORM_DIAL, pour r‚server
+	; On touche pas aux valeurs renvoy‚es par FORM_CENTER
+	
+	clr.w	-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(6,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	move.l	(4,SP),-(SP)
+	move.l	(46,SP),-(SP)	; AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV	
+	lea	(26,SP),SP
+
+	; OBJC_DRAW, pour tracer
+	
+	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	clr.w	-(SP)
+	move.w	#4,-(SP)
+	move.l	(12,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(12,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(44,SP),-(SP)	; AES_Params
+	move.w	#42,-(SP)	; - OBJC_DRAW -
+	move.w	#200,-(SP)	; *** AES ***	
+	JSR	Start_SSAV
+	lea	(24,SP),SP
+	
+	; FORM_DO, pour gerer
+	
+	move.l	Prog0_RS_TrIndex,-(SP)	; L'adresse de l'arbre
+	move.w	#-1,-(SP)	; Pas de champs ‚ditables
+	move.l	(34,SP),-(SP)	; AES_Params
+	move.w	#50,-(SP)	; - FORM_DO -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(14,SP),SP
+	
+	; On s'en fiche du num‚ro du bouton...
+	
+	; FORM_DIAL, pour effacer
+	
+	move.w	#3,-(SP)
+	move.l	(6,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(6,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les coordonn‚es de FORM_CENTER
+	move.l	(4,SP),-(SP)	; Les dimensions de FORM_CENTER
+	move.l	(46,SP),-(SP)	; AES_Params
+	move.w	#51,-(SP)	; - FORM_DIAL -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	lea	(26,SP),SP
+
+	addq.l	#8,SP	; On restaure vu que l'on … plus besoin des valeurs
+
+	; APPL_EXIT
+
+	move.l	(20,SP),-(SP)	; AES_Params
+	move.w	#19,-(SP)	; - APPL_EXIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+
+	; P_TERM0
+
+	clr.w	-(SP)
+	trap	#1
+
+	include	LIBRARY\BOOTONLY.RSM
+	
+Prog0_ARReloc	ds.w	1
+	
+	EVEN		; Au cas o—...
+
+; /// SYS   1 : PROG_TERMINATE ///
+; WORD : Mode
+;        BIT 0 : MEMORY_SAVER
+;                0 = Save memory
+;                1 = DON'T save memory
+; LONG : START_Tab
+; LONG : AES_Params
+; LONG : TKR_Buffer
+; WORD : - PROG_TERMINATE - (1)
+; WORD : *** SYS *** (0)
+;
+; Used Registers : N/A 
+
+Prog_Terminate	; 20 WORD : Mode
+	; 16 LONG : START_Tab
+	; 12 LONG : AES_Params
+	;  8 LONG : TKR_Buffer
+	;  6 WORD : - PROG_TERMINATE - (1)
+	;  4 WORD : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_TERMINATE -)
+	
+	; Une Application va se passer des services de SSAVCALL
+	
+	subq.w	#1,SSAV_Info+4
+
+	; Si BOOT_Mode, on ‚crit la ligne TKR
+
+	move.w	([16,SP]),D0
+	cmpi.w	#-1,D0	; BOOT_Mode
+	BEQ	Prog1_BootExit
+	
+	move.l	(12,SP),-(SP)	; AES_Params
+	move.w	#19,-(SP)	; - APPL_EXIT -
+	move.w	#200,-(SP)	; *** AES ***
+	JSR	Start_SSAV
+	addq.l	#8,SP
+
+	btst.b	#0,(21,SP)	; Mode
+	BNE	Prog1_NoSave
+	
+	BRA	Prog1_Save
+	
+Prog1_BootExit	lea	Prog1_KeepTxt,A0
+	move.l	(8,SP),A1
+	
+	BSR	Prog1_TKRCopy	; On copie un d‚but
+
+	move.l	([16,SP],2),D1	; La m‚moire … garder
+	BNE	Prog1_TKRMemory	; Y'a
+	
+	move.b	#"0",(A1)+	; 0
+	
+	lea	Prog1_ByteTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+	
+	lea	Prog1_MemoTxt,A0
+	
+	BSR	Prog1_TKRCopy	; Idem
+	
+	BRA	Prog1_TKRPrint
+	
+Prog1_TKRMemory	move.l	(8,SP),A0	
+	adda.l	#50,A0	; End of NumBuffer
+	
+Prog1_TKRDecDigit	clr.l	D0	; On efface pour ne pas influencer
+			; le calcul suivant
+	divu.l	#10,D0:D1	; En D0, le Reste (unit‚)
+			; En D1, le Quotient
+	
+	cmpi.l	#10,D1	; On arrive … la fin?
+	BLT	Prog1_TKRLastDigit
+	
+	move.b	D0,-(A0)	; On place le Reste
+	
+	BRA	Prog1_TKRDecDigit
+	
+Prog1_TKRLastDigit	move.b	D0,-(A0)	; On place la derniŠre unit‚e
+	move.b	D1,-(A0)	; On place la derniŠre dizaine en d‚but
+
+	move.w	#9,D0	; Nombre maximum de chiffres
+			; significatifs … corriger
+	
+	move.l	(8,SP),A0	
+	adda.l	#40,A0	; NumBuffer
+	
+Prog1_TKRASCII	add.b	#$30,(A0)+	; On corrige la taille
+	DBF	D0,Prog1_TKRASCII
+	
+	move.w	#9,D1	; Idem … propos des chiffres
+	lea	(-10,A0),A0
+	
+Prog1_TKRStartNum	move.b	(A0)+,D0
+	cmpi.b	#"0",D0
+	BNE	Prog1_TKRLockNum	; On a trouv‚ le d‚but du nombre,
+			; en se passant des "0" du d‚but
+	
+	DBF	D1,Prog1_TKRStartNum
+	
+Prog1_TKRLockNum	subq.l	#1,A0	; On se place juste avant
+
+Prog1_TKRCopyNum	move.b	(A0)+,(A1)+
+	DBF	D1,Prog1_TKRCopyNum	; On utilise le reste du DBF pr‚c‚dent
+	
+	lea	Prog1_ByteTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+	
+	move.b	#"s",(A1)+	; On conjugue
+	
+	lea	Prog1_MemoTxt,A0
+	
+	BSR	Prog1_TKRCopy	; On complete
+
+Prog1_TKRPrint	move.l	(8,SP),-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+	
+Prog1_Save	move.l	([16,SP],2),D0
+	BEQ	Prog1_NoSave
+	
+	clr.w	-(SP)
+	move.l	D0,-(SP)
+	move.w	#$31,-(SP)	; - P_TERMRES -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#8,SP	
+		
+Prog1_NoSave	move.w	D0,-(SP)
+	move.w	#$4C,-(SP)	; - P_TERM -
+	trap	#1	; *** GEMDOS ***	
+	
+Prog1_TKRCopy	move.b	(A0)+,(A1)+
+	BNE	Prog1_TKRCopy
+	
+	subq.l	#1,A1
+
+	RTS
+
+Prog1_KeepTxt	dc.b	"TKR: Keep ",0
+Prog1_ByteTxt	dc.b	" byte",0
+Prog1_MemoTxt	dc.b	" in memory.",13,10,0
+
+	EVEN	
+	
+; /// SYS   2 : PROG_BOOTER ///
+; WORD : Mode
+;        BIT 0 : MEMORY_SAVER
+;                0 = Save memory
+;                1 = DON'T save memory
+; LONG : START_Tab
+; LONG : TITLE_String
+; LONG : TKR_Buffer
+; LONG : PROG_Info
+; LONG : BOOT_Rout
+; WORD : - PROG_BOOTER - (2)
+; WORD : *** SYS *** (0)
+;
+; Used Registers : D0-5/A0
+
+Prog_Booter	; 28 WORD : Mode
+	; 24 LONG : START_Tab
+	; 20 LONG : TITLE_String
+	; 16 LONG : TKR_Buffer
+	; 12 LONG : PROG_Info
+	;  8 LONG : BOOT_Rout
+	;  6 WORD : - PROG_BOOTER - (2)
+	;  4 WORD : *** SYS *** (0)
+	;  0 LONG : RTS (- PROG_BOOTER -) 
+
+	move.w	([12,SP]),D0
+	
+	unpk	D0,D1,#$3030	; Version ".xx"
+	ror.w	#8,D0
+	unpk	D0,D2,#$3030	; Version "xx."
+	
+	cmpi.w	#$3039,D2	; Version "0x."
+	BGT	Prog2_Version	; Sup‚rieur … "09."
+	
+	andi.w	#255,D2	; On transforme "0x." en
+	ori.w	#$2000,D2	; " x."
+	
+Prog2_Version	movea.l	(20,SP),A0	; On s‚lectionne le Titre
+		
+	BSR	Prog2_FindVD
+		
+	move.w	D2,(A0,D3.w)	; On place "xx."
+	move.w	D1,(3,A0,D3.w)	; et ".xx"
+	
+	swap	D3
+	
+	move.w	([12,SP],2),D0	; On charge la date
+	
+	move.w	D0,D1	; Correct_Day
+	andi.w	#%11111,D1
+	
+	BSR	Prog2_Date
+
+	move.w	D2,(A0,D3.w)	; On place le Jour
+	
+	move.w	D0,D1	; Correct_Month
+	andi.w	#%111100000,D1
+	lsr.w	#5,D1
+	
+	BSR	Prog2_Date
+	
+	move.w	D2,(3,A0,D3.w)	; On place le Mois
+	
+	move.w	D0,D1	; Correct_Year
+	andi.w	#%1111111000000000,D1
+	rol.w	#7,D1	; On pousse sur la gauche ;-)
+	addi.w	#80,D1	; Correction … partir de 1980
+	
+	BSR	Prog2_Date
+	
+	move.w	D2,(6,A0,D3.w)	; On place l'Ann‚e
+	
+	pea	Prog2_BeforeTitle
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+	
+	move.l	(20,SP),-(SP)
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	pea	Prog2_AfterTitle
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	move.w	#-1,-(SP)
+	move.w	#11,-(SP)	; - KBSHIFT -
+	trap	#13	; *** BIOS ***
+	addq.l	#4,SP
+	
+	btst.l	#1,D0
+	BEQ	Prog2_BootRout
+	
+	clr.l	([24,SP],2)	; No Saving Memory
+
+	pea	Prog2_NoInstTxt
+	move.w	#9,-(SP)	; - C_CONWS -
+	trap	#1	; *** GEMDOS ***
+	addq.l	#6,SP
+
+	BRA	Prog2_Terminate
+
+Prog2_BootRout	JSR	([8,SP])	; BOOT_Rout
+
+Prog2_Terminate	clr.l	(20,SP)	; No AES_Params
+	move.w	#1,(14,SP)	; - PROG_TERMINATE -
+	clr.w	(12,SP)	; *** SYS ***
+	move.l	(SP),(8,SP)	; (RTS)
+	
+	addq.l	#8,SP	; Simulate JSR Process
+
+	BRA	Prog_Terminate
+
+Prog2_Date	move.w	D1,D4
+	divu.w	#10,D4	; Dizaine de la date
+	move.w	D4,D2
+	
+Prog2_U100	cmpi.w	#10,D2	; Sup‚rieur … cent (10*10)
+	BLT	Prog2_D100	; En de‡a, Let's Go...
+	
+	subi.w	#10,D2	; On retranche cent
+	
+	BRA	Prog2_U100	; On v‚rifie
+	
+Prog2_D100	lsl.w	#8,D2	; On place les dizaines en BCD
+	mulu.w	#10,D4	; On obtient les dizaines
+			; (les unit‚es en reste ne sont pas utilis‚es)
+	sub.w	D4,D1	; Unit‚
+	or.w	D1,D2	; On place les unit‚es en BCD
+	add.w	#$3030,D2	; Correction ASCII … la main
+	
+	RTS
+	
+Prog2_FindVD	clr.l	D3
+
+	move.w	#"*$",D4
+	
+	moveq.w	#1,D5
+
+Prog2_VDLoop	move.b	(A0,D3.w),D0
+	
+	cmp.b	D4,D0
+	BEQ	Prog2_VDEnd
+	
+	addq.w	#1,D3
+	BRA	Prog2_VDLoop
+	
+Prog2_VDEnd	swap	D3
+	ror.w	#8,D4
+	
+	DBF	D5,Prog2_VDLoop
+
+	RTS
+
+Prog2_BeforeTitle	dc.b	13,10,27,"p",0
+Prog2_AfterTitle	dc.b	27,"q",13,10,0
+Prog2_NoInstTxt	dc.b	"  Not Installed...",13,10,0
+
+	EVEN
+	
+; /// SYS   3 : PROG_ACCESSORY ///
+;
+; Used Registers : 
+
+Prog_Accessory
+
+	RTS
+
+; /// SYS   4 : Non D‚finit ///
+
+UnDefSYS4
+
+	RTS
+
+; /// SYS   5 : Non D‚finit ///
+
+UnDefSYS5
+
+	RTS
+
+; /// SYS   6 : Non D‚finit ///
+
+UnDefSYS6
+
+	RTS
+
+; /// SYS   7 : Non D‚finit ///
+
+UnDefSYS7
+
+	RTS
+
+; /// SYS   8 : Non D‚finit ///
+
+UnDefSYS8
+
+	RTS
+
+; /// SYS   9 : Non D‚finit ///
+
+UnDefSYS9
+
+	RTS
+
+; -------------------------
+; --- LIBRAIRIE COOKIES ---
+; -------------------------
+
+; /// SYS  10 : COOK_NULL ///
+; Return : D0.w = Result of "NULL" installation
+;                 0 : OK, "NULL" Cookie installed in first position
+;                -1 : No more place
+;                -2 : No Jar Found
+;
+; Used Registers : D0-2/A0
+
+Cook_Null	pea	Cook10_NullInst
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Cook10_NullInst	; 14 WORD : - COOK_NULL - (10)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- COOK_NULL -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook10_NoJar	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BEQ	Cook10_NullDone	; "NULL" est l…, en premiŠre position
+
+	clr.l	D1
+
+Cook10_NullLookFor	move.l	(A0,D1*8),D0	; D3.l car travail avec la taille de la Jar,
+			; donc j'‚vite des CLR inutile
+	BEQ	Cook10_NullMatch	; "" (NULL) trouv‚
+	
+	addq.l	#1,D1	; Le compteur de Cookies
+	BRA	Cook10_NullLookFor
+	
+Cook10_NullMatch	move.l	(4,A0,D1*8),D0	; Le nombre de Cookies
+	
+	move.l	D1,D2	; On modifie le nombre de Cookies
+	addq.l	#1,D2
+		
+	cmp.l	D0,D2	; On v‚rifie si on peut encore
+			; ajouter "NULL" et "SSAV"
+	BGT	Cook10_NoMorePlace	; Plus de place, donc erreur
+	
+	clr.l	(8,A0,D1*8)	; On reporte le Cookie "" (NULL)
+	move.l	D0,(12,A0,D1*8)
+
+Cook10_NullMove	move.l	(-8,A0,D1*8),(A0,D1*8)
+	move.l	(-4,A0,D1*8),(4,A0,D1*8)
+	
+	subq.l	#1,D1
+	BPL	Cook10_NullMove
+	
+	move.l	#"NULL",(A0)	; On place le Cookie "NULL" en d‚but de Jar
+	move.l	D0,(4,A0)
+
+Cook10_NullDone	clr.w	D0	; C'est bon
+	RTS
+	
+Cook10_NoMorePlace	move.w	#-1,D0
+	RTS
+	
+Cook10_NoJar	move.w	#-2,D0
+	RTS
+		
+; /// SYS  11 : COOK_JARCHECK ///
+; Return : D0.l = 0 if "NULL" Cookie not installed
+;                -1 if No Jar Found
+;                 else [Size.w][Free.w]
+;
+; Used Registers : D0-2/A0
+
+Cook_JarCheck	pea	Cook11_Checker
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+	
+Cook11_Checker	; 14 WORD : - COOK_JARCHECK - (11)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- COOK_JARCHECK -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook11_NoJar	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook11_NoNull	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+	
+Cook11_LastLookFor	move.l	(A0,D2*8),D0
+	BEQ	Cook11_LastFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook11_LastLookFor
+	
+	BRA	Cook11_NoJar
+	
+Cook11_LastFound	addq.l	#1,D1	; Free
+	
+	move.l	(4,A0),D0	; Size
+	swap	D0
+	move.w	D1,D0	; Free
+
+	RTS
+
+Cook11_NoNull	clr.l	D0
+	RTS
+	
+Cook11_NoJar	move.l	#-1,D0
+	RTS
+
+; /// SYS  12 : COOK_FIND ///
+; LONG : CookieName
+; Return : D0.l = Result of CookieLookup
+;                -1 : Not Found, No Jar or "NULL" Cookie not installed
+;                else the CookieParam
+;
+; Used Registers : D0-2/A0
+
+Cook_Find	pea	Cook12_Finder
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+	
+Cook12_Finder	; 16 LONG : CookieName
+	; 14 WORD : - COOK_FIND - (12)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- COOK_FIND -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook12_Error	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook12_Error	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	
+	move.l	(16,SP),D0	; CookieName
+	clr.l	D2
+	
+Cook12_CookieLookFor	cmp.l	(A0,D2*8),D0
+	BEQ	Cook12_CookieFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook12_CookieLookFor
+	
+Cook12_Error	move.l	#-1,D0
+	RTS
+
+Cook12_CookieFound	move.l	(4,A0,D2*8),D0
+	RTS
+
+; /// SYS  13 : COOK_ADD ///
+; LONG : CookieName
+; LONG : CookieParam
+; Return : D0.w = Result of Cookie Installation
+;                 0 : Well Done
+;                -1 : No more place, or "NULL" Cookie not installed
+;                -2 : Already Done
+;
+; Used Registers : D0-2/A0
+
+Cook_Add	pea	Cook13_Adder
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+	
+Cook13_Adder	; 20 LONG : CookieName
+	; 16 LONG : CookieParam
+	; 14 WORD : - COOK_ADD - (13)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- COOK_ADD -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+	
+	JSR	Cook11_Checker	; - COOK_JARCHECK -
+	
+	tst.l	D0	; No "NULL"
+	BEQ	Cook13_NoMorePlace
+	
+	cmpi.l	#-1,D0	; No Jar
+	BEQ	Cook13_NoMorePlace
+	
+	tst.w	D0	; Any Free
+	BEQ	Cook13_NoMorePlace
+	
+	move.l	(20,SP),-(SP)	; CookieName
+	clr.l	-(SP)	; Tempo
+	clr.l	-(SP)	; Tempo
+	clr.l	-(SP)	; Tempo
+	JSR	Cook12_Finder	; - COOK_FIND -
+	lea	(16,SP),SP
+	
+	cmpi.l	#-1,D0	; Not Found, No Jar, nor "NULL"
+	BNE	Cook13_AlreadyDone
+	
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook12_Error	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BNE	Cook13_NoMorePlace	; "NULL" n'est pas l…
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+
+Cook13_LastLookFor	move.l	(A0,D2*8),D0
+	BEQ	Cook13_LastFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook13_LastLookFor
+	
+	BRA	Cook13_NoMorePlace
+	
+Cook13_LastFound	clr.l	(8,A0,D2*8)	; "" (Null)
+	move.l	(4,A0),(12,A0,D2*8)	; JarSize
+	move.l	(20,SP),(A0,D2*8)	; CookieName
+	move.l	(16,SP),(4,A0,D2*8)	; CookieParam
+	
+	clr.w	D0
+	RTS
+
+Cook13_NoMorePlace	move.w	#-1,D0
+	RTS
+	
+Cook13_AlreadyDone	move.w	#-2,D0
+	RTS
+
+; /// SYS  14 : COOK_CHANGE ///
+; LONG : CookieName
+; LONG : NewCookieParam
+; Return : D0.w = Result of CookieParamChange
+;                 0 : Well Done
+;                -1 : Not Found
+;
+; Used Registers : D0-2/A0
+
+Cook_Change	pea	Cook14_Changer
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Cook14_Changer	; 20 LONG : CookieName
+	; 16 LONG : NewCookieParam
+	; 14 WORD : - COOK_CHANGE - (14)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- COOK_CHANGE -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	Cook14_NotFound	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+
+	move.l	(4,A0),D1
+	subq.l	#1,D1
+	clr.l	D2
+	
+	move.l	(20,SP),D0	; CookieName
+	
+Cook14_CookieLookFor	cmp.l	(A0,D2*8),D0
+	BEQ	Cook14_CookieFound
+	
+	addq.l	#1,D2
+	subq.l	#1,D1
+	BPL	Cook14_CookieLookFor
+	
+Cook14_NotFound	move.w	#-1,D0
+	RTS
+	
+Cook14_CookieFound	move.l	(16,SP),(4,A0,D2*8)	; CookieParam
+
+	clr.w	D0
+	RTS
+
+; /// SYS  15 : Non D‚finit ///
+
+UnDefSYS15
+
+	RTS
+
+; /// SYS  16 : Non D‚finit ///
+
+UnDefSYS16
+
+	RTS
+
+; /// SYS  17 : Non D‚finit ///
+
+UnDefSYS17
+
+	RTS
+
+; /// SYS  18 : Non D‚finit ///
+
+UnDefSYS18
+
+	RTS
+
+; /// SYS  19 : Non D‚finit ///
+
+UnDefSYS19
+
+	RTS
+
+; ----------------------
+; --- LIBRAIRIE XBRA ---
+; ----------------------
+
+; /// SYS  20 : XBRA_ADD ///
+; LONG : Start_Addr
+; LONG : NewXBRA_Address
+; Return : D0.w = Result of XBRAInstallation
+;                 0 : Well Done
+;                -1 : Error Occured
+;                -2 : Already Done
+;
+; Used Registers : D0/A0
+
+Xbra_Add	pea	Xbra20_Adder
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Xbra20_Adder	; 20 LONG : Start_Addr
+	; 16 LONG : NewXBRA_Address
+	; 14 WORD : - XBRA_ADD - (20)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- XBRA_ADD -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	([20,SP]),-(SP)	; Start_Addr
+	
+	cmpi.l	#"XBRA",([20,SP],-12)	; NewShort
+	BEQ	Xbra20_NewShort
+	
+	cmpi.l	#"XBRA",([20,SP],-16)	; NewLong
+	BNE	Xbra20_Error
+	
+	move.l	([20,SP],-12),-(SP)	; NewXBRA_Name (Long)
+	
+	BRA	Xbra20_LookUp
+	
+Xbra20_NewShort	move.l	([20,SP],-8),-(SP)	; NewXBRA_Name (Short)
+
+Xbra20_LookUp	clr.l	-(SP)	; Tempo (SYS+Nb)
+	clr.l	-(SP)	; Tempo (RTS Nb)
+	clr.l	-(SP)	; Tempo (RTS)
+	JSR	Xbra22_Finder
+	lea	(20,SP),SP
+	
+	BNE	Xbra20_Already	; D0<>0, XBRA existe
+	
+	move.l	([20,SP]),([16,SP],-4)	; OldXBRA_Address
+	
+	move.l	(16,SP),([20,SP])	; NewXBRA_Address	
+	; C'‚tait juste ‡a!
+	
+	clr.w	D0
+	
+	RTS
+	
+Xbra20_Error	move.w	#-1,D0
+	RTS
+
+Xbra20_Already	move.w	#-2,D0
+	RTS
+
+; /// SYS  21 : XBRA_CHANGE ///
+; LONG : OldXBRA_Entry Pointer
+; LONG : NewXBRA_Entry Pointer
+; Return : D0.w = Result of XBRAChange
+;                 0 : Well Done
+;                -1 : Error Occured
+;
+; Used Registers : D0/A0
+
+Xbra_Change	pea	Xbra21_Changer
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Xbra21_Changer	; 20 LONG : OldXBRA_Entry
+	; 16 LONG : NewXBRA_Entry
+	; 14 WORD : - XBRA_CHANGE - (21)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- XBRA_CHANGE -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+	
+	move.l	(20,SP),A0	; OldXBRA_Entry
+	
+	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra21_Check1
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra21_Check1
+	
+	move.w	#-1,D0
+
+	RTS
+	
+Xbra21_Check1	move.l	([20,SP],-4),A0	; Previous XBRA
+
+	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra21_Check2
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra21_Check2
+
+	move.l	(16,SP),(A0)
+	
+	BRA	Xbra21_OK
+	
+Xbra21_Check2	move.l	(16,SP),(-4,A0)
+
+Xbra21_OK	clr.w	D0
+
+	RTS
+
+; /// SYS  22 : XBRA_FIND ///
+; LONG : Start_Addr
+; LONG : XBRA_Name
+; Return : D0.l = 0 if Error
+;                 else Addr of the XBRA_Entry
+;
+; Used Registers : D0/A0
+
+Xbra_Find	pea	Xbra22_Finder
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Xbra22_Finder	; 20 LONG : Start_Addr
+	; 16 LONG : XBRA_Name
+	; 14 WORD : - XBRA_FIND - (22)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- XBRA_FIND -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	(20,SP),A0	; Start_Addr
+	
+Xbra22_Loop	cmpi.l	#"XBRA",(-12,A0)
+	BEQ	Xbra22_CheckShort
+	
+	cmpi.l	#"XBRA",(-16,A0)
+	BEQ	Xbra22_CheckLong
+	
+	clr.l	D0
+
+	RTS
+	
+Xbra22_CheckShort	move.l	(-8,A0),D0
+	cmp.l	(16,SP),D0
+	BEQ	Xbra22_OK
+
+	BRA	Xbra22_Next
+
+Xbra22_CheckLong	move.l	(-12,A0),D0
+	cmp.l	(16,SP),D0
+	BEQ	Xbra22_OK
+
+Xbra22_Next	move.l	(-4,A0),A0
+	
+	BRA	Xbra22_Loop
+
+Xbra22_OK	move.l	A0,D0
+
+	RTS
+
+; /// SYS  23 : XBRA_SCAN ///
+; LONG : Start address (EVEN)
+; LONG : End address (EVEN)
+; Return : D0.l = 0 if error
+;                 else Pointer on the first entry found
+;                 
+;
+; Used Registers : D0/A0-1
+
+Xbra_Scan	pea	Xbra23_Scanner
+	move.w	#$26,-(SP)	; - SUPEXEC -
+	trap	#14	; *** XBIOS ***
+	addq.l	#6,SP
+	
+	RTS
+
+Xbra23_Scanner	; 20 LONG : Start_Addr
+	; 16 LONG : End Addr
+	; 14 WORD : - XBRA_SCAN - (26)
+	; 12 WORD : *** SYS *** (0)
+	;  8 LONG : RTS (- XBRA_SCAN -)
+	;  4 LONG : (RTS)
+	;  0 LONG : RTS (- SUPEXEC -)
+
+	move.l	(20,SP),D0
+	andi.l	#-2,D0
+	movea.l	D0,A0
+	
+	move.l	(16,SP),D0
+	andi.l	#-2,D0
+	movea.l	D0,A1
+	
+Xbra23_Loop	cmpi.l	#"XBRA",([A0],-12)
+	BEQ	Xbra23_Match
+	
+	cmpi.l	#"XBRA",([A0],-16)
+	BEQ	Xbra23_Match
+	
+	addq.l	#2,A0
+	
+	cmp.l	A1,A0
+	BLT	Xbra23_Loop
+	
+	clr.l	D0
+	
+	RTS
+	
+Xbra23_Match	move.l	A0,D0
+
+	RTS
+
+; /// SYS  24 : Non D‚finit ///
+
+UnDefSYS24
+
+	RTS
+
+; /// SYS  25 : Non D‚finit ///
+
+UnDefSYS25
+
+	RTS
+
+; /// SYS  26 : Non D‚finit ///
+
+UnDefSYS26
+
+	RTS
+
+; /// SYS  27 : Non D‚finit ///
+
+UnDefSYS27
+
+	RTS
+
+; /// SYS  28 : Non D‚finit ///
+
+UnDefSYS28
+
+	RTS
+
+; /// SYS  29 : Non D‚finit ///
+
+UnDefSYS29
+
+	RTS
+
+; -------------------------
+; --- LIBRAIRIE MEMOIRE ---
+; -------------------------
+
+; /// SYS  30 : MEMO_ALLOC ///
+;
+; Memory_DynamicDescriptor : 0
+;
+; Used Registers : 
+
+Memo_Alloc
+
+	RTS
+	
+; /// SYS  31 : Non D‚finit ///
+
+UnDefSYS31
+
+	RTS
+
+; /// SYS  32 : Non D‚finit ///
+
+UnDefSYS32
+
+	RTS
+
+; /// SYS  33 : Non D‚finit ///
+
+UnDefSYS33
+
+	RTS
+
+; /// SYS  34 : Non D‚finit ///
+
+UnDefSYS34
+
+	RTS
+
+; /// SYS  35 : Non D‚finit ///
+
+UnDefSYS35
+
+	RTS
+
+; /// SYS  36 : Non D‚finit ///
+
+UnDefSYS36
+
+	RTS
+
+; /// SYS  37 : Non D‚finit ///
+
+UnDefSYS37
+
+	RTS
+
+; /// SYS  38 : Non D‚finit ///
+
+UnDefSYS38
+
+	RTS
+
+; /// SYS  39 : Non D‚finit ///
+
+UnDefSYS39
+
+	RTS
+
+; --------------------------
+; --- LIBRAIRIE FICHIERS ---
+; --------------------------
+
+; /// SYS  40 : FILE_LOAD ///
+;
+; Used Registers : 
+
+File_Load
+
+	RTS
+
+; /// SYS  41 : Non D‚finit ///
+
+UnDefSYS41
+
+	RTS
+
+; /// SYS  42 : Non D‚finit ///
+
+UnDefSYS42
+
+	RTS
+
+; /// SYS  43 : Non D‚finit ///
+
+UnDefSYS43
+
+	RTS
+
+; /// SYS  44 : Non D‚finit ///
+
+UnDefSYS44
+
+	RTS
+
+; /// SYS  45 : Non D‚finit ///
+
+UnDefSYS45
+
+	RTS
+
+; /// SYS  46 : Non D‚finit ///
+
+UnDefSYS46
+
+	RTS
+
+; /// SYS  47 : Non D‚finit ///
+
+UnDefSYS47
+
+	RTS
+
+; /// SYS  48 : Non D‚finit ///
+
+UnDefSYS48
+
+	RTS
+
+; /// SYS  49 : Non D‚finit ///
+
+UnDefSYS49
+
+	RTS
+
+; -------------------------------
+; --- LIBRAIRIE MATHEMATIQUES ---
+; -------------------------------
+
+; /// SYS  50 : MATH_CONVERT ///
+;
+; Used Registers : 
+
+Math_Convert
+
+	RTS
+
+; /// SYS  51 : MATH_EVALUATE ///
+;
+; Used Registers : 
+
+Math_Evaluate
+
+	RTS
+
+; /// SYS  52 : Non D‚finit ///
+
+UnDefSYS52
+
+	RTS
+
+; /// SYS  53 : Non D‚finit ///
+
+UnDefSYS53
+
+	RTS
+
+; /// SYS  54 : Non D‚finit ///
+
+UnDefSYS54
+
+	RTS
+
+; /// SYS  55 : Non D‚finit ///
+
+UnDefSYS55
+
+	RTS
+
+; /// SYS  56 : Non D‚finit ///
+
+UnDefSYS56
+
+	RTS
+
+; /// SYS  57 : Non D‚finit ///
+
+UnDefSYS57
+
+	RTS
+
+; /// SYS  58 : Non D‚finit ///
+
+UnDefSYS58
+
+	RTS
+
+; /// SYS  59 : Non D‚finit ///
+
+UnDefSYS59
+
+	RTS
+
+; -------------------------------
+; --- LIBRAIRIE CONFIGURATION ---
+; -------------------------------
+
+; /// SYS  60 : CONF_INIT ///
+;
+; Used Registers : 
+
+Conf_Init
+
+	RTS
+
+; /// SYS  61 : Non D‚finit ///
+
+UnDefSYS61
+
+	RTS
+
+; /// SYS  62 : Non D‚finit ///
+
+UnDefSYS62
+
+	RTS
+
+; /// SYS  63 : Non D‚finit ///
+
+UnDefSYS63
+
+	RTS
+
+; /// SYS  64 : Non D‚finit ///
+
+UnDefSYS64
+
+	RTS
+
+; /// SYS  65 : Non D‚finit ///
+
+UnDefSYS65
+
+	RTS
+
+; /// SYS  66 : Non D‚finit ///
+
+UnDefSYS66
+
+	RTS
+
+; /// SYS  67 : Non D‚finit ///
+
+UnDefSYS67
+
+	RTS
+
+; /// SYS  68 : Non D‚finit ///
+
+UnDefSYS68
+
+	RTS
+
+; /// SYS  69 : Non D‚finit ///
+
+UnDefSYS69
+
+	RTS
+
+; -------------------------
+; --- LIBRAIRIE PLUG-IN ---
+; -------------------------
+
+; /// SYS  70 : PLUG_INIT ///
+;
+; Used Registers : 
+
+Plug_Init
+
+	RTS
+
+; /// SYS  71 : Non D‚finit ///
+
+UnDefSYS71
+
+	RTS
+
+; /// SYS  72 : Non D‚finit ///
+
+UnDefSYS72
+
+	RTS
+
+; /// SYS  73 : Non D‚finit ///
+
+UnDefSYS73
+
+	RTS
+
+; /// SYS  74 : Non D‚finit ///
+
+UnDefSYS74
+
+	RTS
+
+; /// SYS  75 : Non D‚finit ///
+
+UnDefSYS75
+
+	RTS
+
+; /// SYS  76 : Non D‚finit ///
+
+UnDefSYS76
+
+	RTS
+
+; /// SYS  77 : Non D‚finit ///
+
+UnDefSYS77
+
+	RTS
+
+; /// SYS  78 : Non D‚finit ///
+
+UnDefSYS78
+
+	RTS
+
+; /// SYS  79 : Non D‚finit ///
+
+UnDefSYS79
+
+	RTS
+
+; ----------------------
+; --- LIBRAIRIE TUBE ---
+; ----------------------
+
+; /// SYS  80 : TUBE_INIT ///
+;
+; Used Registers : 
+
+Tube_Init
+
+	RTS
+
+; /// SYS  81 : Non D‚finit ///
+
+UnDefSYS81
+
+	RTS
+
+; /// SYS  82 : Non D‚finit ///
+
+UnDefSYS82
+
+	RTS
+
+; /// SYS  83 : Non D‚finit ///
+
+UnDefSYS83
+
+	RTS
+
+; /// SYS  84 : Non D‚finit ///
+
+UnDefSYS84
+
+	RTS
+
+; /// SYS  85 : Non D‚finit ///
+
+UnDefSYS85
+
+	RTS
+
+; /// SYS  86 : Non D‚finit ///
+
+UnDefSYS86
+
+	RTS
+
+; /// SYS  87 : Non D‚finit ///
+
+UnDefSYS87
+
+	RTS
+
+; /// SYS  88 : Non D‚finit ///
+
+UnDefSYS88
+
+	RTS
+
+; /// SYS  89 : Non D‚finit ///
+
+UnDefSYS89
+
+	RTS
+	

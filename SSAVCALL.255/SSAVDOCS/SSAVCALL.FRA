@@ -1,0 +1,205 @@
+/// SSAVCALL 2.54 ð STALLION SOFTWARE's AES/VDI CALL¿ - KOSS Prod /////////////
+
+- InSStallation de SSAVCALL -
+
+  > SSAVCALL.PRG est un programme Boot <
+
+1. Utilisez le programme INSSTALL.PRG, et laissez vous guider...
+1. Ou copiez le programme SSAVCALL.PRG dans le Dossier AUTO de votre Partition
+   de Boot (A: pour un lecteur de disquette, C: pour un Disque Dur)
+2. Utilisez le programme AUTOSORT.PRG pour d‚placer le programme SSAVCALL.PRG
+   parmis les premiers programme (avant tous, sauf les modificateurs de
+   Configuration comme : Stoop, SuperBoot8, XBoot, ...)
+3. Red‚marrez l'ordinateur (INSSTALL.PRG s'en occupe si besoin)
+   ATTENTION : INSSTALL.PRG ne change pas l'ordre des fichiers du Dossier AUTO.
+
+- Utilisation de SSAVCALL -
+
+1. Au d‚marrage, vous pouvez empecher les Plug-In de se charger en gardant la
+   touche [Control] enfonc‚e.
+2. Pour modifier le fichier de Configuration SSAVCALL.CNF, utilisez un
+   traitement de texte ASCII, ou utilisez l'Accessoire "SSAV Manager" dans la
+   rubrique Configuration.
+
+- Le r“le de SSAVCALL -
+
+  Ce programme a pour but d'am‚liorer les performances non seulement du
+programmeur en lui offrant de nombreuses nouvelles fonctions, comblant ainsi
+les lacunes du TOS originales, mais aussi am‚liorer les performances de votre
+ordinateur en lui ajoutant de nouvelles fonctions ou en remplacant d'anciennes
+par des modules Plug-In.
+
+- La manifestation de SSAVCALL -
+
+  SSAVCALL ne se manifeste QUE SI un programme … ‚t‚ d‚velopp‚ en y tenant
+compte. Les programme GEM originaux ne subiront aucune am‚lioration notable, en
+dehors des corrections du TOS qui se r‚percute … tous les niveaux.
+  Si un programme tient compte de SSAVCALL, et exploite ses possibilit‚s, le
+plus notable sera sans doute la rapidit‚ de r‚action de l'Interface GEM (j'ai
+banni les fonctions GrowBox et ShrinkBox), le d‚placement des Formulaires, un
+l'aspect esth‚tique uniformis‚ (et pourtant agr‚able), l'utilisation optimale
+des am‚liorations apport‚es par l'AES 3.4 comme les Pop-Up, ...
+  Du cot‚ du programmeur, c'est le jour et la nuit. Jamais une telle
+simplification de l'utilisation du GEM n'avais ‚t‚ atteinte jusque l…. Il ne
+sagit plus pour lui de programmer la r‚action de son programme par rapport …
+l'Interface GEM, mais simplement de DEFINIR la r‚action de SSAVCALL … certains
+endroits strat‚giques de l'Interface. SSAVCALL s'occupe ensuite de tout, et le
+programmeur n'a (pratiquement) plus … savoir ce qui se passe entre le GEM et
+SSAVCALL.
+
+- Pourquoi SSAVCALL est mieux -
+
+  SSAVCALL est une Proto-Interface, dans le sens o— elle est une v‚ritable
+Interface entre le programmeur et le GEM. Il a d‚j… exist‚ de nombreux systŠmes
+similaires, comme le brillantissime BIG, ou comme FlyDial, ChickenDial, Visual
+Assembleur ou d'autres. TOUS ‚tait compos‚ de routines incluses dans chaque
+programme. Cela augmentait consid‚rablement leurs tailles, mais avait
+l'avantage d'ˆtre particuliŠrement transportable. Si vous copiez un tel
+programme, vous avez avec celui-ci les routines de gestions. Alors en quoi
+SSAVCALL est mieux?
+  D‚j…, SSAVCALL ne se trouve QU'UNE FOIS en m‚moire, mˆme en multitƒche, et
+chaque programme exploitant SSAVCALL n'inclus AUCUNE routine de gestion
+d'Interface. Il en r‚sulte une INCROYABLE ECONOMIE de m‚moire. De plus, il
+n'est plus utile au programmeur de se d‚placer avec une quantit‚ euphorisante
+de fichiers de gestion d'Interface, mais seulement avec SSAVCALL.PRG. Il n'aura
+pas … v‚rifier la jonction des diff‚rentes routines de gestion d'un autre
+systŠme avec ses propres routines, mais simplement de donner quelques
+indications … SSAVCALL et de lui fournir les routines qu'il d‚sire voir
+utilis‚es, et c'est tout...
+
+- Comment programmer sous SSAVCALL -
+
+  Commencez par vous d‚barrasser de toutes les mauvaises habitudes acquises
+jusque l…, oubliez une bonne partie des documentations bidons que vous avez put
+acheter dans le commerce, et une fois propre, lancez vous...
+  Dans la lecture de MA documentation. Non qu'elle soit mieux (y'a surement
+personne qui dira le contraire aprŠs consultation), mais elle commencera par
+vous donner de bonnes habitudes de programmation. Oubli‚ le Code automodifi‚,
+bienvenue la Structuration de vos programme. Oubli‚ le foisonnement de routines
+redondante et encombrantes. Oubli‚ les prises de tˆtes. Oubli‚ les soir‚es …
+chasser les Bugs. Oubli‚ les petites amies laiss‚es devant la t‚l‚, ou le chien
+dans son panier. Bienvenue joie de vivre, promenade en famille le Dimanche,
+expression libre de vos projet...
+  C'est pas une mauvaise pub, simplement une promesse. Si j'ai programm‚
+SSAVCALL, c'est bien pour ne plus passer deux semaines sur mes routines de
+calculs, et deux mois sur l'Interface, mais bien DEUX JOURS sur l'Interface.
+Pensez … toutes les nuits perdues … programmer votre Interface, pensez … tous
+les caf‚ ing‚r‚s pour tenir, pensez … tous ces Aspro contre les maux de tˆtes,
+pensez … tous ces grignotages qui vous ont donn‚ cet embonpoint dont vous
+n'ˆtes pas fier, pensez … tous ces Rennie ingurgit‚s pour calmer vos ulcŠres
+caus‚s par les caf‚s-Aspro-grignotages, pensez … tous les amis que vous n'ˆtes
+pas allez voir pendant que vous ‚tiez face … votre ‚cran d'ordinateur, pensez,
+oui pensez … tout ce que vous AURIEZ put faire si SSAVCALL avait exist‚ avant.
+  Ne riez donc pas … la lecture de ce message, mais pensez y VRAIMENT. La vie
+ne se r‚sume pas … passer sa vie devant un ordinateur (oui oui, c'est bien moi
+qui dit ‡a). Et puis pensez … tous ces projet qui n'ont jamais put aboutir,
+d‚courag‚ que vous ‚tiez en pensant … l'Interface qu'il vous faudrait
+programmer. Sortez donc vos projet des vieux cartons o— ils tombent en
+poussiŠre...
+
+- Pourquoi l'Assembleur, et pas le GFA, le C, le ... -
+
+  Lisez INTRO.FRA, vous y apprendrez beaucoup sur moi, et le POURQUOI SSAVCALL.
+Une pr‚cision n'y est cependant pas donn‚. SSAVCALL existe … cause de mon go–t
+pour la nature, et les montagnes tout particuliŠrement. Ayant v‚cus dix ans
+dans le massif vosgiens, j'y ait acquit un amour pour les longues promenades en
+forˆt et sur les cols. A mon acquisition de mon Falcon030 et de Neon, je voulu
+adapter le G‚n‚rateur de Montagnes Fractales - FRAMOGEN - de Mega1 (publi‚ dans
+les ST Magazine nø58-59-60) … NeoN. J'utilisa le GFA, et g‚n‚ra des fichiers
+ASCII que NeoN ne voulu pas relire. Mˆme les propres fichiers ASCII g‚n‚r‚s par
+NeoN lui-mˆme n'‚taient pas lisible. Il me fallu me mettre … l'Assembleur. Ma
+premiŠre version de d‚butant, pas optimis‚e, mis SEULEMENT TROIS SECONDES …
+calculer une montagne de 512*512, contre un petit quart d'heure pour la version
+GFA. Depuis, franchement, mon choix est fait...
+  S'il sagit de gagner un quart d'heure … l'‚criture du programme, et d'en
+perdre un … chaque utilisation, autant se lancer des les t‚l‚communications.
+  OUI, ‚crire un programme en Assembleur est bien plus long qu'en Basic ou en
+C, mais la vitesse d'execution N'A ABSOLUMENT RIEN A VOIR. On peut bien ‚crire
+une routine Assembleur, et l'inclure dans un autre langage, mais l… c'est la
+concision qui fait d‚faut. Pour imprimer un peu de texte … l'‚cran, 20 OCTETS
+en Assembleur, contre 1Ko en C ou Basic. Pour des utilisations un peu plus
+‚volu‚es, la taille des programmes C ou Basic croissent de fa‡on exponentielle
+face … leur version ‚crite en Assembleur.
+  OUI, je pr‚fere perdre UNE FOIS mon temps … l'‚criture, plut“t qu'… chaque
+utilisation. Un programme est SENSE servir son UTILISATEUR, pas son
+PROGRAMMEUR. Evidement, c'est pas commercial de passer trois mois … pondre un
+programme rapide et g‚nial, alors qu'en C on y passe une semaine et qu'il fait
+perdre au bout du compte trois mois … son utilisateur. Et ce pour un prix
+identique...
+  Ca ne r‚pond toujours pas au POURQUOI l'Assembleur : j'aurais effectivement
+pus programmer SSAVCALL en Basic ou en C, mais je n'aurais pas obtenu cette
+taille ridicule; je me serait ‚loign‚ d'une utilisation totale en Assembleur,
+et je n'aurais rien gagn‚. Si utiliser le GEM via l'Assembleur est VRAIMENT
+plus chiant qu'en C (le GEM … ‚t‚ programm‚ en C, ce qui donne quelques
+facilit‚s aux programmeurs en C), j'aurais retrouv‚ ce problŠme en programmant
+SSAVCALL autrement qu'en Assembleur. Et pis de toute fa‡on, j'veux plus rien
+avoir … faire avec autre chose que l'Assembleur (et oui, je ne jure que par
+l'Assembleur, n'en d‚plaise … certains, qui n'ont certainement JAMAIS
+programm‚s en Assembleur, ils auraient compris sinon)...
+  A pr‚sent, programmer devient presque un jeu d'enfant en Assembleur, et vous
+n'avez plus rien … craindre lorsqu'il sagira d'aborder l'Interface.
+
+- Les difficult‚s de SSAVCALL -
+
+  D‚j…, il ne faudra plus trop penser "Structur‚", bien que je vous l'ait
+promis plus haut. Certaines fonctions sont des sortes de "rond-point", et vous
+n'en resortirez JAMAIS. Elles continueront … des routines que vous leurs aurez
+sp‚cif‚s. On en revient un peu … la notion de GOTO.
+  Si avant, on pouvait tout controler, … pr‚sent SSAVCALL s'occupe DE TOUT.
+Vous n'aurez plus droit de regard sur la gestion de votre Interface. Vous
+n'existerez que pour initialiser SSAVCALL et lui proposer les routines qui vous
+rendront c‚lebre. Le reste du temps, vous pourrez le consacrer … un autre
+projet, ou mieux … ceux que vous aimez (je tiens particuliŠrement … faire de
+vous autre chose que des nevros‚s du mulot). SSAVCALL n'est pas l… pour vous
+facher avec votre ordinateur et vous r‚concilier avec vos proches (quoique...),
+mais sert donc … :
+ - GAGNER DU TEMPS (… la programmation ET … l'utilisation)
+ - GAGNER DE LA PLACE
+ - GAGNER DE L'ARGENT (l'utilisation de SSAVCALL ne pose pas trop de
+   contraintes, voyez INTRO.FRA pour savoir comment vous enr‚gistrer)
+ - GAGNER VOTRE VIE, au lieu de la perdre devant votre ordinateur....
+Bien sur, beaucoup de d‚tracteurs existeront, car SSAVCALL eclipsera peut ˆtre
+leurs productions et les nombreuses heures qu'ils y ont pass‚s (je connais ‡a,
+depuis que certains breton m'ont dits que SSAVCALL n'est D'AUCUN INTERET).
+Mais au final, VOUS y gagner et l'UTILISATEUR pour lequel est destin‚ votre
+programme y gagne. En somme, utiliser INTELLIGEMENT SSAVCALL est gage de
+qualit‚, fiabilit‚, rapidit‚, ...
+  JE NE VEUX EN AUCUN CAS d‚pr‚cier les travaux de mes concurrents, mais
+simplement proposer une nouvelle alternative, qui je l'espere r‚conciliera
+ENFIN tout le monde.
+
+- Prise de contact avec SSAVCALL -
+
+  Comme je vous l'ait dit plus haut, le changement de fa‡on de programmation NE
+SE FERA PAS SANS HEURTS. Vous n'aurez presque plus … programmer en tant que
+tel, c'est … dire aligner des lignes de code, mais … cr‚er des tableaux qui
+d‚termineront certaines r‚actions de SSAVCALL dans la SECTION DATA, et d'en
+r‚server quelques uns dans la SECTION BSS. Le reste, c'est SSAVCALL qui
+s'occupera DE TOUT.
+  L'utilisation se d‚roulera toujours via votre Assembleur pr‚f‚r‚ comme
+Assemble ou DevPac, ou par le biais de Filly Basic, un int‚gr‚ pour SSAVCALL.
+  Autre diff‚rence d'importance : La disparition des Tableaux du GEM. SSAVCALL
+s'occuppe de tout, y compris de ‡a. Votre programme, du moment qu'il exploite
+SSAVCALL, exploite le GEM. Et SSAVCALL s'occuppe aussi des appels au GEM, donc
+de la r‚servation des Tableaux. Si vous voulez trifouiller dans le GEM,
+demandez dabord la permission … SSAVCALL, et s'il est daccord, il vous donne
+l'adresse de vos Tableaux AES_Params et VDI_Params
+
+- Les fichiers ressources -
+
+  C'est l'un des problŠmes auquels je me suis confront‚. Devais-je faire des
+Objets UserDef … foison, ou devais-je garder un fichier "normal", laissant le
+soin au programmeur d'enjoliver son Interface.
+  D'un cot‚, je garde le fichier original, et alors le programmeur ne rend pas
+son Interface agr‚able, ou alors l'aspect de celles-ci se desorganise en
+fonction des programmeurs. Mais ce n'est pas … moi de m'occuper de tracer
+l'Interface, le GEM suffit.
+  D'un autre cot‚, je dois m'amuser … ‚crire un tas de routine graphiques pour
+uniformiser l'aspect de l'Interface, et priver d'un peu de libert‚ le
+programmeur.
+  Au final, le meilleur des deux solutions pr‚c‚dement cit‚es est gard‚. Ceci
+dans le sens o— j'ai mis un nouveau type de fichier Ressource. Celui-ci perd
+ENORMEMENT d'Objets GEM, mais en gagne de nouveaux. En somme, je r‚actualise
+les Objet … une utilisation actuelle. Au chargement de ce type de Ressource par
+SSAVCALL, il sera automatiquement converti au format GEM pour l'affichage (dont
+je n'ai VRAIMENT PAS L'INTENTION DE M'OCCUPER).
