@@ -1,0 +1,55 @@
+05/21-22 : X     JBR "LUNE" MOT-CHAL 7    "LUNE" 10:65/6.5
+                 JBR "LIGN" ECR      0    "LIGN" 9: 0/0
+                 JBR "ROND" ECR      0    "ROND" 6:10/1.666
+05/22-23 : X     JBR "LUNE" MOT-CHAL 9
+                 JBR "LIGN" ECR      0
+                 JBR "ROND" ECR      0
+06/ 5- 6 : X     JBR "LUNE" INT      5
+                 JBR "LIGN" PAS      1
+                 JBR "ROND" ECR      0
+06/24-25 : XX    JBR "LUNE" INT      4
+                JJBR "ROND" INT      5
+                 JBR "LIGN" ATK      1-
+07/ 1- 2 : X     JBR "LUNE" DMT      3
+                 JBR "LIGN" ECR      0
+                JJBR "ROND" ECR      0
+07/ 4- 5 : XXX   JBR "LUNE" DMT      3
+                JJBR "ROND" INT      5
+                 JBR "LIGN" ECR      0
+                 JBA "HNGR" PAS      7    "HNGR" 1: 7/7
+                 AGR "WIFE" DTL      0    "WIFE" 2: 0/0
+07/23-24 ; 0.    AGR "WIFE" DTL      0
+                HGBL "SURN" ATK      3-   "SURN" 2:8-/4-
+                POBI "MONO" DTL      1-   "MONO" 1:1-/1-
+07/25-26 : 0 (X)HGBL "SURN" ATK      5-
+                 JBA "MMAN" MOT-CHAL 8    "MMAN" 4:22/5.5
+                 PBA "FILL" PIN      0    "FILL" 4:15/3.75
+08/ 1- 2 : XX    JBA "MMAN" INT      6
+                 PBA "FILL" INT      7
+08/ 3- 4 : XXX   JBR "LUNE" INT      7
+                 PBA "FILL" INT      4
+                 JBA "MMAN" INT      4
+08/11-12 : XXXXX JBR "LUNE" MOT      9
+                 JBR "LIGN" ECR      0
+                POBR "BLOP" INT      4    "BLOP" 2: 8/4
+                 AGR "MINI" MOT      9    "MINI" 2:19/9.5
+                 JBA "MMAN" PAS      4
+                JJBA "FILL" PAS      4
+08/17-18 : XXX   JBR "LUNE" MOT      12
+                 JBR "LIGN" ECR      0
+                 AGR "MINI" INT      10
+                POBR "BLOP" PIN      4
+08/19-20 : X     JBR "LUNE" PAS      6
+                 JBR "LIGN" PAS      0
+
+"MINI" 9.5
+"HNGR" 7
+"LUNE" 6.5
+"MMAN" 5.5
+"BLOP" 4
+"FILL" 3.75
+"ROND" 1.666
+"LIGN" 0
+"WIFE" 0
+"MONO" 1-
+"SURN" 4-

@@ -1,0 +1,192 @@
+; /// XIMG DPacker - By Feroce Lapin - Adaptation 68030 Par KOSS ///
+; Appel par : WORD - Largeur Destination en WORDs
+;             WORD - Nombre de lignes
+;             WORD - Longueur ligne en pixels
+;             WORD - Nombre d'octets du PATTERN RUN
+;             WORD - Nombre de plans
+;             LONG - Adresse destination
+;   ( 4,SP) = LONG - Adresse source (les donn‚es)
+;   ( 0,SP) = RTS
+
+	BRA	Start_DPack
+	
+	dc.w	$100	; Version
+	
+Start_DPack	; Correction du nombre de ligne pour DBF
+
+	subi.w	#1,([4,SP],14)	; Nombre de lignes
+	
+	; Nombre d'octets par ligne
+	
+	clr.l	D0
+	clr.l	D6
+	move.w	([4,SP],12),D0	; Longueur ligne en pixel
+	divu.l	#8,D0	; En octets
+	move.w	D0,D6	; Quotient
+	swap	D0	; Reste
+	
+	tst.w	D0
+	BEQ	Nullos
+
+	; Si reste, ajustement
+
+	addq.w	#1,D6
+Nullos	clr.l	D0
+	
+	move.w	([4,SP],8),D0	; Nombre de plans
+	mulu.w	D0,D6	; Nombre d'octets par ligne
+	
+	move.l	([4,SP]),A2	; Adresse source
+	
+	; Correction du nombre d'octets du PATTERN RUN pour DBF
+	
+	subi.w	#1,([4,SP],10)
+	
+	; Calcul du nombre de WORDs entre les plans
+	
+	clr.l	D7
+	move.w	([4,SP],8),D7	; Nombre de plans
+	move.w	D7,D5
+	subq.w	#1,D7
+	lsl.w	#1,D7
+	swap	D7	; D7 comme bascule
+	
+	move.w	([4,SP],14),D4	; Nombre de lignes
+	move.l	([4,SP],4),A4	; Adresse Destination
+	move.l	A4,A3
+
+Next_Map	move.l	A3,A0	; Adresse destination de la ligne
+
+Map_DPack	clr.w	D3	; Compteur largeur en pixels
+	clr.w	D0
+
+	; Si $0000FFnn, r‚p‚tition nn fois de la ligne pr‚c‚dente
+
+	cmpi.w	#0,(A2)
+	BNE	Line_DPack
+	cmpi.b	#-1,(2,A2)
+	BNE	Line_DPack
+
+	move.b	(3,A2),D0	; Nb de r‚petition de la ligne
+	subq.w	#1,D0	; Y'a le DBF
+	addq.l	#4,A2	; Le HEADER de la ligne
+	
+Line_DPack	cmp.w	([4,SP],12),D3	; Fin ligne?
+	BGE	End_Of_Line
+	clr.w	D1	; On efface le buffer (DBF sur un WORD)
+	
+	move.b	(A2)+,D1	; On tire l'OCTET suivant
+	BEQ	Pattern_Run	; 0 = Pattern_Run
+	
+	cmpi.b	#$80,D1
+	BEQ	BIT_String	; 128 = BIT_String
+	
+; - Solid_Run ð 1 BYTE -
+; BYTE = Xnnnnnnn
+; nnnnnnn times   0 for X=0
+;               $FF for X=1
+
+	move.b	#0,D2
+	bclr.l	#7,D1	; X
+	BEQ	NullX
+	move.b	#$FF,D2
+NullX	subq.w	#1,D1	; Pour le DBF
+
+SRun_Loop	move.b	D2,(A3)+
+	addq.w	#8,D3	; +8 pixels
+	adda.w	D7,A3	; Plan suivant
+	swap	D7
+	
+	DBF	D1,SRun_Loop	; Jusqu'a la fin
+	
+	BRA	Line_DPack
+	
+; - Pattern_Run ð 3 BYTEs -
+; BYTE = 0
+; BYTE = nnnnnnnn
+; BYTE = "..."
+; nnnnnnnn times PatNb BYTES of "..."
+	
+Pattern_Run	clr.w	D2
+	move.b	(A2)+,D2	; nnnnnnnn
+	subq.w	#1,D2	; Pour le DBF
+	move.l	A2,A5	; Sauve adresse
+
+PRun_Loop1	move.l	A5,A2
+	move.w	([4,SP],10),D1	; PatNb
+	
+PRun_Loop2	move.b	(A2)+,(A3)+
+	addq.w	#8,D3	; +8 pixels
+	adda.w	D7,A3	; Plan suivant
+	swap	D7
+	
+	DBF	D1,PRun_Loop2
+	
+	DBF	D2,PRun_Loop1
+	
+	BRA	Line_DPack
+	
+; - BIT_String ð 3 BYTEs -
+; BYTE = $80
+; BYTE = nnnnnnnn
+; BYTE = "..."
+; nnnnnnnn BYTES of "..."
+
+BIT_String	clr.w	D2
+	move.b	(A2)+,D2	; nnnnnnnn
+	subq.w	#1,D2	; Pour le DBF
+	
+BITS_Loop	move.b	(A2)+,(A3)+
+	addq.w	#8,D3	; +8 pixels
+	adda.w	D7,A3	; Plan suivant
+	swap	D7
+	
+	DBF	D2,BITS_Loop
+	
+	BRA	Line_DPack
+	
+End_Of_Line	tst.w	D7
+	BEQ	Next_Swap
+	
+	swap	D7
+
+Next_Swap	subq.w	#1,D5	; 1 plan fini
+	BEQ	End_Of_Map
+	
+	addq.l	#2,A4
+	move.l	A4,A3	; Destination +1 plan
+	clr.w	D3	; 0 pixels trait‚s
+	
+	BRA	Line_DPack
+	
+End_Of_Map	move.w	([4,SP],8),D5	; Nb de plan
+	clr.l	D2	; Pour le LSL
+	move.w	([4,SP],16),D2	; Largeur en WORD
+	lsl.l	#1,D2	; *2 pour largeur en BYTE
+	add.l	D2,([4,SP],4)
+	move.l	([4,SP],4),A4	; R‚sultat
+	move.l	A4,A3	; Nouvelle ligne
+	
+	tst.w	D0	; R‚p‚tition de la ligne?
+	BEQ	Not_Again
+	
+Line_Again	move.w	D6,D1	; Nombres de BYTE par ligne
+	subq.w	#1,D1	; Pour le DBF
+	move.l	A0,A5	
+	
+Again_Loop	move.b	(A5)+,(A3)+
+	DBF	D1,Again_Loop
+	
+	adda.l	D2,A4	; Ligne suivante
+	move.l	A4,A3
+	subq.w	#1,D4	; 1 ligne de faite
+	
+	DBF	D0,Line_Again	; Encore une ligne … r‚peter
+	
+	move.l	A4,([4,SP],4)
+	
+Not_Again	subq.w	#1,D4
+	BPL	Next_Map
+	
+End_Of_IMGDPack	RTS
+	
