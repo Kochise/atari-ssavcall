@@ -1,0 +1,5 @@
+; /// Lord ATTARD's XFORM_DO - Assembler Version By KOSS 1997 ///
+
+XFORM_DO				; Take It Easy...
+
+	RTS
