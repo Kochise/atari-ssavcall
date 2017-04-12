@@ -1,0 +1,82 @@
+; /// SSAVCALL 3.01 - SSAVCALL Vectors Booter - KOSS 2000 /////////////////////
+
+; Author   : Kochise
+; Date     : 05/29/06/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : Motorola 68030 Interrupt Vector Booter
+
+; Machina  : Motorola 68030 based Computer
+; O.S.     : None -> SSAVCALL 3
+
+
+
+	; # ... : 07/01/2000 #
+
+INSSTALL_SSAV	; L…, on inSStalle le Bintz
+	; On commence par le TRAP ("SSAV") pour inSStaller
+	; le Cookie "NULL". Si celui ci s'y trouve d‚j…,
+	; c'est que SSAV est d‚j… en m‚moire, donc l'on supprime
+	; le nouveau TRAP3, et on se casse la queue entre les jambes...
+	
+	move.l	$8C.w,OldTRAP3
+	move.l	#SSAVCALL_TRAP3,$8C.w	; XBRA "SSAV"
+		
+	; De toute fa‡on, on ne peut pas l'inSStaller
+	; deux fois...
+	
+	; >> ATTENTION : Tableau relatif pour le num‚ro du PlugIn !
+	;                Il faut donc chercher le num‚ro … la main.
+
+	move.w	#10,-(SP)	;   - COOK_NULL -
+	move.w	#-3,-(SP)	; *** CUK-MANA ***
+	trap	#3	; /// SSAVCALL ///
+	addq.l	#4,SP
+	
+	; Et oui, on peut s'en aller, y'a plus rien … voir...
+	;  0 : OK/Cookie d‚j… en place
+	; -1 : Plus de place
+	; -2 : Pas de Jar
+	
+	; >> Si pas de place, inSStaller une Cookie-Jar de 32, SVP)
+	
+	tst.w	D0
+	BMI	INSSTALL_SSAVError
+
+	; Inutile en fait, on pense qu'en ‚tant parmis les premiers
+	; dans le dossier Auto, il ne peut y avoir de problŠmes.
+
+	; Le TRAP3 … ‚t‚ d‚tourn‚ juste avant 'COOK_NULL'
+	; Donc on peut y aller franchement !
+	
+	move.l	#"SSAV",-(SP)
+	move.l	#SSAVCALL_Header,-(SP)
+	clr.w	-(SP)	;   - COOK_ADD -
+	move.w	#-3,-(SP)	; *** CUK-MANA ***
+	trap	#3	; /// SSAVCALL ///
+	lea	(12,SP),SP
+	
+	; Pareil, pas d'erreur en principe
+	;  0 : OK
+	; -1 : Erreur
+	; -2 : Existe d‚j…
+	
+	tst.w	D0
+	BMI	INSSTALL_SSAVError
+	
+	; On inSStalle le XBRA "SSAV" sur LineF
+
+	move.l	$2C.w,OldLINEF
+	move.l	#SSAVCALL_LINEF,$2C.w	; XBRA "SSAV"
+
+	clr.w	D0	; C'est tout bon !
+	
+	RTS
+
+INSSTALL_SSAVError	move.l	OldTRAP3,$8C.w
+
+	; On laisse le code d'erreur, & Kassos...
+	
+	RTS
+

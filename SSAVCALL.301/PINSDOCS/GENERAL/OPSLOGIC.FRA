@@ -1,0 +1,20 @@
+/// Ze Logic Ops Gallery //////////////////////////////////// SSAVCALL 3.01 ///
+
+ NOT (NON)  AND (ET)  OR (OU)  XOR (OU EXCLUSIF)  NAND (ET-NON)  NOR (OU-NON)
+  E | S     A B | S   A B | S  A B | S            A B | S        A B | S
+  1 | 0     0 0 | 0   0 0 | 0  0 0 | 0            0 0 | 1        0 0 | 1
+  0 | 1     0 1 | 0   0 1 | 1  0 1 | 1            0 1 | 1        0 1 | 0
+            1 0 | 0   1 0 | 1  1 0 | 1            1 0 | 1        1 0 | 0
+            1 1 | 1   1 1 | 1  1 1 | 0            1 1 | 0        1 1 | 0
+
+ XNOR (OU-NON EXCLUSIF)  donc NOT  est une porte qui inverse l'entr‚e.
+ A B | S                      AND  est … 1 si les deux entr‚es sont … 1.
+ 0 0 | 1                      OR   est … 1 si au moins une entr‚e est … 1.
+ 0 1 | 0                      XOR  est … 1 si les deux entr‚es ne sont pas
+ 1 0 | 0                             identiques.
+ 1 1 | 1                      NAND est l'inverse de AND.
+                              NOR  est l'inverse de OR.
+                              XNOR est l'inverse de XOR.
+
+Imprimez ‡a et collez le devant vous, sur le mur. Ca aide vachement lorsque
+l'on programme en assembleur. KOSS - 1996.

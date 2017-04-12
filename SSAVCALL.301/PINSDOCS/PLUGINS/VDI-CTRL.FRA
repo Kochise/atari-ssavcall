@@ -1,0 +1,2147 @@
+/// Le VDI, num‚ro 115 ////////////////////////////////////////////////////////
+
+Les fonctions VDI peuvent mettre mal … l'aise ceux qui sont habitu‚s … utiliser
+l'AES car elle ne sont pas class‚es par num‚ro croissant, et qu'elles sont d'un
+utilisation diff‚rente, mais il faut vous y faire. Ici, on se repose d‚j… moins
+sur le bon vouloir du GEM, et l'on exploite des fonctions un peu plus "terre …
+terre", mais trŠs utiles...
+En dehors du fouillis apparent, les fonctions du VDI sont en fait class‚es en
+familles.
+N'oubliez pas que ici, ce n'est plus largeur et hauteur, mais un deuxiŠme
+couple de coordonn‚es qui est utilis‚ (attendez, vous allez comprendre … la
+lecture).
+
+--- FONCTIONS DE CONTROLE ---
+
+/// VDI 1 : V_OPNWK (OPEN WORKSTATION) ///
+
+Ouvre une station de travail limit‚e … l'‚cran. De plus on peut d‚finir le
+systŠme de coordonn‚es.
+En soit, n'essayez pas d'utiliser cette fonction, car voyez vous, en utilisant
+le GEM, vous travaillez d‚j… sur une station de travail. En ouvrir une seconde,
+mat‚rielle, planterais l'ordinateur.
+Pour vos station, utilisez les virtuelles.
+  Cependant si, par exemple, comme moi, vous avez ‚crit un shell qui change de
+r‚solution pour s'adapter … celle du programme que l'on veut lancer, il s'agit
+d'effacer la station de travail actuelle, et d'en rouvrir une, adapt‚e.
+Si vous ne faites pas cela, et vous contentez de changer de r‚solution avec
+V_SetScreen (XBIOS 5), vous aurez des surprises … l'utilisation du GEM. Par
+exemple, vous passez de haute … basse r‚solution. L'ouverture d'un FileSelect
+se fera en bas … droite, aux coordonn‚es o— il se serait affich‚ en haute
+r‚solution, et la fonte est en 16*8. Compris?
+
+ParamŠtres : WORD : Num‚ro du p‚riph‚rique
+             WORD : Type de ligne (Voir VDI 15)
+             WORD : Index de couleur des lignes PolyLine (Voir VDI 17)
+             WORD : Type de marqueur (Voir VDI 18)
+             WORD : Index de couleur des marqueur PolyMarker (Voir VDI 20)
+             WORD : Fonte de caractŠre
+             WORD : Index de couleur du texte (1 en g‚n‚'al, pou' le noi')
+             WORD : Style de remplissage
+             WORD : Num‚ro du style de remplissage
+             WORD : Index de couleur du remplissage
+             WORD : SystŠme de coordonn‚es
+                    0 = NDC. SystŠme standard dont l'origine se trouve en bas …
+                             gauche. De plus, les coordonn‚es son fix‚es de 0 …
+                             32767 dans les deux directions. Utile si l'on veut
+                             exploiter une table tra‡ante par exemple, ou tout
+                             autre chose.
+                    1 = R‚serv‚
+                    2 = RC. Comme l'‚cran. L'origine se situe en haut … gauche.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = VDI_ID
+         D1.l = Pointeur vers un tableau contenant toutes les informations
+                relatives aux p‚riph‚riques actuels et standards.
+                Structure du tableau : WORD  0 : Largeur de l'‚cran en point
+                                                 (639 en ST High)
+                                      WORD  1 : Hauteur de l'‚cran en points
+                                      WORD  2 : Pr‚cision du p‚riph‚rique
+                                                0 = Pr‚cis
+                                                1 = Impr‚cis
+                                      WORD  3 : Largeur d'un point en microns
+                                      WORD  4 : Hauteur d'un point en microns
+                                      WORD  5 : Nombre de tailles d'‚criture
+                                                disponibles
+                                                0 = Y'a pas (NdM : C'est
+                                                possible ‡a?)
+                                      WORD  6 : Nombre de types de ligne
+                                                disponibles
+                                      WORD  7 : Nombre de largeurs de ligne
+                                                disponibles
+                                                0 = Y'a toujours pas (NdM :
+                                                    Huu..?)
+                                      WORD  8 : Nombre de types de marqueur
+                                                disponibles
+                                      WORD  9 : Nombre de tailles de marqueur
+                                                disponibles
+                                                0 = C'est une manie ou quoi, y'a
+                                                    rien? T'es sur qu'il marche
+                                                    ton ordinateur?
+                                      WORD 10 : Nombre de fontes disponibles
+                                      WORD 11 : Nombres de motifs de remplissage
+                                      WORD 12 : Nombre de types de hachures
+                                      WORD 13 : Nombre de couleurs affichables
+                                      WORD 14 : Nombre de GDP (VDI 11)
+                                      WORD 15 : Liste des dix GDP de bases
+                                                1 = Barre
+                                                2 = Arc de cercle
+                                                3 = Section de cercle
+                                                4 = Cercle
+                                                5 = Ellipse
+                                                6 = Arc d'ellipse
+                                                7 = Section d'ellipse
+                                                8 = Rectangle … coins arrondis
+                                                9 = Rectangle rempli … coins
+                                           …        arrondis
+                                                10 = Texte graphique
+                                      WORD 24 : -1 = Fin de la liste
+                                      WORD 25 : Attributs correspondants …
+                                                chaque GDP
+                                                0 = Lignes multiples (GDP 2, 6,
+                                                    8)
+                                                1 = Marqueurs multiples
+                                                2 = Texte (GDP 10)
+                                           …    3 = Surface remplie (GDP 1, 3,
+                                                    4, 5, 7, 9)
+                                      WORD 34 : 4 = Que dalle
+                                      WORD 35 : Couleur
+                                                0 = Non
+                                                1 = Oui
+                                      WORD 36 : Rotation du texte possible
+                                                0 = Non
+                                                1 = Oui
+                                      WORD 37 : Remplissage possible
+                                                0 = Non
+                                                1 = Oui
+                                      WORD 38 : Fonction de cellules (VDI 10)
+                                                possible
+                                                0 = Non
+                                                1 = Oui
+                                      WORD 39 : Nombre de couleurs dans la
+                                                palette
+                                                0 = True Color
+                                                2 = Monochrome, sinon le nombre
+                                                    de couleur dans la palette
+                                                    (512 pour un ST, 4096 pour
+                                                    un STe et TT, 262144 pour le
+                                                    Falcon)
+                                      WORD 40 : Controle du pointeur de la
+                                                souris
+                                                1 = Clavier seulement
+                                                2 = Clavier et autre chose (la
+                                                    souris peut ˆtre...)
+                                      WORD 41 : P‚riph‚rique d'entr‚e
+                                                1 = Clavier
+                                                2 = Autre (???)
+                                      WORD 42 : Touches sp‚ciales
+                                                1 = Touches de fonctions
+                                                2 = Autre
+                                      WORD 43 : P‚riph‚rique AlphaNum‚rique
+                                                0 = Aucun (votre clavier est il
+                                                    bien branch‚?)
+                                                1 = Sir Clavier (non, pas toi
+                                                    Christian...)
+                                      WORD 44 : Type de station de travail
+                                                0 = Sortie seule (‚cran)
+                                                1 = Entr‚e seule (...)
+                                                2 = Entr‚e et sortie (‚cran
+                                                    tactile peut ˆtre)
+                                                3 = MetaFile (fichier GEM)
+         D2.l = Pointeur vers un tableau contenant les informations de sortie
+                texte actuel.
+                Structure du tableau : WORD  0 : Largeur minimale d'un caractŠre
+                                       WORD  1 : Hauteur minimale d'un caractŠre
+                                       WORD  2 : Largeur maximale d'un caractŠre
+                                       WORD  3 : Hauteur maximale d'un caractŠre
+                                       WORD  4 : Largeur minimale d'une ligne
+                                       WORD  5 : R‚serv‚ (… 0)
+                                       WORD  6 : Largeur maximale d'une ligne
+                                       WORD  7 : R‚serv‚ (… 0)
+                                       WORD  8 : Largeur minimale d'un marqueur
+                                       WORD  9 : Hauteur minimale d'un marqueur
+                                       WORD 10 : Largeur maximale d'un marqueur
+                                       WORD 11 : Hauteur maximale d'un marqueur
+Pile : 30
+
+/// VDI 2 : V_CLSWK (CLOSE WORKSTATION) ///
+
+Ferme une station de travail.
+
+ParamŠtres : WORD : VDI_ID de la station … fermer (quoi, d‚j… 22H? j'ai encore
+                    un m‚tro … prendre).
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 100 : V_OPNVWK (OPEN VIRTUAL WORKSTATION) ///
+
+Comme VDI 1, Open WorkStation, mais ici, on peu en ouvrir plusieurs, et
+chaqu'une est ind‚pendante des autres. On peut ainsi d‚finir des attributs
+diff‚rents pour chaque station virtuelle. Les paramŠtres d'entr‚e et de sortie
+sont identiques … ceux de Open WorkStation, la diff‚rence ‚tant un paramŠtre en
+plus : le code du p‚riph‚rique. Celui ci est en principe le num‚ro d'un
+p‚riph‚rique physique (0 … 5).
+  Cependant, il s'agit de l'ouvrir comme ‚tant l'‚cran. Dans ce cas, vous
+l'initialisez avec les paramŠtres de l'‚cran en cours.
+
+ParamŠtres : WORD : Code du p‚riph‚rique
+                      0 = Clavier
+                      1 = Ecran
+                      2 = Port S‚rie
+                      3 = Port ParallŠle
+                      4 =
+                      5 =
+             WORD : Num‚ro du p‚riph‚rique
+             WORD : Type de ligne (Voir VDI 15)
+             WORD : Index de couleur des lignes PolyLine (Voir VDI 17)
+             WORD : Type de marqueur (Voir VDI 18)
+             WORD : Index de couleur des marqueur PolyMarker (Voir VDI 20)
+             WORD : Fonte de caractŠre
+             WORD : Index de couleur du texte (1 en gˆn‚'al, pou' le noi')
+             WORD : Style de remplissage
+             WORD : Num‚ro du style de remplissage
+             WORD : Index de couleur du remplissage
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Voyez Open WorkStation
+Pile : 30
+
+/// VDI 101 : V_CLSVWK (CLOSE VIRTUAL WORKSTATION) ///
+
+Ferme une station de travail virtuelle.
+
+ParamŠtres : WORD : VDI_ID de la station virtuelle … fermer
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 3 : V_CLRWK (CLEAR WORKSTATION) ///
+
+D‚truit la station de travail, donc vide l'‚cran (comme aprŠs un V_SetScreen
+(XBIOS 5)).
+
+ParamŠtres : WORD : VDI_ID de la station de travail … d‚truire
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 4 : V_UPDWK (UPDATE WORKSTATION) ///
+
+Sert … forcer la sortie graphique sur la station de travail demand‚e. Sur un
+‚cran, n'a aucun effet car la sortie graphique est imm‚diate, mais sur une
+imprimante, ou une table tra‡ante, sort imm‚diatement les donn‚es du tampon
+graphique (ne vous en inqui‚tez pas, je ne sait pas ce que c'est, mais c'est
+‚crit (une preuve incontestable que certains ‚diteurs veulent vraiment nous
+prendre le choux et passer pour des omniscient)).
+Pour faire un saut de page, faites un Clear WorkStation aprŠs cette fonction.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 119 : VST_LOAD_FONTS (LOAD FONTS) ///
+
+Charge des fontes externes. GDOS doit donc ˆtre install‚ (ou quelque chose de
+similaire).
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Nombre de fontes charg‚es
+Pile : 10
+
+/// VDI 120 : VST_UNLOAD_FONTS (UNLOAD FONTS) ///
+
+Demande d'effacer les fontes charg‚es. Cela ne se fera v‚ritablement que
+lorsque toutes les stations utilisant les mˆmes fontes l'auront demand‚es, ou
+que celles ci soient ferm‚es.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 129 : VS_CLIP (SET CLIPPING RECTANGLE) ///
+
+Le CLIPPING, on y arrive. Certains d'entre vous se sont peut ˆtre d‚j… rong‚s
+les ongles jusqu'a l'os, d'angoisse, … la simple ‚vocation de cette ... chose.
+Et bien voila, le CLIPPING, c'est pas sorcier, les tagueur savent tous ce que
+c'est : c'est juste un pochoir. Disons qu'il est tout de mˆme un peu
+particulier. Avec les coordonn‚es pr‚cis‚es, le GEM va cr‚er une sorte de
+pochoir logique … l'‚cran, et c'est seulement ce qui sera dessin‚ dans ce
+rectangle qui sera v‚ritablement autoris‚ … apparaŒtre. Ainsi, le reste
+n'apparaŒt pas. C'est trŠs utile dans les programmes de dessins, o— vous faites
+un CLIPPING sur l'int‚rieur de la fenˆtre (la zone de travail, ‡a vous rappel
+quelque chose?), et c'est seulement dans cette zone qu'apparaŒtra votre dessin,
+sans qu'il aille couler partout. Et c'est seulement ce rectangle que le GEM vous
+demandera, ou le fera lui mˆme, de redessiner.
+Alors, qui a dit que le GEM est compliqu‚, "que je le fra-ca-sse..." (½ Ellie
+Kakou)
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Mode
+                    0 = On peut taguer partout (mais pas sur les murs de votre
+                        chambre SVP, je ne tiens pas … avoir des maux avec vos
+                        parents).
+                    1 = Le CLIPPING est actif
+             WORD : X1 (en haut … gauche)
+             WORD : Y1 (Idem)
+             WORD : X2 (en bas … droite)
+             WORD : Y2 (Idem)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+--- FONCTIONS D'EDITION ---
+
+/// VDI 6 : V_PLINE (POLYLINE) ///
+
+Dessine une "souite" de lignes dont la suivante commence o— la pr‚c‚dente se
+termine. Les attributs suivants sont pris en compte : Couleur
+                                                      Type
+                                                      Epaisseur
+                                                      Style
+                                                      Mode
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de points. Vu que la premiŠre ligne est d‚finie par
+                    deux points, et que les suivantes n'utilisent plus qu'un
+                    seul, Nombre de points-1 donne le nombre de lignes …
+                    afficher.
+             LONG : Adresse des coordonn‚es des points. Ceux ci doivent ˆtres
+                    compos‚s de la coordonn‚e X sur un WORD, suivit de la
+                    coordonn‚e Y sur un WORD, et ainsi de suite.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 7 : V_PMARKER (POLYMARKER) ///
+
+Place plusieurs marqueurs … l'‚cran. Ces marqueurs peuvent servirent par exemple
+au points de passage d'une courbe de b‚zier dans un programme de dessin. Les
+attributs suivants sont pris en compte : Couleur
+                                         Echelle
+                                         Type
+                                         Mode
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de marqueurs.
+             LONG : Adresse des coordonn‚es des marqueurs. Mˆme remarque que
+                    pr‚cedemment.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 8 : V_GTEXT (TEXT) ///
+
+Sert … afficher un texte graphique. Sa particularit‚ est qu'il peut ˆtre plac‚
+au pixel prŠs, d'une fonte diff‚rente, et des attributs diff‚rents.
+N'oubliez pas le Clipping, comme toutes les autres fonctions graphique.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de caractŠre … afficher
+             WORD : X
+             WORD : Y
+             LONG : Adresse du texte … afficher, au format C normal!
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+/// VDI 9 : V_FILLAREA (FILLED AREA) ///
+
+Sert … tracer un polygone complexe (convexe, concave), et … le remplir suivant
+les attributs de couleur, de style d‚finis … l'ouverture de la station de
+travail (par d‚fauts), ou d‚finit ult‚rieurement par l'utilisateur.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de points
+             LONG : Adresse des coordonn‚es des points. Comme d'hab, le X sur
+                    un WORD, ainsi que le Y, puis on continue.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 10 : V_CELLARRAY (CELL ARRAY) ///
+
+(Pas document‚, mais implant‚)
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Longueur du tableau des couleurs
+             WORD : Longueurs des lignes du tableau des couleurs
+             WORD : Nombre de couleurs par lignes
+             WORD : Nombre de lignes dans le tableau
+             WORD : Mode d'‚criture (Voyez VDI)
+             LONG : Adresse du tableau des couleurs
+                    Chaque index de la couleur tiens sur un WORD
+             WORD : X du coin inf‚rieur gauche
+             WORD : Y du coin inf‚rieur gauche
+             WORD : X du coin sup‚rieur droit
+             WORD : Y du coin sup‚rieur droit
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 32
+
+/// VDI 103 : V_CONTOURFILL (CONTOUR FILL) ///
+
+Remplit une surface … partir d'un points.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Index de la couleur d'arrˆt. Si -1 est mis ici, le VDI
+                    s'arrˆte … toutes les couleurs diff‚rentes du points de
+                    d‚part. De plus, le VDI s'arrˆte au bords de l'‚cran.
+             WORD : X
+             WORD : Y
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+ATTENTION : Cette fonction est bugg‚e dans le TOS 4. PARX a d‚velopp‚ un patch
+            (qui ne marche pas sous D2M, un de leurs soft...), ainsi que Seb des
+            Removers (une pub vraiment gratuite).
+
+/// VDI 114 : VR_RECTFL (FILL RECTANGLE) ///
+
+Sert … afficher un rectangle remplit des attributs d‚finis.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X1 (souvent en haut … gauche, mais pas oblig‚)
+             WORD : Y1 (Idem)
+             WORD : X2 (l'oppos‚ par la diagonale au premier points, c'est le
+                    VDI qui l'a d‚cid‚)
+             WORD : Y2 (Idem)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 18
+
+--- FONCTIONS ESCAPE (SORTIE TEXTE) ---
+
+Les fonctions Escapes ne servent qu'a sortir du texte. La particularit‚ de ces
+fonctions c'est qu'en fait, c'est les sorties de texte du BIOS, mais dont les
+appels sont au format VDI.
+Avec ces fonctions, vous perdez en pr‚cision : vous ne pouvez plus ‚crire au
+pixel prŠs, mais revenez … la notion de ligne et colonne. N‚anmoins vous gagnez
+en rapidit‚ car ces fonctions sont trŠs rapides, par rapport … l'utilisation du
+mode graphique (au pixel prŠs).
+De plus, ces fonctions ‚tant officielles, elles risquent fort d'ˆtres support‚es
+dans les version ult‚rieures des systŠmes d'exploitation des compatibles ATARI
+(je pense … Dolmen du prochain Centek's Phenix ou du Milan, car j'essaye de
+programmer compatible, m“a...).
+
+ATTENTION : pour les fonctions ESC(5) et GDP(11), le num‚ro de la sous fonction
+            est … empiler AVANT l'adresse de VDI_Params.
+
+/// VDI 5,1 : INQUIRE ADDRESSABLE ALPHA CHARACTER CELLS ///
+
+Sert … savoir de combien de lignes et de colonnes est compos‚ l'‚cran.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 1
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Nombre de lignes.w et Nombre de colonnes.w
+Pile : 12
+
+/// VDI 5,2 : EXIT ALPHA MODE ///
+
+Sert … sortir du mode alphanum‚rique. Le curseur disparaŒt, et le GEM reprend
+la main et vous rend la souris, ainsi que son pointeur.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 2
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,3 : ENTER ALPHA MODE ///
+
+Sert … p‚n‚trer (Rrhooo...) le mode alphanum‚rique. La souris cŠde sa place au
+curseur.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 3
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,4 : ALPHA CURSOR UP ///
+
+Fait monter le curseur d'une ligne vers le haut. S'il y est d‚j…, il y reste.
+C'est exactement la mˆme chose que le code VT52 EscA. Mais n'oubliez pas que
+ici il est question du p‚riph‚rique d‚finit.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 4
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,5 : ALPHA CURSOR DOWN ///
+
+Fait descendre le curseur d'une ligne. S'il se trouve au rez de chauss‚, il y
+reste sans descendre … la cave. Idem que EscB.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 5
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,6 : ALPHA CURSOR RIGHT ///
+
+Le curseur se d‚place d'un coup … droite. s'il est au bout, il y reste. Idem
+que EscC.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 6
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,7 : ALPHA CURSOR LEFT ///
+
+La mˆme chose, mais vers la gauche. Idem que EscD.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 7
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,8 : HOME ALPHA CURSOR ///
+
+Fait revenir le curseur tout en haut … gauche (position Home). Pareil que EscH.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 8
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,9 : ERASE TO END OF ALPHA SCREEN ///
+
+Vide l'‚cran depuis le curseur inclus, jusqu'a la fin. Idem que EscJ
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 9
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,10 : ERASE TO END OF ALPHA TEXT LINE ///
+
+Vide la ligne depuis le curseur inclus, jusqu'a la fin. Idem que EscK.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 10
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,11 : DIRECT ALPHA CURSOR ADDRESS ///
+
+Positionne le curseur … un endroit pr‚cis. Si les coordonn‚es pr‚cis‚es sont
+excessives, celles ci son ramen‚es au maximum permit, c'est … dire la ligne
+maximum ou la colonne maximum. Idem que EscY
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro de la ligne
+             WORD : Num‚ro de la colonne
+             WORD : 11
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 5,12 : OUTPUT CURSOR ADDRESSABLE ALPHA TEXT ///
+
+Sort une chaŒne de caractŠres. Idem que C_CONWS (GEMDOS 9).
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de caractŠre … sortir
+             LONG : Adresse du texte
+             WORD : 12
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 18
+
+/// VDI 5,13 : REVERSE VIDEO ON ///
+
+Passe en inverse vid‚o. L'‚criture passe en blanc, et le fond en noir. Idem que
+Escp.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 13
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,14 : REVERSE VIDEO OFF ///
+
+Revient en ‚criture normale. Idem que Escq.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 14
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,15 : INQUIRE CURRENT ALPHA CURSOR ADDRESS ///
+
+Sert … obtenir la position actuelle du curseur.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 15
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l : Num‚ro de ligne.w et Num‚ro de colonne.w
+Pile : 12
+
+/// VDI 5,16 : INQUIRE TABLET STATUS ///
+
+Sert … savoir si y'a quelque chose de connect‚ au clavier (joystick, souris).
+Et pas de tablettes, comme certains se plaisent … nommer ces p‚riph‚riques.
+Il y a un test … l'allumage de votre ATARI-BRANDT-BOSCH-CITROEN pour savoir
+cela, donc, THEORIQUEMENT, si vous rebranchez votre clavier aprŠs l'allumage de
+votre ordinateur, il ne devrait pas remarquer le changement. Cela car
+l'initialisation du 6301 se fait au boot (la cause du bug du 6301 si vous
+gardez les deux boutons de la souris enfonc‚slors du boot).
+Mais bon, qui s'amuse … brancher son clavier aprŠs avoir allum‚ son ST...
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 16
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = 0 : Y'a rien
+                1 : Y'a quelque chose
+Pile : 12
+
+/// VDI 5,17 : HARD COPY ///
+
+Balance le contenu de l'‚cran sur l'imprimante. Ne marche qu'en ST High.
+N‚anmoins, rien ne vous empˆche de faire une routine de tramage, et
+d'impression se r‚f‚rent … des modules (Speedo?). Le processeur saute … $502.w.
+Mais chut, je n'ait rien dit...
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 17
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 5,18 : PLACE GRAPHIC CURSOR AT LOCATION ///
+
+Fait apparaŒtre le pointeur de la souris au cas o— l'on avait demand‚
+pr‚c‚demment de le faire disparaŒtre.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X
+             WORD : Y
+             WORD : 18
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 5,19 : REMOVE LAST GRAPHIC CURSOR ///
+
+Fait disparaŒtre le pointeur de la souris. TrŠs utile lorsque l'on d‚cide
+d'aller dessiner dans une fenˆtre.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : 19
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+--- FONCTIONS GRAPHIQUES (PRIMITIVES) ---
+
+C'est les ‚l‚ments de base du graphisme. D‚brouillez vous...
+
+/// VDI 11,1 : V_BAR (BAR) ///
+
+Sert … afficher une barre. En fait, il s'agit d'une ligne dont l'attribut
+d'‚paisseur est pris en compte. Y'a aussi : Motif de remplissage
+                                            Mode
+                                            Couleur
+                                            P‚rimŠtre
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X1
+             WORD : Y1
+             WORD : X2
+             WORD : Y2
+             WORD : 1
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+/// VDI 11,2 : V_ARC (ARC) ///
+
+Sert … dessiner un arc de cercle, et non pas d'ellipse. Les attributs sont pris
+en compte : Motif de remplissage
+            Mode
+            Couleur
+            P‚rimŠtre
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Angle de d‚part. N'oubliez pas que l'on est dans le
+                    r‚f‚rentiel trigonom‚trique. Donc 0 c'est trois heures, 90
+                    c'est midi, 180 c'est neuf heures, et 270 c'est six heures.
+                    Doit ˆtre exprim‚ en dixiŠme de degr‚.
+                    V‚rifiez cependant que le systŠme peut utiliser les dixiŠmes
+                    de degr‚, ou est limit‚ au pas de 90 degr‚s (voyez VDI 102).
+             WORD : Angle de fin. Idem
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon
+             WORD : 2
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 22
+
+/// VDI 11,3 : V_PIESLICE (PIE) ///
+
+C'est presque pareille qu'avant, mais au lieu d'avoir juste un cercle, vous
+avez la fameuse part de camembert.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Angle de d‚part.
+             WORD : Angle de fin.
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon
+             WORD : 3
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 22
+
+/// VDI 11,4 : V_CIRCLE (CIRCLE) ///
+
+Un cercle, simplement.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon
+             WORD : 4
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 18
+
+/// VDI 11,5 : V_ELLIPSE (ELLIPSE) ///
+
+Une ellipse. C'est un cercle quelque peu d‚form‚.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon horizontal
+             WORD : Rayon vertical
+             WORD : 5
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+/// VDI 11,6 : V_ELLARC (ELLIPTICAL ARC) ///
+
+Hybride entre l'Arc et l'Ellipse.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Angle de d‚part
+             WORD : Angle de fin
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon horizontal
+             WORD : Rayon vertical
+             WORD : 6
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 24
+
+/// VDI 11,7 : V_ELLPIE (ELLIPTICAL PIE) ///
+
+Hybride entre le Camembert et l'Ellipse (Beurk...)
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Angle de d‚part
+             WORD : Angle de fin
+             WORD : X du centre
+             WORD : Y du centre
+             WORD : Rayon horizontal
+             WORD : Rayon vertical
+             WORD : 7
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 22
+
+/// VDI 11,8 : V_RBOX (ROUNDED RECTANGLE) ///
+
+Rectangle aux coins arrondis.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X1 (en bas … gauche cette fois)
+             WORD : Y1 (Idem)
+             WORD : X2 (en haut … droite)
+             WORD : Y2 (Idem)
+             WORD : 8
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+/// VDI 11,9 : V_RFBOX (FILLED ROUNDED RECTANGLE) ///
+
+Rectangle aux coins arrondis, et rempli.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X1 (en bas … gauche cette fois)
+             WORD : Y1 (Idem)
+             WORD : X2 (en haut … droite)
+             WORD : Y2 (Idem)
+             WORD : 9
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 20
+
+/// VDI 11,10 : V_JUSTIFIED (JUSTIFIED GRAPHICS TEXT) ///
+
+Sert … sortir un texte format‚ justifi‚. On peut ainsi d‚finir sur quelle
+longueur il aura le droit (et non pas le gauche) de s'‚taler.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de caractŠres … afficher
+             WORD : Espacement entre les mots. C'est le VDI qui va d‚cider de
+                    combien d'espace il va rajouter entre les mots pour faire
+                    remplir l'espace demand‚ par le texte.
+                    0 = Aucun
+                    1 = Autoris‚
+             WORD : Espacement entre les lettres. Idem.
+                    0 = Aucun
+                    1 = Autoris‚
+             LONG : Adresse du texte … afficher
+             WORD : X de d‚part du texte
+             WORD : Y de d‚part du texte
+             WORD : Longueur horizontale demand‚e
+             WORD : 10
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 28
+
+--- FONCTIONS COMPLEMENTAIRES ---
+
+/// VDI 12 : VST_HEIGH (SET CHARACTER HEIGHT - ABSOLUTE MODE) ///
+
+Sert … d‚finir la taille d'une cellule de caractŠre.
+  Pour les fontes Non-Proportionnelles (fontes systŠmes), dont tous les
+caractŠres occupent la mˆme place, cela d‚finit la taille pour tous les
+caractŠres de la fonte.
+  Pour les fontes Proportionnelles, o— certains caractŠres, plus larges,
+occupent plus de place, cette fonction fixe la taille pour le caractŠre le plus
+large.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Taille demand‚e
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les tailles des caractŠres.
+                Structure du tableau : WORD 0 : Largeur du caractŠre
+                                       WORD 1 : Hauteur du caractŠre (entre sa
+                                                base et le haut de la cellule du
+                                                caractŠre)
+                                       WORD 2 : Largeur de la cellule
+                                       WORD 3 : Hauteur de la cellule
+Pile : 12
+
+/// VDI 13 : VST_ROTATION (SET CHARACTER BASELINE VECTOR) ///
+
+Permet de d‚finir l'angle du texte.
+V‚rifiez d'abord si vous pouvez demander n'importe quel angle par un Extended
+Inquire Function (VDI 102)
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Angle demand‚ (en dixiŠme de degr‚)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Angle r‚ellement s‚lectionn‚ (en principe par pas de 90ø)
+Pile : 12
+
+/// VDI 14 : VS_COLOR (SET COLOR REPRESENTATION) ///
+
+Sert … changer la couleur d'un index de la palette. Les intensit‚ … entrer sont
+aux formats VDI (0 … 1000).
+
+ATTENTION : Sur les moniteurs monochromes, une autres valeur que blanc donne du
+            noir. Cependant, sur Falcon030, en monochrome sur un ‚cran VGA par
+            exemple, les couleurs d‚finis sont r‚ellement utilis‚es. Ainsi on
+            peut avoir un ‚cran en "Rouge et Noir" suivant son choix par
+            exemple.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Index de la couleur … changer
+             WORD : Intensit‚ du rouge (0 … 1000)
+             WORD : Intensit‚ du vert (0 … 1000)
+             WORD : Intensit‚ du bleu (0 … 1000)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 18
+
+/// VDI 15 : VSL_TYPE (SET POLYLINE LINE TYPE) ///
+
+Sert … d‚finir le type de ligne.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Type demand‚
+                    1 = Ligne continue  (%1111111111111111)
+                    2 = Tiret long      (%1111111111110000)
+                    3 = Pointill‚       (%1100000011000000)
+                    4 = Tiret et point  (%1111111100001100)
+                    5 = Tiret           (%1111111100000000)
+                    6 = Tiret, 2 points (%1111000110011000)
+                    7 = Utilisateur (Voyez VDI 113 pour cela)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Type r‚ellement utilis‚
+Pile : 12
+
+/// VDI 16 : VSL_WIDTH (SET POLYLINE LINE WIDTH) ///
+
+Sert … d‚finir la largeur d'une ligne.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Largeur demand‚e (impair de pr‚f‚rence)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Largeur r‚ellement s‚lectionn‚e
+Pile : 12
+
+/// VDI 17 : VSL_COLOR (SET POLYLINE COLOR INDEX) ///
+
+Sert … d‚finir la couleur de la ligne.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Idex de la couleur demand‚e
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Index r‚ellement utilis‚
+Pile : 12
+
+/// VDI 18 : VSM_TYPE (SET POLYMARKER TYPE) ///
+
+Sert … d‚finir le type de repr‚sentation utilis‚ pour les marqueurs.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Type de repŠre
+                    1 = Point (.)
+                    2 = Croix horizontale (un peu comme le signe +)
+                    3 = Etoile (dans le genre de *)
+                    4 = Carr‚ (mieux que [])
+                    5 = Croix diagonale (comme X)
+                    6 = Losange (dans la mˆme famille que <>)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Type de repŠre r‚ellement utilis‚
+Pile : 12
+
+/// VDI 19 : VSM_HEIGHT (SET POLYMARKER HEIGHT)///
+
+Sert … choisir la taille des repŠres.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Taille demand‚
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Taille r‚ellement s‚lectionn‚e
+Pile : 12
+
+/// VDI 20 : VSM_COLOR (SET POLYMARKER COLOUR INDEX) ///
+
+Sert … choisir la couleur des repŠres.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Index de couleur demand‚
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Index r‚ellement utilis‚
+Pile : 12
+
+/// VDI 21 : VST_FONT (SET TEXT FACE) ///
+
+Sert … choisir la fonte. Il faut en principe en avoir pr‚alablement charg‚.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro de la fonte voulue
+                    1 = Fonte systŠme (toujours disponible)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Num‚ro de la fonte r‚ellement s‚lectionn‚
+Pile : 12
+
+/// VDI 22 : VST_COLOR (SET GRAPHIC TEXT COLOUR INDEX) ///
+
+Sert … d‚finir la couleur du texte.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Index de la couleur … utiliser
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Index r‚ellement utilis‚
+Pile : 12
+
+/// VDI 23 : VSF_INTERIOR (SET FILL INTERIOR STYLE) ///
+
+Sert … choisir le style de remplissage.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Style demand‚
+                    0 = Remplissage plein avec la couleur d'index 0
+                    1 = Remplissage plein avec la couleur demand‚e
+                    2 = Remplissage avec motif
+                    3 = Remplissage avec hachures
+                    4 = Motif utilisateur (Voyez VDI 112)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Style s‚lectionn‚
+Pile : 12
+
+/// VDI 24 : VSF_STYLE (SET FILL STYLE INDEX) ///
+
+Sert … d‚finir le num‚ro de style du motif de remplissage
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro de style
+                    Style Motif :  1 = 12.5% tramage entre couleur la couleur
+                                       de fond (index 0), et la couleur demand‚
+                                   2 = 25% tramage
+                                   3 = 37.5% tramage
+                                   4 = 50% tramage
+                                   5 = 62.5% tramage
+                                   6 = 75% tramage
+                                   7 = 87.5% tramage
+                                   8 = 100% tramage, couleur demand‚
+                                   9 = Briques
+                                  10 = Briques diagonales (bas gauche vers haut
+                                       droit)
+                                  11 = Pointes
+                                  12 = "Coupes de Champagne"
+                                  13 = Relief m‚tallique
+                                  14 = "Papier Peint"
+                                  15 =
+                                  16 = Tissage
+                                  17 = Motif tissus en dent de scie
+                                  18 = Motif tissus carr‚
+                                  19 = Bulles
+                                  20 = Tuiles rondes
+                                  21 = Tuiles obliques (haut gauche vers bas
+                                       droit)
+                                  22 = Damier
+                                  23 = Damier oblique
+                                  24 = Parquet
+                    Style Hachure :  1 = Lignes obliques (bas gauche vers haut
+                                         droit)
+                                     2 = Idem que 1, mais lignes ‚paisses
+                                     3 = Cadrillage oblique
+                                     4 = Lignes verticales
+                                     5 = Lignes horizontales
+                                     6 = Cadrillage
+                                     7 = Idem que 1, mais espac‚es
+                                     8 = Idem que 2, mais espac‚es
+                                     9 = Idem que 3, mais lignes espac‚es
+                                    10 = Idem que 4, mais lignes espac‚es
+                                    11 = Idem que 5, mais lignes espac‚es
+                                    12 = Idem que 6, simplement
+                                    2 =
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Num‚ro du style r‚ellement s‚lectionn‚
+Pile : 12
+
+/// VDI 25 : VSF_COLOR SET FILL COLOUR INDEX) ///
+
+Sert … d‚finir la couleur du remplissage.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Couleur demand‚e
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Couleur r‚ellement utilis‚e
+Pile : 12
+
+/// VDI 32 : VSWR_MODE (SET WRITING MODE) ///
+
+Sert … choisir le mode d'‚criture. Permet d'effectuer une op‚ration logique
+entre le motif ou les caractŠres … afficher, et le fond.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Mode choisit
+                    1 = Replace : Les nouvelles donn‚es remplacent les
+                                  pr‚c‚dentes sans autre forme de procŠs.
+                    2 = Transparent : Le masque est utilis‚ pour d‚finir les
+                                      points … changer.
+                    3 = XOR : Inverse les BITs en communs avec le masque. Donc
+                              si vous faites une deuxiŠme fois appel … cette
+                              fonction, tout ce qui avait ‚t‚ invers‚ revient
+                              dans le statut de d‚part. Essayez voir...
+                    4 = Invers Transparent : Idem que Transparent, sauf qu'ici,
+                                             ce sont les BITs … 0 qui servent …
+                                             d‚finir les points … changer.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Mode r‚ellement s‚lectionn‚
+Pile : 12
+
+/// VDI 104 : VSF_PERIMETER (SET FILL PERIMETER VISIBILITY) ///
+
+Sert … choisir si oui ou non, la zone de remplissage doit ˆtre entour‚e d'une
+ligne (attention … son ‚paisseur) de la couleur demand‚e.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : P‚rimetre de remplissage
+                    0 = Non
+                    1 = Oui
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Mode r‚ellement s‚lectionn‚
+Pile : 12
+
+/// VDI 106 : VST_EFFECTS (SET GRAPHIC TEXT SPECIAL EFFECTS) ///
+
+Sert … d‚finir les effets graphiques sur le texte.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Effets demand‚s
+                    BIT 0 = Bold - Gras
+                    BIT 1 = Light - Clair
+                    BIT 2 = Italic - Italique
+                    BIT 3 = Soulign‚
+                    BIT 4 = OutLined - Contour
+                    BIT 5 = Shade - Ombr‚
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Effets r‚ellement s‚lectionn‚s
+Pile : 12
+
+/// VDI 107 : VST_POINT (SET CHARACTER CELL HEIGHT - POINTS MODE) ///
+
+Sert … choisir la taille de la cellule d'un caractŠre. Si normalement VDI 12
+suffit, ici c'est en pr‚vision d'une impression.
+Cette fonction est extrˆmement utile pour les traitement de textes WYSIWYG
+(What You See Is What You Get - Ce Que Vous Voyez Est Ce Que Vous Obtenez), car
+on peut avoir un rapport proportionnel … l'‚cran, par rapport … ce que l'on
+veut obtenir sur l'imprimante.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Taille en 1/72ø de pouce (soit 0.35277 millimŠtres par
+                    points)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Taille r‚ellement s‚lectionn‚
+Pile : 12
+
+/// VDI 108 : VSL_ENDS (SET POLYLINE END STYLES) ///
+
+Sert … choisir le style de terminaison des extr‚mit‚s des lignes.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Style du d‚part
+                    0 = Bout carr‚
+                    1 = FlŠche
+                    2 = Bout arrondi
+             WORD : Style de fin
+                    Idem que style de d‚part
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 14
+
+/// VDI 112 : VSF_UDPAT (SET USER DEFINED FILL PATTERN) ///
+
+Sert … d‚finir un style de remplissage utilisateur.
+Un grand avantage de cette fonction, est de permettre de d‚finir des styles en
+couleurs.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de plans
+             LONG : Adresse des plans formants le motif
+                    Chaque plan doit ˆtre compos‚ de 16 WORDs.
+                    Les plans doivent se suivre.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 16
+
+/// VDI 113 : VSL_UDSTY (SET USER-DEFINED LINE STYLE PATTERN) ///
+
+Permet de d‚finir un style de ligne utilisateur
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Style de la ligne sur 16 BITs
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+--- FONCTIONS DE QUADRILLAGE ---
+
+Les fonctions se rapportant aux quadrillage ne sont en fait que des blocs
+m‚moire ‚cran ou autre. Certains dans certaines documentations ont utilis‚s la
+notion de quadrillage car cela est "sens‚" rappeler les coordonn‚es des pixels.
+
+/// VDI 105 : V_GET_PIXEL (GET PIXEL) ///
+
+Permet d'obtenir l'index de couleur d'un point.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X
+             WORD : Y
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Valeur.w et Index.w de la couleur du point
+Pile : 14
+
+/// VDI 109 : VRO_CPYFM (COPY RASTER - OPAQUE) ///
+
+Copie d'un bloc vers un autres. Ces blocs peuvent appartenir … l'‚cran ou non.
+Ce sont les plus petites dimensions donn‚es qui sont utilis‚es. Il apparaŒt une
+nouvelle structure, se rapportant … l'‚cran.
+
+> Structure MFDB
+  LONG 0 : Pointeur sur le bloc de l'image
+  WORD 2 : Largeur du bloc en points
+  WORD 3 : Hauteur du bloc en points
+  WORD 4 : Longueur d'un ligne en WORDs
+  WORD 5 : Format du bloc
+           0 = Machine (Raster, o— les plans sont entrelac‚s)
+           1 = Standard (les plans se suivent (et ne se ressemblent pas))
+  WORD 6 : Nombre de plans
+  WORD 7 : R‚serv‚
+
+ATTENTION : Le systŠme d'exploitation, pour les copie de blocs, ne gŠre pas le
+            format Standard.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Op‚ration logique … effectuer sur le bloc.
+                    Ce sont les mˆmes que celle du Blitter (qui est la version
+                    Hard de cette fonction, sp‚cialement d‚velopp‚e par ATARI).
+                       0 = Destination … 0
+                       1 = Source AND Destination
+                       2 = Source NAND Destination
+                       3 = Source (copie simple)
+                       4 = NOT Source AND Destination
+                       5 = Destination
+                       6 = Source XOR Destination
+                       7 = Source OR Destination
+                       8 = NOT Source NAND Destination
+                       9 = NOT Source XOR Destination
+                      10 = NOT Destination
+                      11 = Source NOR Destination
+                      12 = NOT Source
+                      13 = NOT Source OR Destination
+                      14 = NOT Source NOR Destination
+                      15 = Destination … "1"
+             WORD : X du d‚but du bloc source
+             WORD : Y du d‚but du bloc source
+             WORD : X de fin du bloc source
+             WORD : Y de fin du bloc source
+             WORD : X de d‚but du bloc de destination
+             WORD : Y de d‚but du bloc de destination
+             WORD : X de fin du bloc de destination
+             WORD : Y de fin du bloc de destination
+             LONG : Adresse du MFDB du bloc source
+             LONG : Adresse du MFDB du bloc destination
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 36
+
+/// VDI 110 : VR_TRNFM (TRANSFORM FORM) ///
+
+Transforme le format graphique d'un bloc au format actuel. Il est donc inutile
+de sp‚cifier le nouveau format dans le MFDB Destination. C'est, je pense, une
+grave erreur de la part de Digital Research, de n'avoir pas pr‚vus cela.
+Mais bon, cela sera peut ˆtre diff‚rent dans une prochaine version de SSAV.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du MFDB du bloc source
+             LONG : Adresse du MFDB du bloc destination
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 18
+
+/// VDI 121 : VRT_CPYFM (COPY RASTER - TRANSPARENT) ///
+
+Copie un bloc en lui faisant effectuer une transformation de format, pour
+l'adapter … l'‚cran. Le bloc source doit ˆtre au format monochrome.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Mode de transformation
+                    1 = Remplacement : Les BITs … 1 du bloc source sont
+                                       affich‚s avec la couleur demand‚e, ainsi
+                                       que les BITs … 0.
+                    2 = Transparent : Seuls les BITs du bloc source … 1 sont
+                                      affich‚s dans la couleur demand‚e.
+                    3 = XOR :
+                    4 = Transparent Inverse : Seuls les BITs du bloc source … 1
+                                              sont affich‚s dans la couleur
+                                              demand‚e.
+             WORD : Index de couleur pour les BITs du bloc source … 1
+             WORD : Index de couleur pour les BITs du bloc source … 0
+             WORD : X du d‚but du bloc source
+             WORD : Y du d‚but du bloc source
+             WORD : X de fin du bloc source
+             WORD : Y de fin du bloc source
+             WORD : X de d‚but du bloc de destination
+             WORD : Y de d‚but du bloc de destination
+             WORD : X de fin du bloc de destination
+             WORD : Y de fin du bloc de destination
+             LONG : Adresse du MFDB du bloc source
+             LONG : Adresse du MFDB du bloc destination
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 40
+
+--- FONCTIONS D'ENTREE ---
+
+Ces fonctions de saisies sont les plus puissantes de l'ATARI. Ce sont elles qui
+permettent de ne pas stopper l'ordinateur, mais d'effectuer la saisie en "tache
+de fond".
+
+/// VDI 33 : VSIN_MODE (SET INPUT MODE) ///
+
+Sert … d‚terminer le mode de saisie de chaque type de p‚riph‚rique.
+Attention, car les fonctions suivantes celle ci r‚agiront de maniŠre d‚termin‚e
+par cette fonction, donc faites trŠs attention.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : P‚riph‚rique de saisie.
+                    Le VDI en traite quatre de types diff‚rents
+                    1 = Locator : Un p‚riph‚rique qui donne une position
+                                  (souris, stylo, tablette graphique, ...)
+                    2 = Valuator : Modification de valeurs suivant l'entr‚e.
+                                   En principe, ne marche pas sur ATARI.
+                                   Sur PC, ce sont par exemple les JoySticks
+                                   analogique contenants des potentiomŠtres,
+                                   et pouvant fournir une valeur, donc.
+                                     Il parait que c'est la modification d'un
+                                   nombre avec les fleches, mais vu que le ST
+                                   est capable de le faire, je ne vois pas
+                                   pourquoi cela n'a pas ‚t‚ adapt‚ sur ATARI.
+                    3 = Choice : Ici, sur ATARI, ce sont nos touches de
+                                 fonctions
+                    4 = String : Le clavier, tout simplement, avec lettres et
+                                 chiffres.
+             WORD : Mode d'attente
+                    1 = Request. Dans ce cas, la fonction attend le nombre
+                        d'OCTET … entrer.
+                    2 = Sample. La fonction renvoie code ASCII par code ASCII
+                        ceux des touches enfonc‚es.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Mode r‚ellement s‚lectionn‚
+Pile : 14
+
+/// VDI 28 : VRQ_LOCATOR (INPUT LOCATOR) ///
+
+Cette fonction fournit la position de la souris ou compagnie.
+
+Request Mode : La souris est positionn‚e aux coordonn‚es pr‚cis‚es. La fonction
+               se d‚roule jusqu'a qu'une touche du clavier ou de la souris soit
+               enfonc‚e.
+               ATTENTION : Le pointeur de la souris est affich‚, mˆme s'il ne
+                           l'‚tait pas
+Sample Mode : La souris est positionn‚e aux coordonn‚es pr‚cis‚es, mais cette
+              fois ci, la fonction attend que la position de la souris de la
+              souris ait chang‚e ou qu'une touche du clavier ou de la souris
+              ait ‚t‚ enfonc‚e.
+              ATTENTION : Ici, vous obtenez soit la nouvelle position de la
+                          souris ou le code ASCII de la touche enfonc‚e.
+                          De plus, le pointeur de la souris est effac‚ (mais
+                          peut ˆtre affich‚ "Met" Show Cursor)
+
+ATTENTION : Le code renvoy‚ pour le bouton gauche est $20 (32) [Espace]
+                                           droit  est $21 (33) [!]
+            Prenez donc la valeur du BIT 0 pour savoir ce qu'il en est.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X
+             WORD : Y
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Code ASCII de la touche enfonc‚e (pour les boutons de la
+                souris, voyez plus haut)
+         D1.l = X.w et Y.w de la souris
+Pile : 14
+
+/// VDI 29 : VRQ_VALUATOR (INPUT VALUATOR) ///
+
+En soit, cette fonction est inutile car n'a pas ‚t‚ adapt‚e sur ATARI, vus qu'il
+n'existe aucun p‚riph‚rique d'entr‚e analogique en s‚rie (mont‚ d'origine) sur
+ATARI. Cependant, si Maitre DALSTEIN veut bien faire un truc dans ce sens, …
+connecter sur le port cartouche, pourquoi n'y aurait il pas une raison … ce que
+la prochaine version de SSAV dispose effectivement de routines pour g‚rer la
+chose en question.
+Mais c'est … voir, et les propositions de connecteurs (pour JoySticks
+analogique?), ou autres, en ce sens (NdM: encore...?), sont les bienvenues.
+
+Normalement, les docs d‚veloppeur indiquent que cette fonction sert … changer
+une valeur comprise entre 0 et 100 avec les flŠches. Celles du bas ou du haut
+servant … augmenter ou diminuer la valeur par pas de dix, et celle de gauche et
+de droite par pas de 1 (un peu comme la modification de la m‚moire sous SysInfo
+V8.23).
+
+Request Mode : Modifie la valeur jusqu'a que la fonction re‡oive un code ASCII
+               ou que les boutons de la souris soient enfonc‚s.
+
+Sample Mode : La fonction se termine au premier changement significatif.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Valeur initiale (comprise entre 0 et 100)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Valeur.w finale et Code.w ASCII
+         D1.w = Evenement si Sample Mode
+                0 : Rien pass‚
+                1 : Valeur chang‚e
+                2 : Code ASCII
+Pile : 12
+
+/// VDI 30 : VRQ_CHOICE (INPUT CHOICE) ///
+
+Cette fonction attend qu'une touche de fonction soit actionn‚e.
+Si la r‚ponse est invalide (allez savoir pourquoi), la fonction renvoie la
+valeur initiale (permet par exemple de savoir si une touche de fonction a ‚t‚
+appuy‚e en mettant la valeur initiale … -1).
+
+Request Mode : Attend une touche de fonction.
+
+Sample Mode : La fonction regarde si a ce moment l…, une touche de fonction est
+              enfonc‚e, et fournie sa valeur dans ce cas
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Valeur initiale (inutile en Sample Mode)
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Num‚ro de la touche de fonction, ou valeur.
+Pile : 12
+
+/// VDI 31 : VRQ_STRING (INPUT STRING) ///
+
+Permet de saisir une chaŒne de caractŠre. Si la sortie sur ‚cran est permise,
+la chaŒne est affich‚e avec les attributs du texte courant, et … la position
+indiqu‚e.
+
+Request Mode : La fonction ne s'arrˆte que si le buffer est plein, ou que la
+               touche [Return] ou [Enter] ait ‚t‚ enfonc‚e.
+
+Sample Mode : Comme Request Mode, mais de fa‡on intempestive.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Longueur maximum de la chaŒne … saisir
+                    ATTENTION : Cette valeur ne doit SURTOUT pas d‚passer le
+                    nombre de IntOut que vous avez d‚finit dans votre
+                    programme.
+             WORD : Mode de sortie
+                    0 = Pas de sortie sur l'‚cran
+                    1 = Sortie sur l'‚cran autoris‚e
+             WORD : X
+             WORD : Y
+             LONG : Adresse o— doit ˆtre inscrite la chaŒne
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Longueur saisie
+Pile : 22
+
+/// VDI 111 : VSC_FORM (SET MOUSE FORM) ///
+
+Encore une autre maniŠre de changer de souris.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : X du Point Chaud
+             WORD : Y du Point Chaud
+             WORD : Index de couleur pour le masque (en principe 0 pour Blanc)
+             WORD : Index de couleur pour les donn‚es (1 pour Noir normalement)
+             LONG : Adresse de 16 WORDs composants le masque
+             LONG : Adresse de 16 WORDs composants le pointeur
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 26
+
+/// VDI 118 : VEX_TIMV (EXCHANGE TIMER INTERRUPT VECTOR) ///
+
+Permet de faire ex‚cuter une action par le VDI.
+Celle ci sera ex‚cut‚e … chaque battement du Timer (r‚visez votre MFP). En
+principe, c'est … chaque VBL que s'effectue l'appel … votre routine.
+
+ATTENTION : Pendant l'ex‚cution de la routine, les interruptions sont
+            d‚sactiv‚es. Les registres ne doivent en AUCUN cas ˆtres modifi‚s,
+            et celle ci ne doit pas ˆtre trop longue.
+
+ParamŠtres : WORD : VDI_Id
+             LONG : Adresse de la routine … activer
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Nombre de millisecondes entre deux battements du Timer
+         D1.l = Adresse de la pr‚c‚dente routine
+Pile : 14
+
+/// VDI 122 : V_SHOW_C (SHOW CURSOR) ///
+
+Fait apparaŒtre le pointeur de la souris, si celui ci avait disparu.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Mode
+                    0 = Force l'apparition du curseur
+                    1 = Prend en compte le nombre de fois que l'on a demand‚ au
+                        curseur de disparaŒtre.
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 12
+
+/// VDI 123 : V_HIDE_C (HIDE CURSOR) ///
+
+Fait disparaŒtre le curseur.
+
+ATTENTION : Mˆme invisible, le curseur continu … ˆtre g‚r‚, donc n'attendez pas
+            … le revoir forcement r‚apparaŒtre o— il avait disparu.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : Aucun
+Pile : 10
+
+/// VDI 124 : VQ_MOUSE (SAMPLE MOUSE BUTTON STATE) ///
+
+Sert … obtenir l'‚tat de la souris.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = X.w et Y.w de la souris
+         D1.w = Etats des boutons de la souris
+                BIT 0 : Bouton gauche
+                BIT 1 : Bouton droit
+Pile : 10
+
+/// VDI 125 : VEX_BUTV (EXCHANGE BUTTON CHANGE VECTOR) ///
+
+Permet de faire ex‚cuter une routine … chaque changement de l'‚tat des boutons
+de la souris. Pour changer les boutons par exemple, et obtenir une souris pour
+gaucher.
+
+Pour cela, voici un petit programme qui s'en occupe:
+
+Left_Mouse      lsl.l           #14,D0          ; Les BITs des boutons
+                                                ; chevauchent les deux WORDs
+                swap            D0              ; On inverse les WORDs
+                bclr.l          #31,D0          ; On efface l'‚tat du bouton
+                                                ; gauche
+                BEQ             Exit_Lefter     ; S'il ‚tait … 0, on s'en fout
+                bset.b          #1,D0           ; Sinon, on le replace
+
+Exit_Lefter     RTS
+
+ATTENTION : Le VDI, … ce niveau, n'a pas encore enregistr‚ l'‚tat de ces
+            boutons, mais vous appelle, car il … d‚tect‚ un changement.
+            Cependant, l'‚tat actuel vous est transmit dans D0.w.
+            A la fin de la routine, vous devez renvoyer cet ‚tat (que vous
+            pouvez avoir modifi‚) dans D0.
+            Le VDI prend alors en compte ce nouvel ‚tat (dans D0).
+            Les registres, en dehors de D0, NE doivent PAS avoir chang‚.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse de votre routine
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse de la pr‚c‚dente routine
+Pile : 14
+
+/// VDI 126 : VEX_MOTV (EXCHANGE MOUSE MOVEMENT VECTOR) ///
+
+Permet de faire ex‚cuter une routine … chaque affichage du pointeur de la
+souris (en principe … chaque fois quelle change de position).
+
+ATTENTION : Le VDI n'a pas encore enregistr‚ les nouvelles coordonn‚es.
+            Vous obtenez dans D0.w la nouvelle position X, et dans D1.w, la Y.
+            Ces valeurs doivent s'y retrouver au retour.
+            Les registres ne doivent en AUCUN cas avoir chang‚s.
+            Les interruptions sont impossibles.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse de la routine
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse de la pr‚c‚dente routine
+Pile : 14
+
+/// VDI 127 : VEX_CURV (EXCHANGE CURSOR CHANGE VECTOR) ///
+
+Permet de faire ex‚cuter une routine d'affichage du curseur.
+Si vous voulez demander au VDI de le faire pour vous, utilisez l'ancienne
+adresse, renvoy‚e aprŠs l'appel de cette fonction.
+
+Pensez que vous avez besoin, … l'appel de la routine de :
+ - Effacer votre curseur
+ - Sauvegarder le fond
+   Il n'est pas utile de faire un tas d'op‚ration logiques pour sauvegarder
+   juste ce qui sera sous le pointeur. Faites juste une copie du rectangle o—
+   sera affich‚ le pointeur.
+ - Afficher … la nouvelle position
+
+ATTENTION : Le VDI n'a pas encore enregistr‚ les nouvelles coordonn‚es.
+            Vous obtenez dans D0.w la nouvelle position X, et dans D1.w, la Y.
+            Ces valeurs doivent s'y retrouver au retour.
+            Les registres ne doivent en AUCUN cas avoir chang‚s.
+            Les interruptions sont impossibles.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse de la routine
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse de l'ancienne routine
+Pile : 14
+
+/// VDI 128 : VQ_KEY_S (SAMPLE KEYBOARD STATE INFORMATION) ///
+
+Permet de connaŒtre l'‚tat des touches sp‚ciales du clavier.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Etat des touches sp‚ciales
+                BIT 0 : SHIFT Droit
+                BIT 1 : SHIFT Gauche
+                BIT 2 : CONTROL
+                BIT 3 : ALTERNATE
+Pile : 10
+
+--- FONCTIONS D'ETAT DU SYSTEME ---
+
+/// VDI 26 : VQ_COLOR (INQUIRE COLOR REPRESENTATION) ///
+
+Permet d'obtenir des informations sur les couleurs mises en places.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Index de la couleur … obtenir
+             WORD : Mode
+                    0 = Couleur d‚finit dans le VDI, et qui devrait
+                        normalement s'afficher
+                    1 = Couleur r‚ellement affich‚e
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les informations sur la couleur
+                Structure du tableau : WORD 0 : Index de la couleur
+                                       WORD 1 : Rouge (0 … 1000)
+                                       WORD 2 : Vert (0 … 1000)
+                                       WORD 3 : Bleu (0 … 1000)
+Pile : 14
+
+/// VDI 27 : VQT_ARRAY (INQUIRE CELL ARRAY) ///
+
+(Pas document‚, mais carr‚ment implant‚, si si...)
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Longueur d'une ligne dans le tableau d'index
+             WORD : Nombre de lignes dans le tableau d'index
+             WORD : X du coin haut - gauche
+             WORD : Y du coin haut - gauche
+             WORD : X du coin bas - droite
+             WORD : Y du coin bas - droite
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse du tableau
+         D1.l = Adresse d'un tableau contenant les informations du tableau
+                d'index
+                Structure du tableau : WORD 0 : Longueur du tableau d'index
+                                       WORD 1 : Nombre d'‚l‚ment par ligne
+                                       WORD 2 : Nombre de lignes du tableau
+                                       WORD 3 : Validit‚
+                                                0 = Pas d'erreur (c'est ...)
+                                                1 = Certains points n'ont pus
+                                                    ˆtre d‚termin‚s.
+                                                    Dans ce cas, la case
+                                                    correspondant au point
+                                                    contient -1.
+Pile : 22
+
+/// VDI 35 : VQL_ATTRIBUTES (INQUIRE CURRENT POLYLINE ATTRIBUTES) ///
+
+Permet d'obtenir les attributs de lignes de la station courante.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les attributs de lignes
+                Structure du tableau : WORD 0 : Style de la ligne
+                                       WORD 1 : Index de couleur
+                                       WORD 2 : Mode d'‚criture
+                                       WORD 3 : Style du d‚part
+                                       WORD 4 : Style de la fin
+         D1.w = Largeur courant de la ligne
+Pile : 10
+
+/// VDI 36 : VQM_ATTRIBUTES (INQUIRE CURRENT POLYMARKER ATTRIBUTES) ///
+
+Sert … obtenir les attributs actuels des marqueurs.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les attributs courants des
+                marqueurs.
+                Structure du tableau : WORD 0 : Style du marqueur
+                                       WORD 1 : Index de couleur
+                                       WORD 2 : Mode d'‚criture
+         D1.l = Epaisseur.w et Hauteur.w
+Pile : 10
+
+/// VDI 37 : VQF_ATTRIBUTES (INQUIRE CURRENT FILL AREA ATTRIBUTES) ///
+
+Sert … obtenir les paramŠtres actuel de remplissage.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : DO.l : Adresse d'un tableau contenant les attributs courants du
+                remplissage
+                Structure du tableau : WORD 0 : Style de remplissage
+                                       WORD 1 : Index de couleur du remplissage
+                                       WORD 2 : Num‚ro du style du remplissage
+                                       WORD 3 : Mode d'‚criture
+                                       WORD 4 : Visualisation du p‚rimŠtre
+Pile : 10
+
+/// VDI 38 : VQT_ATTRIBUTES (INQUIRE CURRENT GRAPHIC TEXT ATTRIBUTES) ///
+
+Sert … obtenir (et non … fixer) les attributs de sortie graphique.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les attributs d'affichage
+                Structure du tableau : WORD 0 : Police actuellement mise en
+                                                oeuvre
+                                       WORD 1 : Couleur du texte
+                                       WORD 2 : Angle de rotation du texte (en
+                                                dixiŠme de degr‚)
+                                       WORD 3 : Alignement horizontale
+                                       WORD 4 : Alignement verticale
+                                       WORD 5 : Mode d'‚criture
+         D1.l = Adresse d'un tableau contenant les attributs des caractŠres
+                Structure du tableau : WORD 0 : Largeur d'un caractŠre
+                                       WORD 1 : Hauteur d'un caractŠre
+                                       WORD 2 : Largeur d'une cellule
+                                       WORD 3 : Hauteur d'une cellule
+Pile : 10
+
+/// VDI 102 : VQ_EXTND (EXTENDED INQUIRE FONCTION) ///
+
+Permet d'obtenir encore plus d'informations sur la station de travail, que
+celles offertes … son ouverture.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Type d'informations demand‚es
+                    0 = Celle offerte … l'ouverture de la station
+                    1 = Les ‚tendues, celle que normalement on ne connaŒt pas
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Handle
+         D1.l = Adresse d'un tableau contenant les informations demand‚es.
+                Si vous avez demand‚ les informations normales, vous obtenez le
+                mˆme tableau qu'a l'ouverture de votre station, sinon, c'est un
+                tableau diff‚rent.
+                Structure du tableau : WORD  0 : Type de la sortie ‚cran
+                                                 0 = C'est pas un ‚cran (???)
+                                                     Une paire de rames peut
+                                                     ˆtre, pour voir clair.
+                                                 1 = Deux parties distinctes,
+                                                     graphiquement et
+                                                     textuellement, ainsi que
+                                                     deux RAM vid‚o diff‚rentes
+                                                     (donc en principe deux
+                                                     ‚crans, un graphique, et
+                                                     un textuel).
+                                                 2 = Deux parties diff‚rentes,
+                                                     mais RAM vid‚o commune
+                                                     (y'aurait pas un os?).
+                                                 3 = L'inverse : Les deux
+                                                     parties de gestion
+                                                     graphique et textuel sont
+                                                     communes, mais il y a deux
+                                                     RAM vid‚o (une pour chaque
+                                                     partie, mais c'est pas
+                                                     possible)
+                                                 4 = Les deux parties sont
+                                                     communes, ainsi que la RAM
+                                                     vid‚o (cas des ATARIs)
+                                       WORD  1 : Nombre de couleurs de fond
+                                                 (???)
+                                       WORD  2 : Effets graphiques support‚s sur
+                                                 le texte. Voyez la fonction
+                                                 correspondante (VDI 106)
+                                       WORD  3 : Agrandissement/R‚duction
+                                                 0 = Impossible
+                                                 1 = Possible
+                                       WORD  4 : Nombre de plans vid‚o
+                                       WORD  5 : Table Look Up (???)
+                                                 0 = Non g‚r‚e
+                                                 1 = Ger‚e
+                                       WORD  6 : Coefficient de performance.
+                                                 C'est le nombre d'op‚rations
+                                                 effectu‚es par seconde sur une
+                                                 matrice de 16*16 points. €a
+                                                 permet de donner un ordre
+                                                 d'id‚e sur la performance de
+                                                 votre machine, surtout si vous
+                                                 connaissez la valeur d'autre
+                                                 machine. Mais entre nous, ne
+                                                 vous y fiez SURTOUT pas.
+                                                 Ce doit ˆtre le temps que met
+                                                 le GEM … tracer la souris (ce
+                                                 qu'il fait en permanence).
+                                                 Le rapport d'un Falcon030 par
+                                                 rapport … un ST est donn‚ …
+                                                 138% ici, alors que test‚ dans
+                                                 les conditions normales
+                                                 d'utilisation, on atteind sans
+                                                 peine les 340%.
+                                       WORD  7 : Possibilit‚ de remplir une zone
+                                                 en tenant compte des
+                                                 diff‚rences de couleurs pour
+                                                 g‚rer la limite du remplissage.
+                                                 0 = Non
+                                                 1 = Oui
+                                       WORD  8 : Possibilit‚ de rotation des
+                                                 caractŠres.
+                                                 0 = Non
+                                                 1 = Par pas de 90ø
+                                                 2 = Par pas de dixiŠme de degr‚
+                                                 ATTENTION : TrŠs important!
+                                       WORD  9 : Nombre de mode d'‚criture
+                                       WORD 10 : Modes de saisit possibles
+                                                 0 = Aucun
+                                                 1 = Request
+                                                 2 = Request - Sample
+                                       WORD 11 : Possibilit‚ d'alignement du
+                                                 texte
+                                                 0 = Non
+                                                 1 = Oui
+                                       WORD 12 : Possibilit‚ de gestion de
+                                                 l'encrage de l'imprimante
+                                                 0 = Non
+                                                 1 = Oui
+                                       WORD 13 : Possibilit‚ de changer de
+                                                 couleur par d‚placement du
+                                                 ruban sur les imprimantes
+                                                 couleur matricielles
+                                                 0 = Non
+                                                 1 = Oui, sur plusieurs lignes
+                                                 2 = Oui, sur plusieurs lignes
+                                                     et rectangles
+                                       WORD 14 : Nombre maximum de coordonn‚es
+                                                 g‚r‚es pour les diff‚rents
+                                                 fonctions en n‚cessitant
+                                                 (PolyLine, PolyMarker, Filled
+                                                 Area, ...)
+                                                 -1 = Illimit‚
+                                       WORD 15 : Nombre d'entr‚es IntIn
+                                                 -1 = Illimit‚
+                                       WORD 16 : Nombre de boutons de la souris
+                                                 (d‚pend si elle a de l'acn‚)
+                                       WORD 17 : Possibilit‚ d'application des
+                                                 styles sur le lignes larges.
+                                                 0 = Non
+                                                 1 = Oui
+                                       WORD 18 : Mode d'‚criture pour les lignes
+                                                 larges
+         D2.l = Infos sur les caractŠres si vous avez demand‚ les informations
+                … l'ouverture d'une station
+Pile : 12
+
+/// VDI 115 : VQT_INPUT (INQUIRE INPUT MODE) ///
+
+L'inverse de la fonction VDI 33. Permet de connaŒtre, pour chaque type de
+p‚riph‚rique, le mode d'attente.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro du p‚riph‚rique
+                    1 = Locator
+                    2 = Valuator
+                    3 = Choice
+                    4 = String
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = 1 : Mode Request
+                2 : Mode Sample
+Pile : 12
+
+/// VDI 116 : VQT_EXTENT (INQUIRE TEXT EXTENT) ///
+
+Permet de connaŒtre la position et la place qu'occupera … l'‚cran la chaŒne de
+caractŠre pr‚cis‚e.
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Nombre de caractŠres … afficher
+             LONG : Adresse de la chaŒne de caractŠres
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant les coordonn‚es des extr‚mit‚s
+                du rectangle contenant la chaŒne.
+                Structure du tableau : WORD 0 : X du coin inf‚rieur gauche du
+                                                rectangle
+                                       WORD 1 : Y du coin inf‚rieur gauche du
+                                                rectangle
+                                       WORD 2 : X du coin inf‚rieur droit du
+                                                rectangle
+                                       WORD 3 : Y du coin inf‚rieur droit du
+                                                rectangle
+                                       WORD 4 : X du coin sup‚rieur gauche du
+                                                rectangle
+                                       WORD 5 : Y du coin sup‚rieur gauche du
+                                                rectangle
+                                       WORD 6 : X du coin sup‚rieur droit du
+                                                rectangle
+                                       WORD 7 : Y du coin sup‚rieur droit du
+                                                rectangle
+Pile : 16
+
+/// VDI 117 : VQT_WIDTH (INQUIRE CHARACTER CELL WIDTH) ///
+
+Sert … connaŒtre la largeur d'une cellule de caractŠre, ainsi que l'intervalle
+… gauche et … droite (un petit espace pour que les caractŠres ne collent pas
+entres eux).
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro du caractŠre dans la fonte
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.w = Num‚ro du caractŠre, -1 s'il n'est pas disponible
+         D1.l = Adresse d'un tableau contenant les informations sur le
+                caractŠre d‚finit.
+                Structure du tableau : WORD 0 : Largeur de la cellule du
+                                                caractŠre
+                                       WORD 1 : Intervalle … gauche de la
+                                                cellule
+                                       WORD 2 : Intervalle … droite de la
+                                                cellule
+Pile : 12
+
+/// VDI 130 : VQT_NAME (INQUIRE FACE NAME & INDEX) ///
+
+Permet d'obtenir le nom de la fonte, ainsi que son num‚ro.
+
+ATTENTION : Le nom de la fonte est sur 32 OCTETs, dont la structure est
+             - 16 OCTETs pour le nom proprement dit de la fonte
+             - 16 OCTETs pour les attributs (Bold (Gras), Italics (...))
+
+ParamŠtres : WORD : VDI_ID
+             WORD : Num‚ro de la fonte
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Adresse d'un tableau contenant le num‚ro et le nom de la fonte
+                Structure du tableau : WORD 0 : Num‚ro de la fonte
+                                       WORD 1 …  8 : Nom
+                                       WORD 9 … 16 : Attributs
+Pile : 12
+
+/// VDI 131 : VQT_FONTINFO (INQUIRE CURRENT FACE INFORMATION) ///
+
+Sert … obtenir des informations confidentielles sur la fonte actuelle.
+
+ParamŠtres : WORD : VDI_ID
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour : D0.l = Valeur ASCII minimale.w et maximale.w
+         D1.l = Adresse d'un tableau contenant les informations de la fonte
+                courante
+                Structure du tableau : WORD 0 : Largeur maximale d'une cellule
+                                                d'un caractŠre sans effet
+                                                graphique.
+                                       WORD 1 : Distance entre la ligne de base
+                                                (la base du caractŠre) et le bas
+                                                de la cellule d'un caractŠre.
+                                       WORD 2 : Elargissement horizontale due …
+                                                un effet graphique.
+                                       WORD 3 : Distance entre la ligne de
+                                                descente (la base de la jambe du
+                                                p, g, j, ...) et le bas de la
+                                                cellule d'un caractŠre. Il y a
+                                                une fine ligne inutilis‚e pour
+                                                que les caractŠres ne collent
+                                                pas.
+                                       WORD 4 : D‚calage … gauche pour
+                                                l'italique
+                                       WORD 5 : Distance entre la ligne de
+                                                moiti‚ de cellule (le haut d'un
+                                                caractŠre minuscule) et la ligne
+                                                de base (la base du caractŠre)
+                                       WORD 6 : D‚calage … droite pour
+                                                l'italique
+                                       WORD 7 : Distance entre la ligne
+                                                ascendante (le haut d'un
+                                                caractŠre majuscule) et la ligne
+                                                de base (la base du caractŠre)
+                                       WORD 8 : R‚serv‚, … 0
+                                       WORD 9 : Distance entre la ligne de base
+                                                (la base du caractŠre) et le
+                                                haut de la cellule d'un
+                                                caractŠre
+Pile : 10
+
+--- FONCTIONS NON ENCORE IMPLANTEES FAUTE DE DOCUMENTATION ---
+
+ATTENTION : Ces fonction sont en r‚alit‚ PARTIELLEMENT implant‚es, en pr‚vision
+            d'une obtention de documents me permettant de les implanter
+            compl‚temment, donc ne faites SURTOUT PAS appel … elles, sinon vous
+            courrez droit au Bug.
+
+/// VDI 5,99 : V_BEZ_QUAL ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 6,13 : V_BEZ ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 9,13 : V_BEZ_FILL ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 11,13,0 : V_BEZ_OFF ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 11,13,1 : V_BEZ_ON ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 39 : VST_ALIGNMENT (SET GRAPHIC TEXT ALIGNMENT) ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 232 : VQT_FONTHEADER () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+
+/// VDI 234 : VQT_TRACKKERN () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 235 : VQT_PAIRKERN () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 236 : VST_CHARMAP () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 237 : VST_KERN () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+
+/// VDI 239 : V_GETBITMAT_INFO () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 240 : VQT_F_EXTENT () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 241 : V_FTEXT () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 242 : V_FTEXT_OFFSET () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 243 : V_GETOUTLINE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 244 : VST_SCRATCH () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 245 : VST_ERROR () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 246 : VST_ARBPT () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 247 : VQT_ADVANCE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 248 : VQT_DEVINFO () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 249 : V_SAVECACHE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 250 : V_LOADCACHE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 251 : V_FLUSHCACHE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 252 : VST_SETSIZE() ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 253 : VST_SKEW () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 254 : VQT_GET_TABLE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI 255 : VQT_CACHESIZE () ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :
+
+/// VDI -1 : V_SET_APP_BUFF ///
+
+ParamŠtres :
+             LONG : Adresse du buffer des variables (VDI_PARAMS)
+Retour :
+Pile :

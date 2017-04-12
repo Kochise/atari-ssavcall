@@ -1,0 +1,26 @@
+; /// SSAVCALL 3.01 - Line A Vector / FillyBASIC - KOSS 2000 //////////////////
+
+; Author   : Kochise
+; Date     : 05/06/07/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : Line A Vector / FillyBASIC Real-Time Interpreter
+
+; Machina  : Motorola 68030 based Computer
+; O.S.     : SSAVCALL 3 / FillyBASIC
+
+; *****************************************************************************
+; *** LINE A : L'Interpr‚teur int‚gr‚ … SSAVCALL ******************************
+; *****************************************************************************
+
+	; # ... : 07/01/2000 #
+
+	dc.b	"XBRA"
+	dc.b	"SSAV"
+OldLINEA	ds.l	1
+
+SSAVCALL_LINEA	;> SP   = Inchang‚ (derniŠre valeur emPil‚e)
+	; SSP   = SR
+	; SSP+2 = PC
+	; SSP+6 = $2C (Pour LineF)

@@ -1,0 +1,17 @@
+; /// SSAVCALL 3.01 - RT_M_MT_OS Kernel - KOSS 2000 ///////////////////////////
+
+; Author   : Kochise
+; Date     : 05/06/07/2000
+; Type     : SSAVCALL Source Module 
+; Language : Assembler (Motorola 68030)
+; Sequence : BOOT
+; Purpose  : Real-Time Mutative Multi-Tasking Operating System Kernel
+
+; Machina  : Motorola 68030 based Computer
+; O.S.     : SSAVCALL 3
+
+; ###############################################################
+; # #
+; # #
+; # #
+; ###############################################################

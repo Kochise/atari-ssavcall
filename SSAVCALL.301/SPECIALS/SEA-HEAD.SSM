@@ -1,0 +1,64 @@
+; /// SSAVCALL Project 3.xx - >Program< - KOSS 1999 ///
+
+	comment	HEAD=7	; FastLoad
+	
+; *****************************************************************************
+	SECTION	TEXT
+; *****************************************************************************
+	
+	dc.b	"ðSEA"	; Valid   SSAVCALL Program
+	dc.b	"SSAV"	; Valid   SSAVCALL Signature
+	dc.w	$300	; Minimal SSAVCALL Version
+	dc.l	SEA_PlugIn-List	; PlugIn-List
+	dc.l	SEA_Boot	; Boot Session Code
+	dc.l	SEA_Desk	; Desk Session Code
+	dc.w	$100	; Program Version
+	; Date Format :	 AAAAAAAmmmmJJJJJ
+	dc.w	%0	; Program Date
+	dc.l	0	; Program Field
+	dc.l	-1	; Program Public
+	dc.l	-1	; Program Private
+	dc.b	"Your Program's Name",0 ; Program Name
+	dc.b	"Your Name, Coder",0	; Program Author
+
+; > How it works : Stallion's Executable Application (ðSEA)
+; Valid   SSAVCALL Program   : 'ðSEA' Header
+; Valid   SSAVCALL Signature : 'SSAV' Header
+; Minimal SSAVCALL Version   : To avoid Obsolete Effect when trying to run a
+;                              recent SEA File on a TOO old SSAVCALL Version
+; Plug-In List               : Address of a Field of PIN's Name
+; Boot Session Code          : Address of a routine executed during the BOOT sequence
+; Desk Session Code          : Address of a routine executed when run from the DeskTop
+; Program Version            : Version of the program in BCD Format ($xxyy / $0123 -> v1.23)
+; Program Date               : Date of assembly (Date Format : AAAAAAAmmmmJJJJJ)
+; Program Field              : Address of the ProgramField (a kinda BasePage) 
+;                              * Used by SSAVCALL, leave this space blank *
+; Program Public             : Public Encryption Key (DSE-CRC)
+; Program Private            : Private Encryption Key (RSA)
+; Program Name               : "The name of your program",0 (try not to exceed 10 Chars)
+; Program Author             : "Your name, young one",0 (not TOO long, please...)
+
+SEA_Boot
+
+; ---
+
+SEA_Desk
+
+	
+; *****************************************************************************
+	SECTION	DATA
+; *****************************************************************************
+	
+; Yeah, for this table, just put in the right order the PIN's name of which you
+; want to use...
+; In the following example, when you want to use a Command in 'AES-CTRL', just 
+; put 1 in the Stack (for the first entry of the PlugIn-List), then use TRAP #3...
+; WARNING not to unshort your PlugIn-List during the program execution !
+	
+SEA_PlugIn-List	dc.b	"AES-CTRL"
+	dc.b	"VDI-CTRL"
+
+	
+; *****************************************************************************
+	SECTION	BSS
+; *****************************************************************************

@@ -1,0 +1,348 @@
+/// Le SYStŠme, num‚ro 0 ///////////////////////////////////////////////////////
+
+--- LIBRAIRIE PROGRAMMES ---
+
+/// SYS   0 : PROG_INIT ///
+
+  Cette fonction sert … initialiser votre programme. Tout comme SSAVCALL en
+g‚n‚ral, son fonctionnement est l‚gerement diff‚rent de ce que vous avez
+l'habitude d'utiliser avec le TOS. Pour commencer :
+
+  - Utilisez le source SSAVINIT pour d‚marrer votre programme, et surtout
+    NE TOUCHEZ >JAMAIS< aux premiŠres lignes jusqu'… l'appel de cette fonction.
+    En effet, suivant l'‚tat de l'ATARI au lancement du programme, les
+    registres du 680x0 seront dans des configurations diff‚rentes.
+    Pour pouvoir d‚terminer dans quel mode (phase de BOOT, Accessoire, ou
+    programme sous GEM) se trouve votre ordinateur, PROG_INIT neccessite
+    qu'aucun changement ne soit effectu‚ sur les registres. Il est DONC
+    IMPORTANT de ne surtout pas toucher aux registres avant l'appel … PROG_INIT
+
+  - Vous devez utiliser OBLIGATOIREMENT un tableau "START_Tab" pour que la
+    fonction y range certaines informations
+
+  - Suivant le mode de votre ATARI (BOOT, ACC ou GEM), la fonction va ensuite
+    continuer … une des trois adresses que vous lui donnerez. A ce moment, la
+    pile sera automatiquement restaur‚e.
+
+  Voil… pour ce que vous devez savoir en priorit‚. Vous l'aurez compris, cette
+fonction vous permet de d‚marrer votre programme dans N'IMPORTE QUEL MODE.
+Plus besoin que vous cassiez la tˆte … savoir comment faire pour d‚marrer un
+programme en accessoire, PROG_INIT le fait pour vous.
+  Attention aussi … ne pas apeller APPL_INIT de l'AES, car PROG_INIT s'en
+charge d‚j….
+
+> Structure START_Tab
+
+   0 WORD : AP_ID
+            -1 si en phase de BOOT, sinon l'AP_ID donn‚ par l'AES
+   2 LONG : Taille du programme en m‚moire
+            ATTENTION : Pret … l'emploi avec P_TERMRES
+                         BasePage
+                        +SECTION TEXT
+                        +SECTION DATA (if any)
+                        +SECTION BSS  (if any)
+                        +NewStackFrame
+   6 LONG : Fin de la zone du programme (nouvelle PILE incluse)
+  10 LONG : Adresse du Memory_DynamicDescriptor
+
+ParamŠtres : WORD : Longueur en LONG de la nouvelle PILE
+             WORD : Mode
+                    BIT 0 : MEMORY_SHINKER
+                            0 = R‚duit la m‚moire
+                            1 = Ne r‚duit pas, mais calcule l'usage m‚moire
+                        1 : R‚serv‚ (… l'usage interne de la fonction)
+             LONG : START_Tab
+             LONG : AES_Params
+             LONG : GEM_Mode, adresse d'une routine o— la fonction continuera
+                    si le programme est execut‚ depuis le Bureau.
+                    -1 si doit afficher un formulaire "Programme BOOT" depuis
+                    le bureau
+             LONG : ACC_Mode, adresse d'une routine o— la fonction continuera
+                    si le programme est execut‚ en tant qu'Accessoire.
+                    -1 si doit afficher un formulaire "Programme BOOT" …
+                    l'arriv‚ sur le Bureau
+             LONG : BOOT_Mode, adresse d'une fonction o— la fonction continuera
+                    si le programme est execut‚ dans la phase de Boot.
+                    -1 si doit continuer pendant le BOOT
+                    ATTENTION : Dans ce cas, la fonction est r‚ellement termin‚e
+                    et il sagit alors de continuer aprŠs elle.
+             WORD : 0
+             WORD : 0
+Retour : Le tableau START_Tab est rempli comme convenu, et le programme continu
+         soit … l'adresse GEM_Mode si l'on est sous le Bureau, ACC_Mode si l'on
+         est charg‚ comme accessoire, ou BOOT_Mode si l'on est en phase de BOOT.
+Pile : 28
+Registres utilis‚s : D0-2/A0/A6
+
+ATTENTION : Si vous avez utilisez -1 pour ACC_Mode, et qu'il est install‚ comme
+            Accessoire, voici ce qu'il se passera :
+            - Des son chargement, un formulaire s'affichera sur un ‚cran blanc,
+              car le Bureau … ce moment l… ne sera pas encore affich‚
+              (n'oubliez pas que le chargement des ACCs s'effectue en fin de
+              BOOT, … l'initialisation de l'AES, mais avant l'arriv‚e sur le
+              Bureau). En somme, … ce stade, aucune Station de Travail n'est
+              encore ouverte (voir VDI.FRA).
+            - A la sortie du formulaire, le chargement des ACCs se terminera,
+              et vous arriverez enfin sur le Bureau.
+            - L…, vous pourrez alors aller deplacer votre programme en ACC,
+              voire l'effacer car inutile dans ce mode, pour le copier dans le
+              dossier AUTO de votre partition de Boot.
+            - A ce niveau, seul l'utilisation du Bureau est active. TOUTE
+              TENTATIVE d'executer un quelconque programme se soldera par le
+              plantage de votre ordinateur. Vous etes pr‚venus...
+
+REMARQUE : Vu que la BasePage est remise … sa place (TPA+4), vous pouvez donc
+           l'utiliser … la fin de cette fonction, dont la transparence est
+           unique dans son domaine.
+           INUTILE donc de vous hater de recopier la CommandLine (pour
+           r‚cup‚rer les paramŠtres de la Ligne de Commande, ou d'un Drag'n
+           Drop quelconque) avant l'appel … cette fonction. FaŒtes-le de
+           pr‚f‚rence qu'en GEM_Mode, car c'est inutile en ACC_Mode et
+           BOOT_Mode...
+
+/// SYS   1 : Prog_Terminate ///
+
+  Cette fonction termine votre programme. Au besoin elle garde en m‚moire ce
+qui est n‚ccessaire. Sous GEM, informe automatiquement l'AES de notre d‚part.
+En phase de BOOT, affiche en plus une ligne TKR d'information sur l'‚tat de
+reservation m‚moire effectu‚e.
+
+> Structure TKR_Buffer
+
+   0 : 40 free BYTES (for TKR Informations)
+  39 : 10 free BYTES (for Numeric Conversion)
+Le pŠre du systŠme TKR est (\/) Martin Osieka, d‚vellopeur de GEMRAM et de WINX
+
+ParamŠtres : WORD : Mode
+                    BIT 0 : MEMORY_SAVER
+                            0 = Save memory
+                            1 = DON'T save memory
+             LONG : START_Tab
+             LONG : AES_Params
+             LONG : TKR_Buffer
+             WORD : - PROG_TERMINATE - (1)
+             WORD : *** SYS *** (0)
+Retour : N/A
+Pile : N/A
+Registres utilis‚s : N/A
+
+/// SYS   2 : Prog_Booter ///
+
+  Cette fonction automatise un programme pr‚vu pour fonctionner en phase de
+BOOT. Voici ce qu'elle fait :
+
+  - Corrige votre ligne de Titre avec les informations contenues en PROG_Info
+    Place la Version en "$$.$$"
+    Place la Date en "**/**/**"
+  - Affiche la ligne de Titre corrig‚e
+  - Execute la routine BOOT_Rout
+    > Ici, … vous de vous exprimer
+  - Termine en sauvant la m‚moire si n‚ccessaire, et affiche une ligne TKR
+    (utilise simplement la fonction PROG_TERMINATE)
+
+ParamŠtres : WORD : Mode
+                    BIT 0 : MEMORY_SAVER
+                            0 = Save memory
+                            1 = DON'T save memory
+             LONG : START_Tab
+             LONG : TITLE_String
+             LONG : TKR_Buffer
+             LONG : PROG_Info
+             LONG : BOOT_Rout
+             WORD : - PROG_BOOTER - (2)
+             WORD : *** SYS *** (0)
+Retour : N/A
+Pile : N/A
+Registres utilis‚s : D0-5/A0
+
+REMARQUE : Si la touche L-Shift (Gauche) est enfonc‚e … l'appel de cette
+           Fonction, le programme n'est pas install‚ en m‚moire.
+           La ligne "  Not Installed..." est affich‚e entre la ligne de Titre
+           et la ligne TKR.
+
+ATTENTION : Il est OBLIGATOIRE de mettre dans la ligne de Titre "$$.$$" et
+            "**/**/**".
+
+/// SYS   3 : Prog_Accessory ///
+ParamŠtres : WORD : - PROG_ACCESORY - (3)
+             WORD : *** SYS *** (0)
+Retour :
+Pile :
+Registres utilis‚s :
+
+--- LIBRAIRIE COOKIES ---
+
+/// SYS  10 : Cook_Null ///
+
+  Modifie le CookieJar en d‚placant TOUS LES Cookies, et en placant en PREMIERE
+POSITION un Cookie au nom de "NULL", de paramŠtre la taille de la Jar.
+Evite ainsi de chercher le dernier Cookie NULL "".
+  La taille de la Jar est donc IMMEDIATEMENT accessible en ([5A0.w],4), si et
+seulement si en ([5A0.w]) se trouve "NULL".
+
+ATTENTION : N'UTILISEZ JAMAIS CETTE FONCTION. SSAVCALL s'en charge d‚j… au
+            Boot, il est donc inutile de le refaire.
+
+ParamŠtres : WORD : - COOK_NULL - (10)
+             WORD : *** SYS *** (0)
+Retour : D0.w = R‚sultat de la modification
+                 0 : OK, sans problŠme, ou d‚j… fait
+                -1 : Plus de place, erreur
+                -2 : Pas de Jar
+Pile : 4
+Registres utilis‚s : D0-2/A0
+
+/// SYS  11 : Cook_JarCheck ///
+
+  Sert … obtenir quelques informations sur la CookieJar.
+
+ParamŠtres : WORD : - COOK_JARCHECK - (11)
+             WORD : *** SYS *** (0)
+Retour : D0.l = R‚sultat de la prospection
+                -1 : Pas de Jar
+                sinon [Size.w][Free.w]
+Pile : 4
+Registres utilis‚s : D0-2/A0
+
+ATTENTION : Cette fonction r‚duit les information sur un WORD : En somme, le
+            paramŠtre d'un Cookie est sur un LONG, or cette fonction retourne
+            deux WORDs. Mais je doute qu'il puisse exister des Jars de plus de
+            65536 Cookies (512 Ko)
+
+/// SYS  12 : Cook_Find ///
+
+  Cherche un Cookie
+
+ParamŠtres : LONG : CookieName
+             WORD : - COOK_FIND - (12)
+             WORD : *** SYS *** (0)
+Retour : D0.l = R‚sultat de la recherche
+                -1 : Erreur
+                sinon, le ParamŠtre du Cookie recherch‚
+Pile : 8
+Registres utilis‚s : D0-2/A0
+
+/// SYS  13 : Cook_Add ///
+
+  Ajoute un Cookie … la Jar.
+
+ParamŠtres : LONG : CookieName
+             LONG : CookieParam
+             WORD : - COOK_ADD - (13)
+             WORD : *** SYS *** (0)
+Retour : D0.w = R‚sultat de l'addition
+                 0 : OK
+                -1 : Erreur
+                -2 : Cookie d‚j… existant
+Pile : 12
+Registres utilis‚s : D0-2/A0
+
+/// SYS  14 : Cook_Change ///
+
+  Change le Parametre d'un Cookie.
+
+ParamŠtres : LONG : CookieName
+             LONG : NewCookieParam
+             WORD : - COOK_CHANGE - (14)
+             WORD : *** SYS *** (0)
+Retour : D0.w = R‚sultat de la modification
+                 0 : OK
+                -1 : Erreur (Cookie inexistant)
+Pile : 12
+Registres utilis‚s : D0-2/A0
+
+--- LIBRAIRIE XBRA ---
+
+/// SYS  20 : Xbra_Add ///
+
+  D‚tourne un vecteur
+
+ParamŠtres : LONG : Start_Addr
+                    Pour d‚tourner le vecteur du GEMDOS ($84.w), vous devez
+                    donc mettre ici $84.w
+             LONG : NewXBRA_Address
+                    Ici, c'est l'adresse du d‚but de votre routine pr‚c‚d‚ du
+                    XBRA correspondant
+             WORD : - XBRA_ADD - (20)
+             WORD : *** SYS *** (0)
+Retour : D0.w = R‚sultat du d‚tournement
+                 0 : OK
+                -1 : Erreur
+                -2 : XBRA de ce nom existe d‚j…
+Pile : 12
+Registres utilis‚s : D0/A0
+
+/// SYS  21 : Xbra_Change ///
+
+  Change le d‚tournement d'un XBRA. ATTENTION A NE PAS FAIRE D'ERREUR !
+
+ParamŠtres : LONG : OldXBRA_Entry Pointer
+                    Adresse de l'ancienne routine XBRA
+             LONG : NewXBRA_Entry Pointer
+                    Adresse de la nouvelle routine XBRA
+             WORD : - XBRA_CHANGE - (21)
+             WORD : *** SYS *** (0)
+Retour : D0.w = R‚sultat de la modification
+                 0 : OK
+                -1 : Erreur
+Pile : 12
+Registres utilis‚s : D0/A0
+
+/// SYS  22 : Xbra_Find ///
+
+  Trouve un XBRA
+
+ParamŠtres : LONG : Start_Addr
+                    Pour rechercher un XBRA parmis les d‚tournement du GEMDOS,
+                    par exemple, mettez $84.w ici
+             LONG : XBRA_Name
+             WORD : - XBRA_FIND - (22)
+             WORD : *** SYS *** (0)
+Retour : D0.l = R‚sultat de la recherche
+                0 : Erreur
+                sinon adresse de la routine XBRA
+Pile : 12
+Registres utilis‚s : D0/A0
+
+/// SYS  23 : Xbra_Scan ///
+
+  Scanne les d‚tournements possibles sur une portion de m‚moire.
+Par exemple, vous voullez savoir les d‚tournements possibles sur les TRAPs.
+En adresse d'entr‚e vous metterez donc $80.w (TRAP #0), et en fin $BC (TRAP
+#15). Si le premier d‚tournement trouv‚ est effectu‚ sur le BIOS (TRAP #13,
+$B4.w), vous obtiendrez en D0.l = $B4.w
+
+ParamŠtres : LONG : Start address (EVEN)
+             LONG : End address (EVEN)
+             WORD : - XBRA_SCAN - (23)
+             WORD : *** SYS *** (0)
+Retour : D0.l = R‚sultat de la recherche
+                0 : Erreur
+                sinon adresse du premier XBRA trouv‚
+Pile : 12
+Registres utilis‚s : D0/A0-1
+
+--- LIBRAIRIE MEMOIRE ---
+
+/// SYS  30 : Memo_Alloc ///
+
+--- LIBRAIRIE FICHIERS ---
+
+/// SYS  40 : File_Load ///
+
+--- LIBRAIRIE MATHEMATIQUES ---
+
+/// SYS  50 : Math_Convert ///
+/// SYS  51 : Math_Evaluate ///
+
+--- LIBRAIRIE CONFIGURATION ---
+
+/// SYS  60 : Conf_Init ///
+
+--- LIBRAIRIE PLUG-IN ---
+
+/// SYS  70 : Plug_Init ///
+
+--- LIBRAIRIE TUBE ---
+
+/// SYS  80 : Tube_Init ///

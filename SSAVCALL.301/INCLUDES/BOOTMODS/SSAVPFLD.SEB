@@ -1,0 +1,62 @@
+~BEGIN
+
+; /// SSAVCALL 3.01 - Standard Program Field for ATARI - KOSS 2000 ////////////
+
+; Author   : Kochise
+; Date     : 05/29/06/2000
+; Type     : SSAVCALL Source Module 
+; Language : FillyBASIC
+; Sequence : BOOT
+; Purpose  : SSAVCALL PROG FIELD (ATARI Compatible)
+
+; Machina  : ATARI Falcon030
+; O.S.     : SSAVCALL 3
+
+ProgramField[TAB]=
+{
+  *ProgramTabs[TAB],
+  {
+    (1,*)=NULL,		; PRG_BasePage
+    (1,*)=NULL,		; PRG_ID
+    
+    *SYS_Params[TAB],
+    {
+      *AES_Handle[1,W]=NULL,	; AP_ID
+      *VDI_Handle[1,W]=NULL	; VD_ID
+    }
+
+    ; /// Les Variables de l'AES ///
+    *AES_Params[TAB],
+    {
+      *Control[5,W]=NULL,
+      *Global[14,W]=NULL,
+      *Int_In[16,W]=NULL,
+      *Int_Out[7,W]=NULL,
+      *Addr_In[3,*]=NULL,
+      *Addr_Out[1,*]=NULL
+    }
+
+    ; /// Les Variables du VDI ///
+    *VDI_Params
+    {
+      *Contrl[12,W]=NULL,
+      *IntIn[64,W]=NULL,	; Minimum 30
+      *PtsIn[64,W]=NULL,	; Minimum 45
+      *IntOut[64,W]=NULL,	; Minimum 30
+      *PtsOut[64,W]=NULL	; Minimum 12
+    }
+  }
+
+  *ProgramTranslator[TAB]
+  {
+
+    ; /// Le Buffer TRK ///
+    *TKR_Buffer[TAB]
+    {
+      (40,B)=NULL,		; Texte
+      (10,B)=NULL		; Buffer nombre
+    }
+  }
+}
+
+~END

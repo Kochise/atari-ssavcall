@@ -1,0 +1,54 @@
+; /// SSAVCALL Project 3.xx - >Outstanding Driver< - KOSS 1999 ///
+
+	comment	HEAD=7
+
+; *****************************************************************************
+	SECTION	TEXT
+; *****************************************************************************
+
+	dc.b	"ðSOD"	; Driver Signature
+	dc.b	"SSAV"	; Driver Valid
+	dc.b	"DRV-NAME"	; Driver Name
+	ds.w	1	; Driver Number	
+	ds.l	1	; Driver Next
+	ds.l	1	; Driver FuncList
+	dc.l	-1	; Driver Boot
+	dc.l	-1	; Driver Code
+	dc.l	YOURTABLE_Jump	; Driver JumpTable
+	dc.w	0	; Driver Minimal
+	dc.w	0	; Driver Maximal
+	dc.l	-1	; Driver Public
+	dc.l	-1	; Driver Private
+	dc.w	$100	; Driver Version
+	; Date Format :	 AAAAAAAmmmmJJJJJ
+	dc.w	%0	; Driver Date
+	dc.l	"Your Name, Coder",0	; Driver Author
+
+; > How it works : Stallion's Outstanding Driver (ðSOD)
+; Driver Signature : 'ðSOD' Header
+; Driver Valid     : 'SSAV' Header
+; Driver Name      : Name of the Driver, 8 Chars MAX !!!
+; Driver Number    : Number of this Driver in the Driver-Queue
+;                    * Used by SSAVCALL, leave this space blank *
+; Driver Next      : Address of the next Driver in the Driver-Queue
+;                    * Used by SSAVCALL, leave this space blank *
+; Driver FuncList  : Address of a Field of Commands
+; Driver Boot      : Address of a routine run just once at Driver-BOOT
+; Driver Code      : Address of a routine run at each Driver's Invocation 
+; Driver JumpTable : Address of an Array of Address -> Driver-Commands
+; Driver Minimal   : Minimal Driver-Command Number (may be Negative -> -32768)
+; Driver Maximal   : Maximal Driver-Command Number (may be Positive ->  32767)
+; Driver Public    : Public Encryption Key (DSE-CRC)
+; Driver Private   : Private Encryption Key (RSA)
+; Driver Version   : Version of the Driver in BDC Format ($xxyy / $0123 -> v1.23)
+; Driver Date      : Date of Assembly (Date Format : %AAAAAAAmmmmJJJJJ)
+; Driver Author    : "Your Name",0 (not TOO long, please)
+
+; *****************************************************************************
+	SECTION	DATA
+; *****************************************************************************
+
+; *****************************************************************************
+; For Memory, SECTION BSS is STRICTLY FORBIDDEN in a Driver.
+; If ever there is one, it wouldn't be kept in Memory, you've been warned !
+; *****************************************************************************

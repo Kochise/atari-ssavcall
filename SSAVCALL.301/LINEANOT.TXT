@@ -1,0 +1,10 @@
+/// LineA Notice - KOSS 2000 //////////////////////////////////////////////////
+
+Abcd
+
+b : Module Type
+cd : Module Number
+
+then Instruction Number, plus Parameters
+
+[Abcd][Inst]([Par0][Par1]...[ParN])
