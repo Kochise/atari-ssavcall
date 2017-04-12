@@ -1,0 +1,24 @@
+/// RŠgles de pr‚sentation pour un programme en AUTO //////////////////////////
+
+Afin d'avoir quelque chose de propre … l'‚cran lors du Boot, il sagit de:
+
+1- Ecrire sur la premiere ligne, pen vid‚o inverseq:
+   - Le titre du logiciel
+   - Sa version
+   - Son programmeur
+   - Sa date d'assemblage
+Par exemple, pour SSAVCALL:
+p SSAVCALL  2.31 - A KOSS Production (08/08/98) q
+   Essayez de limiter le titre … 40 caractŠres pour les boot en basse
+   r‚solution (ne faites donc pas la mˆme erreur que moi!)
+2- Ecrire les informations utiles au logiciel
+   Utilisez le nombre de lignes dont vous avez besoin, pas de limitation
+3- Terminer par une ligne "TKR" avec:
+   - 0 si l'on ne garde rien en m‚moire
+   - La taille du code gard‚ en m‚moire le cas ‚ch‚ant
+4- Passer … la ligne deux fois pour laisser une ligne vide entre votre
+   pr‚sentation, et celle du programme suivant
+
+Pour la derniere ligne - "TKR" -, utilisez la fonction incluse dans SSAVCALL.
+Il est donc souhaitable de placer SSAVCALL le plus haut possible dans la liste
+des programmes en AUTO. Utilisez AUTOSORT (inclus) pour cela...

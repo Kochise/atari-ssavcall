@@ -1,0 +1,3 @@
+*.ss linguist-language=Assembly
+*.SS linguist-language=Assembly
+*.SSM linguist-language=Assembly

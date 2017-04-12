@@ -1,0 +1,24 @@
+/// Utilisation du GEM ////////////////////////////////////////////////////////
+
+Le principal but de SSAVCALL ‚tant de permettre du gagner du temps dans la
+programmation d'une interfacce en GEM, il est ‚vident que pour ceux qui ne
+savent de toute facon pas utiliser le GEM, ‡a ne leurs servira pas … grand
+chose.
+Voici donc la methode d'utilisation du GEM, compar‚e … celle de SSAVCALL (pas
+plus courte, mais plus puissante des le d‚part).
+
+Initialisation du GEM
+
+GEM                                    | SSAVCALL
+                                       |
+On libŠre la m‚moire disponible en     | On v‚rifie la pr‚sence de SSAVCALL en
+laissant de la place pour la pile      | m‚moire avec "SSAV" dans D0.l
+avec un M_SHRINK                       | -Si n'est pas pr‚sent, on informe
+                                       |  l'utilisateur
+                                       | -Si SSAVCALL est pr‚sent, on continue
+                                       |
+On fait un APPL_INIT pour informer     | On lance la proc‚dure d'initialisation
+le GEM de notre pr‚sence               | du programme pour que SSAVCALL puisse
+                                       | fonctionner. Il s'occupe d‚j…
+                                       | d'informer le GEM de notre pr‚sence
+

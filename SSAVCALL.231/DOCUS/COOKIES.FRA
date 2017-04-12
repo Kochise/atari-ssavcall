@@ -1,0 +1,168 @@
+/// Les Cookies ///////////////////////////////////////////////////////////////
+
+Les Cookies sont des sortes d'indices de pr‚sence d'un programme en m‚moire.
+Il existe les Cookies officiels, ceux d'ATARI, et les autres, ceux que vous
+pouvez cr‚er.
+
+Le Cookie-Jar est un emplacement limit‚ en m‚moire pouvant contenir un nombre
+limit‚ de Cookies.
+
+Un Cookies en compos‚ de 2 LONGs: LONG 0 - Le nom du Cookie
+                                           Les Cookies officiels d'ATARI
+                                            commencent avec "_" puis le nom sur
+                                            3 octets.
+                                           Les Cookies utilisateurs doivent
+                                            avoir un nom sur 4 octets donc, et
+                                            ne commencant pas par "_".
+                                  LONG 1 - L'information du Cookie
+                                            Ce peut etre juste un num‚ro
+                                            d‚crivant un ‚l‚ment de la machine,
+                                            comme le Cookie "_FPU" qui donne la
+                                            version du coprocesseur
+                                            math‚matique int‚gr‚ … l'ATARI, ou
+                                            une adresse vers un bloc de
+                                            description, ou d'une routine.
+
+L'adresse de base du Cookie-Jar se trouve en $5A0.w. L'adresse contenue ici est
+en g‚n‚ral $980.w.
+Les Cookies se suivent les uns … la suite des autres, le nom puis
+l'information. Un dernier Cookie, commun‚ment appel‚ "NULL" termine la liste
+des Cookies. Ce Cookie se distingue par un nom inexistant, et pas "NULL".
+Le Cookie "NULL" est compos‚ d'un LONG … 0, puis d'un LONG d‚signant le nombre
+maximal de Cookies pouvant etres contenus dans la Cookie-Jar, le Cookie "NULL"
+inclus.
+
+Lorsque vous installez votre Cookie, comptez le nombre de Cookies depuis le
+d‚but jusqu'au Cookie "NULL" inclus, et v‚rifiez s'il reste de la place pour le
+votre.
+S'il reste de la place, gardez provisoirement le nombre de Cookies maximum dans
+un registre de donn‚e, ecrasez le Cookie "NULL" avec le votre, ajoutez votre
+information, puis mettez le Cookie "NULL" aprŠs le votre en effacant un LONG,
+et en ajoutant aprŠs celui ci le nombre de Cookies maximum que vous aviez
+sauvegard‚ dans un registre de donn‚e.
+
+Voici une routine toute faites:
+
+Enfin une liste de diff‚rents Cookies, dont les officiels:
+
+"NULL" (Attention, pas un LONG … z‚ro, mais bien NULL en ASCII)
+       Nombre de Cookies maximum
+       Ce Cookie est plac‚ par SSAVCALL au d‚but de la Cookie-Jar afin de
+       savoir imm‚diatement le nombre de Cookies maximum.
+       Une simple boucle permet donc ensuite de savoir si on … trouv‚ le
+       v‚ritable Cookie "NULL" (un LONG … z‚ro) avant que le compteur le soit
+       lui mˆme, … z‚ro, ou s'il reste de la place.
+
+"_CPU" La version de votre processeur
+       Par exemple : contient 30 ($1E) pour le 68030
+                     contient 0 pour le 68000
+
+"_VDO" La version du processeur vid‚o
+       WORD Fort WORD Faible Type
+         0         0           ST
+         1         0           STe
+         2         0           TT
+         3         0           Falcon030
+
+"_MCH" Le type d'ordinateur
+       WORD Fort WORD Faible Type
+         0         0           ST
+         1         0           STe
+         1        16           MegaSTe
+         2         0           TT
+         3         0           Falcon030
+
+"_SWI" Configuration HardWare
+       Ici se trouve un champ de BITs qui servent … configurer la machine
+
+"_SND" La constitution de l'‚tage sonore
+       BIT Element        Type
+         0   PSG (Yamaha)   ST-STe-TT-Falcon030
+         1   DMA 8 BITs        STe    Falcon030
+         2   DMA Record               Falcon030
+         3   Codec 16 BITs            Falcon030
+         4   DSP                      Falcon030
+
+"_FDC" La densit‚ maximale du lecteur de disquette
+       L'information est constitu‚e de la fa‡on suivante : "xyyy"
+       x   Densit‚
+         0   DD (720Ko)
+         1   HD (1.44Mo)
+         2   ED (2.88Mo)
+
+       Les trois octets constituants la partie "yyy" ne sont l… que pour
+       renseigner sur la version de votre ordinateur
+       yyy
+         "ATC" : Atari Trade-able Computer (ceux issus de la production en
+                 s‚rie)
+         "DP1" : DreamPark Development (certains prototypes, et les versions
+                 d‚velloppeurs, dont les diff‚rences sont d'ordres techniques
+                 (surtout sur le bus d'extension))
+
+"_FPU" La version du coprocesseur math‚matique
+       Un champ de BIT repr‚sente le coprocesseur inclus dans l'ATARI
+       Le BIT correspondant est mis … un pour indiquer la pr‚sence de tel ou
+       tel coprocesseur. Il ne peut y avoir plusieurs coprocesseur dans un
+       ATARI. Attention pour l'indication d'un 68882.
+       BIT Version "SoftWare" (lorsque vous avez un ‚mulateur)
+         0 Interface SFP004 d'ATARI pour MegaST
+         1 6888? \Les deux BITs sont … 1 pour un 68882
+         2 68881 /
+         3 68040
+
+       BIT Version "HardWare" (le type de la puce coprocesseur)
+         8 Interface SFP004 d'ATARI pour MegaST
+         9 6888? \Les deux BITs sont … 1 pour un 68882
+         A 68881 /
+         B 68040
+
+"_AKP" Informations de gestion pour le processeur (8 BITs) du clavier
+       Le WORD Fort est r‚serv‚, et le WORD Faible est compos‚ de la fa‡on
+       suivante : xy
+       x d‚signe le langage du TOS
+       y d‚signe le type du clavier
+       Valeur possibles       Type du clavier
+         0 USA
+         1 Allemagne            QWERTY
+         2 France               AZERTY
+         3 Grande Bretagne
+         4 Espagne
+         5 Italie
+         6 Suede
+         7 Suisse (Fran‡ais)
+         8 Suisse (Allemand)
+         9 Turque
+        10 Finlande
+        11 Norvege
+        12 Danemark
+        13 Arabie Saoudite
+        14 Hollande
+        15 Tchekoslovakie
+        16 Hongrie
+
+"_IDT" Le format de l'heure et de la date
+       BIT   Description
+         7-0   Code ASCII du s‚parateur de la date
+        11-8   Affichage de la date
+                 0 - MM/JJ/AA
+                 1 - JJ/MM/AA
+                 2 - AA/MM/JJ
+                 3 - AA/JJ/MM
+       15-12   Format de l'heure
+                 0 - 12 heures
+                 1 - 24 heures
+
+"_FRB" Adresse du buffer d'‚change de 64Ko entre la ST-Ram et la TT-Ram
+
+Quelques Cookies utilisateurs
+
+"SSAV" SSAVCALL (v1.11 et sup‚rieur)
+       Adresse de la routine de SSAVCALL
+
+"MOGR" GEMRAM
+
+"WINX" WINX
+
+"äFSC" Falcon Screen
+
+"Veil" Turbo Veille

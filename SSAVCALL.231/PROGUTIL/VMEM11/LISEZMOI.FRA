@@ -1,0 +1,16 @@
+/// VMEM 1.1 - Gestionnaire de m‚moire virtuelle pour TT et Falcon030 /////////
+
+ATTENTION : VMEM n'est ABSOLUMENT PAS un concurrent d'OUTSIDE.
+            VMEM fait comme SSAV, il ajoute des routines de controle d'une
+            m‚moire sur disque, mais NE FAIT PAS d'ajout de m‚moire.
+            Il faut que le programme l'utilise directement.
+            Ce n'est pas une utilisation transparent comme n'importe quelle
+            m‚moire virtuelle.
+            Ne vous m‚prennez pas !!!
+            Ce n'est pas une version de d‚monstration. VMEMDEMO contient un
+            exemple d'utilisation des routines. VMEM.PRG (Dir) contient les
+            sources de VMEM.
+            Docs en Allemand...
+
+                                                   Kochise Of STALLION SOFTWARE
+

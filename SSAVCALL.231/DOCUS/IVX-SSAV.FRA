@@ -1,0 +1,30 @@
+/// IVx-SSAV /////////////////////////////////////////////////////////////////
+
+Les deux fichiers IVx-SSAV.S sont les installateurs de SSAVCALL. Pour pouvoir
+l'utiliser, il faut demander sa pr‚sence via TRAP 2 avec "SSAV" dans D0 (voyez
+SSAVCALL.DOC). Ces fichiers vous permettent de ne pas avoir … chaque fois …
+refaire une phase d'installation, vu qu'elle sont d‚j… ‚crite dans ces
+fichiers. Il ne vous reste donc plus qu'a y inclure votre programme … l'endroit
+indiqu‚, et … assembler le tout.
+
+                                                   Kochise Of STALLION SOFTWARE
+
+IVN-SSAV.S ð Version Normale de l'installateur de SSAVCALL.
+
+  Pr‚ferez cette version si vous voulez faire un programme pour des personnes
+  relativement comp‚tentes, n'ayant pas peur de manipuler … la main des
+  fichiers. Cette version, de ce fait, est ‚conomique en place vu que les
+  op‚rations de copie et de v‚rification n'y figurent pas.
+
+    Taille de l'installateur: 4833 octets
+
+IVP-SSAV.S ð Version professionnelle de l'installateur de SSAVCALL.
+
+  Pr‚ferez cette version si vous voulez faire un programme commercial ou pour
+  des personnes s'inquiettant peu de comment l'ordinateur fonctionne, ou ne
+  cherchant pas … s'encombrer des problemes de configurations. Vu que cette
+  version est plus ‚labor‚e, elle prend plus de place. Mais dans un cadre
+  professionnel le disque dur et la m‚moire sont en cons‚quence, donc cela ne
+  pose pas de problemes.
+
+    Taille de l'installateur: 13042 octets

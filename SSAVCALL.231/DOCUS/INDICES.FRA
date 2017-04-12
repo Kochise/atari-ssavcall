@@ -1,0 +1,30 @@
+/// Indices de pr‚sence de SSAVCALL... ////////////////////////////////////////
+
+Il y a trois indices pour trouver SSAVCALL:
+
+1-Le Cookie SSAV
+  OffSet 0 : "SSAV"
+  OffSet 4 : Adresse du d‚but de SSAVCALL
+
+2-Le Cookie NULL
+  C'est une particularit‚ de SSAVCALL...
+  Je d‚place tous les Cookies, et place en premier le Cookie "NULL"
+  OffSet 0 : "NULL"
+             ATTENTION, v‚ritable nom "NULL" ($4E554C4C), et pas un LONG nul
+             (NULL).
+             Permet imm‚diatement de savoir combien de Cookies composent le
+             Cookie-Jar, sans avoir … en chercher la fin. Le fait que ce
+             premier Cookie porte un vrai nom, et pas un LONG … 0 permet aux
+             routines de recherches de ne pas planter en croyant etre … la fin
+             du Cookie-Jar.
+  OffSet 4 : Le nombres de Cookies
+
+3-Le d‚tournement XBRA du TRAP #2
+  ($88) : Adresse de l'XBRA de SSAVCALL
+  OffSet -12 : "XBRA"
+  OffSet  -8 : "SSAV" (ShortXBRA)
+  OffSet  -4 : Ancienne adresse du TRAP #2
+  OffSet   0 : Routine de r‚ponse de SSAVCALL
+               Si vous continuez ici avec "SSAV" dans D0.l, au
+               retour vous trouverez dans D0.l l'adresse du d‚but de SSAVCALL.
+               C'est la mˆme adresse qui suit le Cookie SSAV.

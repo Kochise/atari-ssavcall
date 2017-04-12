@@ -1,0 +1,682 @@
+/// La LineA //////////////////////////////////////////////////////////////////
+
+  Bon, je vous donne cette partie … titre documentaire, aprŠs r‚flexion. Je me
+trouvait devant le dilemme de vous instruire la dessus, ou pas, mais de toute
+maniere, vous auriez fini par trouver la documents relatifs … la LineA.
+  Ici, la Line A traite les instructions sp‚ciales dont cet OCTET de poids fort
+est $A. Le processeur Motorola interprete ces instructions de facons sp‚ciales,
+en op‚rant un peu … la fa‡on d'un TRAP. L'ATARI r‚cupŠre tout ‡a, et l'utilise
+pour faire des op‚rations graphiques de bas niveau.
+Ces
+instruction graphiques sont les plus utilis‚es, en particulier par le VDI.
+Y'en a juste 16, mais c'est
+largement suffisant.
+  Vu que ce sont des fonctions sp‚cifique (en fait un v‚ritable Op-Code), pour
+appeler par exemple la premiŠre fonction, il faut ‚crire dans votre programme
+
+             dc.w            $A000
+
+  Une fois la fonction ex‚cut‚e, le programme poursuit … l'instruction suivante,
+sans avoir besoin de restaurer la pile ou autre chose, vu que vous n'utilisez
+pas de registres.
+
+  Si j'h‚sitait … vous renseigner la dessus, c'est qu'ATARI, avant leur mort
+(Dieu ait leurs ames), avait interdit l'utilisation de la LineA. Revenons sur
+son pass‚. Au d‚but de l'ATARI, il fallait des programmes pour que la machine
+se vende. Or vous l'avez vu, le VDI n'est pas ce qu'il y … de plus pratique. De
+plus, le r‚sultat d‚pend de la nature de la Station. La LineA ‚tait plus rapide
+… acceder, car juste via un OpCode, et son execution etait plus rapide.
+Cependant, elle connue plus de succes que les commandes VDI correspondantes (on
+se demande pourquoi...). Cela fait, beaucoup de programmes utilisaient la
+LineA, sans problemes. Arriva le TT, d'une conception radicalement differente,
+qui apporta son nombre d'avantages, mais son lot d'incompatibilit‚. La LineA en
+fut un facteur importante. Non pas qu'elle s'averait inutile, elle remplissait
+toujours son role, mais beaucoup avaient cour-circuit‚ le VDI, et sur TT, ‡a ne
+marchais plus. Regardez donc comme le ST est un vrai TANK. On peu ecrire … la
+limite de la m‚moire sans plantage, on peut adresser des registres fantomes
+(n'est ce pas Mad Max?), on peut se passer du VDI, etc...
+  Or le TT, et son petit frere le Falcon030, sont de nature plus fragile. Si
+ATARI a d‚cid‚ de laisser la LineA, c'est pour que les programmes qui
+l'utilisent (et qui marchent exceptionnellement) puissent fonctionner. Mais il
+aurait bien aim‚ que l'on programme proprement et correctement, n'ayant pas …
+nous redire que le VDI existe, et s'il y avait evolution, ce serait lui qui
+serait support‚, et pas la LineA.
+La LineA c'est bien s'il n'y a qu'un seul programme qui tourne en m‚moire. Or
+le TT et le Falcon030 sont aptes au Multitache. La LineA est d'un niveau
+d'exploitation tres bas. R‚sultat, l'OS n'est pas au courant de ce qui se passe
+dans la machine, et ne peut arbitrer les applications entres elles, et eviter
+d'inevitables plantages.
+  Bref, si jamais vous developpez un programme, utilisez le VDI. Si vous
+desassemblez un programme, cela pourra vous aider pour comprendre. Et cela
+ajoute de la stabilit‚ … l'ensemble.
+
+Derniere chose, toutes les instructions ne fonctionnent qu'en mode utilisateur.
+
+Voici donc la description de chaque instruction :
+
+/// A000 : LineA Init ///
+
+Met la Line A en branle. €a fait pas de bruit, ne mange pas de pain, mais Dieu,
+que c'est pratique.
+Retour : D0.l et A0 = Adresse des variables Line A. Ces variables forment un
+                      gigantesque tableau contenant toutes (ou presque) les
+                      informations sur tout ce qui peut ˆtre utile au systŠme
+                      d'exploitation. J'en voit d‚j… en train de se chauffer le
+                      bout des doigts, en songeant d‚j… au Patch qui va
+                      r‚volutionner le monde (un patch pour ‚liminer BG? Le trip
+                      total, quoi...).
+                        C'est d'ailleurs grƒce … ces variables que FalconScreen
+                      ‚tend la r‚solution de l'‚cran (avec modification
+                      judicieuse des registres du Videl (NdM: N'essayez pas sur
+                      votre ST, il n'a pas ‚t‚ pr‚vus pour, et un systeme
+                      OverScan prendrait trop de temps)). Mais voyez plut“t :
+OffSet Size Name         Data
+  -906 LONG Cur_Font     Pointeur sur le Header de la Fonte utilis‚e
+  -902                   R‚serv‚
+     …
+  -856 WORD M_Pos_HX     X du Point Chaud
+  -854 WORD M_Pos_HY     Y du Point Chaud
+  -852 WORD M_Planes     Mode d'‚criture de la souris
+                          1 = Normal
+                         -1 = XOR
+  -850 WORD M_Cdb_BG     Couleur du masque de la souris
+  -848 WORD M_Cdb_FG     Couleur du pointeur de la souris
+  -846 WORD Mask_Form    Les donn‚es de la souris
+                         16 WORDs : Le masque
+                         16 WORDs : Le pointeur
+  -782 WORD Inq_Tab      Les 45 WORDs renvoy‚s par Vq_Extend (VDI )
+  -692 WORD Dev_Tab      Les 45 WORDs renvoy‚s pas V_Opn(V)Wk (VDI 1-100)
+  -602 WORD G_CurX       La coordonn‚e X actuelle de la souris
+  -600 WORD G_CurY       Idem mais pour Y (hin hin...)
+  -598 WORD M_Hid_Ct     Compteur du nombre de fois que vous avez demandez de
+                         faire disparaŒtre la souris
+  -596 WORD Mouse_Bt     Etat des boutons de la souris (une souris … 16 boutons
+                         est donc possible, et non, elle n'a pas de l'acn‚).
+  -594 WORD Req_Col      Les part VDI des couleurs RGB. Voyez Vq_Color (VDI )
+                         sur 48 WORDs
+  -498 WORD Siz_Tab      Sur 15 WORDs, les tailles pour les sorties texte
+  -468 WORD              R‚serv‚
+  -466 WORD              R‚serv‚
+  -464 LONG Cur_Work     Pointeur vers les attributs de la station de travail
+                         actuelle
+  -460 LONG Def_Font     Pointeur vers le Header de la fonte par d‚faut
+  -456 LONG Font_Ring    4 LONGs qui forment la "Font_Queue", … l'image de la
+                         VBL_Queue.
+  -440 WORD Font_Count   Nombre de fonte dans Font_Ring
+  -438                   R‚serv‚
+     …
+  -348 BYTE Cur_Ms_Stat  Statut de la souris
+  -347 BYTE              R‚serv‚
+  -346 WORD V_Hid_Cnt    Nombre de fois que l'on a demand‚ au curseur de
+                         disparaŒtre
+  -344 WORD Cur_X        Coordonn‚e de la nouvelle position de la souris. Si
+                         cette position est la mˆme que G_CurX et G_CurY, le
+                         systŠme d'exploitation ne se donne pas la peine de
+                         retracer la souris, et ainsi vous gagnez quelques
+                         cycles machines. Regardez l'oscillo d'un SoundTracker,
+                         bougez la souris, et concluez...
+  -342 WORD Cur_Y        Idem pour les Y.
+  -340 BYTE Cur_Flag     Si diff‚rent de z‚ro, la souris sera redessin‚e … la
+                         prochaine VBL
+  -339 BYTE Mouse_Flag   Si diff‚rent de z‚ro, la souris est lƒch‚e sur le
+                         Bureau, sinon elle est immobilis‚e
+  -338 LONG              R‚serv‚
+  -334 WORD V_Sav_X      Coordonn‚e X sauvegard‚e du curseur
+  -332 WORD V_Sav_Y      Coordonn‚e Y sauvegard‚e du curseur
+  -330 WORD Save_Len     Hauteur en point du morceau d'‚cran sauvegard‚ sous le
+                         pointeur de la souris (en principe ‚gal … la hauteur
+                         de la souris)
+  -328 LONG Save_Adr     Adresse du premier mot sauvegard‚ du morceau d'‚cran
+                         sous la souris. En principe d‚pend de la forme de la
+                         souris.
+  -324 WORD Save_Stat
+  -322 WORD Save_Area    128 WORDs composants le fond de l'‚cran avant que la
+                         souris n'ait eu le temps de le salir de ses pixels
+                         rebels et revendicateurs.
+   -66 LONG User_Tim     Pointeur vers la routine utilisateur invoqu‚e … chaque
+                         battement de l'horloge. Voyez VEx_Time (VDI ).
+   -62 LONG Next_Tim     Pointeur vers la routine de tra‡age du pointeur de la
+                         souris.
+   -58 LONG User_But     Pointeur vers la routine personnelle de gestion des
+                         boutons de la souris.
+   -54 LONG User_Cur     Pointeur vers la routine de tra‡age personnelle de la
+                         souris.
+   -50 LONG User_Mot     Pointeur vers la routine personnelle de gestion du
+                         d‚placement de la souris
+   -46 WORD V_Cel_Ht     Hauteur en points de la cellule d'un caractŠre
+   -44 WORD V_Cel_MX     Nombre de caractŠres par ligne-1
+   -42 WORD V_Cel_MY     Nombre de lignes-1
+   -40 WORD V_Cel_WR     Nombre d'OCTETs entre une ligne et la suivante
+   -38 WORD V_Col_BG     Couleur du fond
+   -36 WORD V_Col_FG     Couleur du premier plan
+   -34 LONG V_Cur_Ad     Adresse du curseur … l'‚cran
+   -30 WORD V_Cur_Of     Nombre d'OCTETs entre le d‚but de l'‚cran et la
+                         premiŠre ligne de texte
+   -28 WORD V_Cur_X      Position X du curseur
+   -26 WORD V_Cur_Y      Position Y du curseur
+   -24 BYTE V_Period     Nombre de VBL entre deux clignotement du curseur
+   -23 BYTE V_Cur_Ct     Compte … rebours avant le clignotement du curseur
+   -22 LONG V_FntAd      Pointeur vers les donn‚es de la fonte actuelle
+   -18 WORD V_Fnt_Nd     Code ASCII maximum de la fonte
+   -16 WORD V_Fnt_St     Code ASCII minimum de la fonte
+   -14 WORD V_Fnt_Wd     Largeur de la fonte (en OCTETs)
+   -12 WORD V_Rez_Hz     Nombre de points de l'‚cran actuel
+   -10 LONG V_Off_Ad     Pointeur vers une tables d'OffSet de fontes
+    -6 WORD              R‚serv‚
+    -4 WORD V_Rez_Vt     Nombre de lignes de l'‚cran actuel
+    -2 WORD Bytes_Ln     Largeur MFDB de l'‚cran
+     0 WORD V_Planes     Nombre de plan de l'‚cran actuel
+     2 WORD V_Lin_Wr     Nombre d'OCTETs par ligne
+     4 LONG GEM_Contrl   Pointeur vers le tableau Contrl du GEM
+     8 LONG GEM_IntIn    Pointeur vers le tableau IntIn du GEM
+    12 LONG GEM_PtsIn    Pointeur vers le tableau PtsIn du GEM
+    16 LONG GEM_IntOut   Pointeur vers le tableau IntOut du GEM
+    20 LONG GEM_PtsOut   Pointeur vers le tableau PtsOut du GEM
+    24 WORD _FG_BP_1     Ces registres limitent … 16 couleurs l'affichage
+    26 WORD _FG_BP_2     via la LineA. D‚composez les 4 BITs composants
+    28 WORD _FG_BP_3     le registre de couleur … utiliser, et mettez 1
+    30 WORD _FG_BP_4     dans les registres correspondants. Voyez A003...
+    32 WORD _LstLin      -1 ici
+    34 WORD _Ln_Mask     Motif de ligne
+    36 WORD _Wrt_Mode    Mode d'‚criture (Voyez VDI 32)
+                         0 = Source
+                         1 = Transparent
+                         2 = XOR
+                         3 = NOT Transparent
+    38 WORD _X1          Coordonn‚e X du coin sup‚rieur gauche
+    40 WORD _Y1          Coordonn‚e Y du coin sup‚rieur gauche
+    42 WORD _X2          Coordonn‚e X du coin inf‚rieur droit
+    44 WORD _Y2          Coordonn‚e Y du coin inf‚rieur droit
+    46 LONG _PatPtr      Pointeur vers les donn‚es du motif de remplissage
+    50 WORD _PatMsk      Pointeur vers le masque du motif de remplissage
+    52 WORD _MultiFill   0 = Motif de remplissage sur un seul plan
+                         1 = Motif de remplissage sur tous les plans
+    54 WORD _Clip        0 = Pas de CLIPPING
+                         1 = CLIPPING
+    56 WORD _XMn_Clip    Coordonn‚e X du coin sup‚rieur gauche du CLIPPING
+    58 WORD _YMn_Clip    Coordonn‚e Y du coin sup‚rieur gauche du CLIPPING
+    60 WORD _XMx_Clip    Coordonn‚e X du coin inf‚rieur droit du CLIPPING
+    62 WORD _YMx_Clip    Coordonn‚e Y du coin inf‚rieur droit du CLIPPING
+    64 WORD _XAcc_DDA    ???
+    66 WORD _DDA_Inc     Facteur d'Agrandissement/R‚duction
+    68 WORD _T_SclSts    0 = R‚duction
+                         1 = Agrandissement
+    70 WORD _Mono_Status 0 = Fonte proportionnelle
+                         1 = Fonte non proportionnelle
+    72 WORD _SourceX     X du caractŠre dans la fonte
+    74 WORD _SourceY     Y du caractŠre dans la fonte
+    76 WORD _DestX       Coordonn‚e X du caractŠre … l'‚cran
+    78 WORD _DestY       Coordonn‚e Y du caractŠre … l'‚cran
+    80 WORD _DelX        Largeur du caractŠre
+    82 WORD _DelY        Hauteur du caractŠre
+    84 LONG _FBase       Pointeur vers le d‚but des donn‚es de la fonte
+    88 WORD _FWidth      Largeur de la fonte
+    90 WORD _Style       Effets graphiques
+    92 WORD _LiteMask    Masque pour l'‚criture en clair
+    94 WORD _SkewMask    Masque pour l'‚criture en italique
+    96 WORD _Weight      Nombre de BITs pour le gras
+    98 WORD _R_Off       D‚placement droit pour l'italique
+   100 WORD _L_Off       D‚placement gauche pour l'italique
+   102 WORD _Scale       0 = Non
+                         1 = Oui
+   104 WORD _Chup        Angle de rotation du texte en dixiŠme de degr‚
+   106 WORD _Text_FG     Couleur du texte
+   108 LONG _ScrtChp     Adresse de la m‚moire tampon pour la production des
+                         effets graphiques sur le texte
+   112 WORD _Scrpt2
+   114 WORD _Text_BG     Couleur du fond pour le texte
+   116 WORD _CopyTran    Si … 0, Copie Opaque (normale)
+                              1, Copie Transparente (monochrome vers couleur)
+   118 LONG _Fill_Abort  Pointeur vers une routine de test d'arrˆt pour le
+                         remplissage. Il faut mettre 0 dans D0 pour faire
+                         continuer le remplissage, sinon 1 pour qu'il s'arrˆte.
+
+         A1 = Pointeur vers un tableau contenant les adresses des trois fontes
+              systŠmes (6*6 ic“nes, 8*8 Low Reso, 8*16 Hi Reso)
+              Structure du tableau : LONG 0 : Adresse du Header de la fonte 6*6
+                                     LONG 1 : Adresse du Header de la fonte 8*8
+                                     LONG 2 : Adresse du Header de la fonte
+                                              8*16
+         A2 = Pointeur vers un tableau contenant les adresses des diff‚rentes
+              routines Line A
+              Structure du tableau : LONG 0 : Put Pixel
+                                     LONG 1 : Get Pixel
+                                     LONG 2 : Line
+                                     LONG 3 : Horizontal Line
+                                     LONG 4 : Filled Rectangle
+                                     LONG 5 : Filled Polygon
+                                     LONG 6 : BitBlt
+                                     LONG 7 : TextBlt
+                                     LONG 8 : Show Mouse
+                                     LONG 9 : Hide Cursor
+                                     LONG A : Transform Mouse
+                                     LONG B : UnDraw Sprite
+                                     LONG C : Draw Sprite
+                                     LONG D : Copy Raster Form
+                                     LONG E : Contour Fill
+
+/// A001 : Put Pixel ///
+
+Place un point d'une couleur donn‚e … l'‚cran.
+
+ParamŠtres : ([12,A0])   X dans PtsIn0 (celui du GEM (voir variables LineA))
+             ([12,A0],2) Y dans PtsIn1 (Idem)
+             ([8,A0])    Index de la couleur dans IntIn0 (Idem)
+Retour : Aucun (sauf … l'‚cran)
+
+/// A002 : Get Pixel ///
+
+Permet d'obtenir la couleur d'un point.
+
+ParamŠtres : ([12,A0])   X dans PtsIn0 (Celui du GEM)
+             ([12,A0],2) Y dans PtsIn1 (Idem)
+Retour : D0.w = Index de couleur du point
+
+/// A003 : Line ///
+
+Permet de tracer une ligne. La fonction trace de la gauche vers la droite et de
+haut en bas, donc attention … l'ordre des X et des Y.
+
+ParamŠtres : (38,A0) X1 dans _X1
+             (40,A0) Y1 dans _Y1
+             (42,A0) X2 dans _X2
+             (44,A0) Y2 dans _Y2
+               Attention, car les lignes qui sortent de l'‚cran ne subissent pas
+               de CLIPPING. En clair, la ligne est ‚crite jusqu'au bout. Pour
+               faire cela, imaginez vous le jeu Asteroid, o— lorsque le vaisseau
+               sort d'un cot‚ de l'‚cran, il r‚apparaŒt de l'autre cot‚.
+                 Ici, c'est la mˆme chose. Une ligne de 0,0 … 639,639 sera
+               affich‚e en fait de 0,0 … 479,479 et de 480,0 … 639,159.
+                 Pour des lignes en couleur, il ne s'agit pas d'indiquer
+               simplement l'index de couleur … utiliser, mais de d‚finir
+               directement les plans de BITs … afficher.
+             (24,A0) Plan 0 dans _FG_BP_1 Decomposez le num‚ro du registre de
+             (26,A0) Plan 1 dans _FG_BP_2 couleur … utiliser, et mettez par
+             (28,A0) Plan 2 dans _FG_BP_3 exemple 1.w dans _FG_BP_3 si le BIT 2
+             (30,A0) Plan 3 dans _FG_BP_4 du registre est … 1. Z‚ro sinon...
+             (34,A0) Motif de la ligne dans _Ln_Mask
+             (36,A0) Mode d'‚criture dans _Wrt_Mod
+               0 = Trace normalement la ligne
+               1 = OR entre l'‚cran et le motif de la ligne
+               2 = XOR entre l'‚cran et le motif de la ligne
+               3 = XNOR entre l'‚cran et le motif de la ligne
+             (32,A0) -1 dans _LstLin
+Retour : Aucun (sauf bien ‚videment … l'‚cran)
+
+/// A004 : Horizontal Line ///
+
+Version optimis‚e de la pr‚c‚dente, qui ne trace que des lignes horizontales.
+C'est donc trŠs rapide. Cependant, cette fonction n'est pas plus simple que la
+pr‚c‚dente.
+
+ParamŠtres : (38,A0) X1 dans _X1
+             (40,A0) Y dans _Y1
+             (42,A0) X2 dans _X2
+             (44,A0) Y dans _Y2
+             (24,A0) Plan 0 dans _FG_BP_1
+             (26,A0) Plan 1 dans _FG_BP_2
+             (28,A0) Plan 2 dans _FG_BP_3
+             (30,A0) Plan 3 dans _FG_BP_4
+             (34,A0) Motif de la ligne dans _Ln_Mask
+             (36,A0) Mode d'‚criture dans _Wrt_Mod
+               0 = Trace normalement la ligne
+               1 = OR entre l'‚cran et le motif de la ligne
+               2 = XOR entre l'‚cran et le motif de la ligne
+               3 = XNOR entre l'‚cran et le motif de la ligne
+             (46,A0) Pointeur sur le motif de ligne … utiliser dans _PatPtr
+             (50,A0) Masque du motif de la ligne dans _PatMsk
+Retour : Aucun
+
+/// A005 : Filled Rectangle ///
+
+Sert … afficher un rectangle plein. Cette fonction est une d‚clinaison de la
+pr‚c‚dente, et en GROS, affiche une suite de lignes horizontales … l'‚cran. Mˆme
+chose, l'ordre des coordonn‚es est important, donc haut … gauche d'abord, puis
+bas … droite.
+
+ParamŠtres : (38,A0) X1 dans _X1
+             (40,A0) Y1 dans _Y1
+             (42,A0) X2 dans _X2
+             (44,A0) Y2 dans _Y2
+             Pour les couleurs, c'est pareils.
+             (24,A0) Plan 0 dans _FG_BP_1
+             (26,A0) Plan 1 dans _FG_BP_2
+             (28,A0) Plan 2 dans _FG_BP_3
+             (30,A0) Plan 3 dans _FG_BP_4
+             (36,A0) Mode d'‚criture dans _Wrt_Mod
+               0 = Trace normalement la ligne
+               1 = OR entre l'‚cran et le motif de la ligne
+               2 = XOR entre l'‚cran et le motif de la ligne
+               3 = XNOR entre l'‚cran et le motif de la ligne
+             (46,A0) Pointeur sur le motif de la ligne dans _PatPtr
+             (50,A0) Pointeur vers le masque dans _PatMsk
+             (54,A0) Flag du CLIPPING dans _Clip
+               0 = Le rectangle est affich‚ tel quel, comme on le demande
+               1 = Le CLIPPING d‚finit est pris en compte
+             (56,A0) X1 du CLIPPING dans _XMn_Clip
+             (58,A0) Y1 du CLIPPING dans _YMn_Clip
+             (60,A0) X2 du CLIPPING dans _XMx_Clip
+             (62,A0) Y2 du CLIPPING dans _YMx_Clip
+Retour : Aucun (sinon … l'‚cran, bien sur)
+
+/// A006 : Filled Polygon ///
+
+Trace un ensemble de lignes, et remplit les espaces.
+
+ParamŠtres : ([4,A0],2) Nombre de couple de coordonn‚es dans Contrl1
+             ([12,A0],...) Les diff‚rents couples dans PtsIn
+               ATTENTION : Pour le premier couple, X dans PtsIn0 et Y dans
+                           PtsIn1. Pour clore un polygone, terminer avec les
+                           mˆmes premiŠres coordonn‚es.
+             (40,A0) Y de la ligne dans _Y1
+             (24,A0) Plan 0 dans _FG_BP_1
+             (26,A0) Plan 1 dans _FG_BP_2
+             (28,A0) Plan 2 dans _FG_BP_3
+             (30,A0) Plan 3 dans _FG_BP_4
+             (36,A0) Mode d'‚criture dans _Wrt_Mod
+               0 = Trace normalement la ligne
+               1 = OR entre l'‚cran et le motif de la ligne
+               2 = XOR entre l'‚cran et le motif de la ligne
+               3 = XNOR entre l'‚cran et le motif de la ligne
+             (46,A0) Pointeur sur le motif de la ligne dans _PatPtr
+             (50,A0) Pointeur vers le masque dans _PatMsk
+             (54,A0) Flag du CLIPPING dans _Clip
+               0 = Le rectangle est affich‚ tel quel, comme on le demande
+               1 = Le CLIPPING d‚finit est pris en compte
+             (56,A0) X1 du CLIPPING dans _XMn_Clip
+             (58,A0) Y1 du CLIPPING dans _YMn_Clip
+             (60,A0) X2 du CLIPPING dans _XMx_Clip
+             (62,A0) Y2 du CLIPPING dans _YMx_Clip
+Retour : Aucun
+
+/// A007 : BitBlt ///
+
+Copie d'une zone de m‚moire vers une autre, OBLIGATOIREMENT de la mˆme taille.
+Si vous z'avez un Blitter, la fonction l'exploite.
+
+ParamŠtres : Adresse d'une structure BitBlt dans A6 (c'est pas commun, hein?)
+
+> Structure BitBlt
+  WORD  0 : Largeur de la zone en points
+  WORD  1 : Hauteur de la zone en points
+  WORD  2 : Nombre de plans
+  WORD  3 : Couleur du premier plan
+  WORD  4 : Couleur de fond
+  LONG  5 : Op‚ration logique … effectuer. Les mˆmes que celle du Blitter.
+               0 = Destination … 0 (utile pour effacer une zone de m‚moire)
+               1 = Source AND Destination
+               2 = Source NAND Destination
+               3 = Source (le plus fr‚quent)
+               4 = NOT Source AND Destination
+               5 = Destination (quelle utilit‚?)
+               6 = Source XOR Destination
+               7 = Source OR Destination
+               8 = NOT Source NAND Destination
+               9 = NOT Source XOR Destination
+              10 = NOT Destination
+              11 = Source NOR Destination
+              12 = NOT Source
+              13 = NOT Source OR Destination
+              14 = NOT Source NOR Destination
+              15 = Destination plein (tous les BITs … 1)
+  WORD  7 : Coordonn‚e X du coin sup‚rieur gauche du bloc source
+            Si vous voulez copier un bloc entier, mettez 0
+  WORD  8 : Coordonn‚e Y du coin sup‚rieur gauche du bloc source
+  LONG  9 : Adresse du bloc source
+  WORD 11 : Nombre d' OCTETs entre deux WORD … copier. Normalement 2 pour une
+            copie contigu‰.
+  WORD 12 : Nombre d'OCTETs … sauter pour la ligne suivante.
+  WORD 13 : Nombre d'OCTETs … sauter pour arriver sur le prochain plan. 2 il me
+            semble.
+  WORD 14 : Coordonn‚e X du coin sup‚rieur gauche du bloc destination
+  WORD 15 : Coordonn‚e Y du coin sup‚rieur gauche du bloc destination
+  LONG 16 : Adresse de la destination
+  WORD 18 : Idem que WORD 11, mais pour la destination
+  WORD 19 : Idem que WORD 12, mais toujours pour la destination
+  WORD 20 : Idem que WORD 13, destination donc
+  LONG 21 : Adresse de la "grille" Pattern. - Je comprend Pas -
+  WORD 23 : Taille d'une ligne de la grille en OCTETs
+  WORD 24 : Nombre d'OCTETs jusqu'au prochain plan de la grille
+  WORD 25 : Hauteur de la grille
+  WORD 26 : Masque (???)
+       …
+  WORD 37 :
+
+Retour : Aucun
+
+/// A008 : TextBlt ///
+
+C'est LA fonction texte de l'ATARI. Elle est ind‚pendante des fonctions BIOS,
+mais vraiment sup‚rieure. Cependant, les apports qu'elle offre, faudra les
+pr‚ciser pr‚cedemment, donc attendez vous … un gros boulot. Le mieux, entre
+nous, est d'‚crire une macro routine pour l'utiliser, avec un passage de
+paramŠtres. De plus, on peut utiliser des fontes diff‚rentes, ce qui veut dire
+casse tˆte (un vrai de vrai, ici).
+
+> Structure Font
+  Structure d'une fonte normale.
+  WORD  0 : Font Identifier : num‚ro de la fonte
+              1 = Fonte systŠme
+  WORD  1 : Taille de la fonte en points
+  WORD  2 … 17 : Nom de la fonte
+  WORD 18 : Code ASCII minimum des caractŠres affichables (32 pour l'espace, en
+            principe)
+  WORD 19 : Code ASCII maximum des caractŠres affichables
+  WORD 20 : Distance entre la ligne de base et la ligne sup‚rieure
+  WORD 21 : Distance entre la ligne de base et la ligne ascendante
+  WORD 22 : Distance entre la ligne de base et la demi ligne
+  WORD 23 : Distance entre la ligne de base et la ligne descendante
+  WORD 24 : Distance entre la ligne de base et la ligne inf‚rieure
+  WORD 25 : Largeur du caractŠre le plus large de la fonte
+  WORD 26 : Largeur de la cellule de caractŠre la plus large de la fonte (en
+            principe un point de plus que la largeur du caractŠre le plus
+            large)
+  WORD 27 : D‚calage gauche pour l'‚criture en italique
+  WORD 28 : D‚calage droit pour l'‚criture en italique
+  WORD 29 : Nombre de BITs en plus … afficher pour obtenir une ‚criture en gras
+  WORD 30 : Hauteur de la ligne pour l'‚criture en UnderLine
+  WORD 31 : Masque pour l'‚criture en clair
+  WORD 32 : Masque pour l'‚criture en italique
+  WORD 33 : Type de la fonte
+            BIT 0 : Systeme
+                      0 = Non
+                      1 = Oui
+            BIT 1 : Table de d‚calage horizontale
+                      0 = Non
+                      1 = Oui
+            BIT 2 : Byte Swap Flag - Format de la fonte
+                      0 = Format INTEL (OCTET Bas - OCTET Haut (sens Z80))
+                      1 = Format MOTOROLA (OCTET Haut - OCTET Bas (sens normal))
+            BIT 3 : Proportionnalit‚ de la fonte
+                      0 = Fonte Proportionnelle, la largeur des caractŠres
+                          d‚pend de leur taille
+                      1 = Fonte Non-Proportionnelle, la largeur est la mˆme pour
+                          tous les caractŠres
+  LONG 34 : Adresse de la table de d‚calage horizontale
+  LONG 36 : Adresse de la table de d‚calage des caractŠres
+  LONG 38 : Adresse des donn‚es de la fonte
+  WORD 40 : Taille d'une ligne de caractŠre
+  WORD 41 : Nombre de lignes de la fonte
+  LONG 42 : Adresse de la prochaine fonte
+
+ParamŠtres : (36,A0) Mode d'‚criture dans _Wrt_Mode
+             (106,A0) Index de couleur du texte dans _Text_FG
+             (114,A0) Index de couleur du fond du texte dans _Text_BG
+             (84,A0) Pointeur sur le d‚but des donn‚es de la fonte dans _FBase
+             (88,A0) Largeur de la fonte dans _FWidth
+             (72,A0) X du caractŠre dans la fonte dans _SourceX
+             (74,A0) Y du caractŠre dans la fonte dans _SourceY
+             (76,A0) X du caractŠre … l'‚cran dans _DestX
+             (78,A0) Y du caractŠre … l'‚cran dans _DestY
+             (80,A0) Largeur du caractŠre en points dans _DelX
+             (82,A0) Hauteur du caractŠre en points dans _DelY
+             (90,A0) Effets … appliquer sur le texte dans _Style
+             (92,A0) Masque pour l'‚criture en clair dans _LiteMask
+             (94,A0) Masque pour l'‚criture en italique dans _SkewMask
+             (96,A0) Facteur d'agrandissement du caractŠre dans _Weight
+             (98,A0) D‚placement droit pour l'italique dans _R_Off
+             (100,A0) D‚placement gauche pour l'italique dans _L_Off
+             (102,A0) Mode d'Agrandissement/R‚duction dans _Scale
+             (64,A0) Accumulateur pour l'agrandissement dans _XACC_DDA
+             (66,A0) Facteur d'agrandissement ou de r‚duction dans _DDA_Inc
+             (68,A0) Direction de l'alignement dans _T_SclSts
+             (104,A0) Angle de rotation dans _Chup
+             (70,A0) Mode d'‚criture fixe dans _Mono_Status
+             (108,A0) Poiteur sur un buffer de travail pour l'application des
+               effets dans _ScrtChp
+             (112,A0) D‚placement pour l'alignement dans _ScrtChp dans _ScrPt2
+Retour : Aucun
+
+/// A009 : Show Mouse ///
+
+Fait apparaŒtre la souris, mˆme sous TOS.
+
+ParamŠtres : ([4,A0],2) 0 dans Contrl1
+             ([4,A0],6) 1 dans Contrl3
+             ([8,A0]) Si vous mettez 0 dans IntIn0, le pointeur de la souris
+               apparaŒt
+               imm‚diatement, sinon le compteur est pris en compte, et vous
+               devez
+             appeler cette fonction autant de fois qu'il … ‚t‚ demand‚ de faire
+             disparaŒtre le pointeur avant que celui ne r‚apparaisse. Kapito?
+Retour : La souris dans les basques (La voisine perch‚e sur une chaise au
+         milieu de la cuisine : Hiiiiiiiiiii!)
+
+/// A00A : Hide Cursor ///
+
+Demande de faire disparaŒtre la souris.
+
+ParamŠtres : Aucun
+Retour : Clap, plus de souris. La voisine : "Rhhhƒƒaa... Lovely" (½ Gotlib)
+
+/// A00B : Transform Mouse ///
+
+Une nouvelle souris, une.
+
+ParamŠtres : ([8,A0],6) Couleur du masque (0 = Blanc en principe) dans IntIn3
+             ([8,A0],8) Couleur du pointeur (1 = Noir en principe) dans IntIn4
+             ([8,A0],10 … 40) Les donn‚es du masque dans IntIn5 … IntIn20
+             ([8,A0],42 … 72) Les donn‚es du pointeur dans IntIn21 … IntIn36
+Retour : Votre souris change de tˆte. Formidable, non? Essayez avec celle d'un
+         ‚l‚phant, ‡a trompe ‚norm‚ment.
+
+/// A00C : Undraw Sprite ///
+
+Dessine un Sprite de 16*16 pixels.
+
+ParamŠtres : Adresse du buffer contenant le fond … replacer dans A2
+Retour : Plus de Sprite
+
+/// A00D : Draw Sprite ///
+
+Dessine un Sprite monochrome.
+
+ParamŠtres : Coordonn‚e X du Point Chaud du Sprite … afficher dans D0
+             Coordonn‚e Y du Point Chaud du Sprite … afficher dans D1
+             Pointeur vers la d‚finition du Sprite dans A0
+               WORD 0 : Coordonn‚e X du Point Chaud dans le Sprite
+               WORD 1 : Coordonn‚e Y du Point Chaud dans le Sprite
+               WORD 2 : Format
+                        0 = VDI
+                        1 = XOR (???)
+                Suivant ce que contient les variables FG_Func et BG_Func, il se
+                passe quelque chose de diff‚rent, suivant en plus le format
+                choisit :
+
+
+               WORD 3 : Couleur du masque
+               WORD 4 : Couleur du Sprite
+
+               puis 32 WORDs (2*16 lignes) o— les lignes du masque et du Sprite
+               sont entrelac‚es
+
+               WORD 5 : Ligne 0 du masque
+               WORD 6 : Ligne 0 du Sprite
+               WORD 7 : Ligne 1 du masque
+               WORD 8 : Ligne 1 du Sprite
+               ...
+             Pointeur vers un buffer pour stocker le fond dans A2
+               Ce buffer doit avoir une taille de 64 OCTETs pour chaque plan,
+               plus 10 OCTETs
+Retour : Un Sprite, … l'‚cran, en principe.
+
+/// A00E : Copy Raster Form ///
+
+Copie d'une zone de m‚moire … m‚moire. La diff‚rence avec BitBlt vient du fait
+que cette fonction est un peu plus simple, et que l'on peut se passer des MFDB
+si l'on ne prend que des morceaux d'‚cran.
+
+ATTENTION : C'est une copie, donc le format Standard (PC, les OCTETs des pixels
+            les uns … la suite des autres) n'est pas support‚.
+
+ParamŠtres : ([8,A0]) Options de copie dans IntIn0
+               BIT 3-0 : Suivant le mode de copie Opaque ou Transparente
+                         Copie Opaque : 0 = Destination … 0
+                                        1 = Source AND Destination
+                                        2 = Source NAND Destination
+                                        3 = Source (le plus fr‚quent)
+                                        4 = NOT Source AND Destination
+                                        5 = Destination (quelle utilit‚?)
+                                        6 = Source XOR Destination
+                                        7 = Source OR Destination
+                                        8 = NOT Source NAND Destination
+                                        9 = NOT Source XOR Destination
+                                        10 = NOT Destination
+                                        11 = Source NOR Destination
+                                        12 = NOT Source
+                                        13 = NOT Source OR Destination
+                                        14 = NOT Source NOR Destination
+                                        15 = Destination … "1"
+                         Copie Transparente : 0 = Replace Mode
+                                              1 = Transparent Mode
+                                              2 = XOR Mode
+                                              3 = Reverse Transparent Mode
+               BIT 4 : Utilisation de la grille Pattern
+                       0 = Non
+                       1 = Oui
+             ([8,A0],2) Index des BIT … 1 pour la copie Transparente dans IntIn1
+             ([8,A0],4) Index des BIT … 0 pour la copie Transparente dans IntIn2
+             ([12,A0]) X1 du coin sup‚rieur gauche de la source dans PtsIn0
+             ([12,A0],2) Y1 du coin sup‚rieur gauche de la source dans PtsIn1
+             ([12,A0],4) X2 du coin inf‚rieur droit de la source dans PtsIn2
+             ([12,A0],6) Y2 du coin inf‚rieur droit de la source dans PtsIn3
+             ([12,A0],8) X1 du coin sup. gauche de la destination dans PtsIn4
+             ([12,A0],10) Y1 du coin sup. gauche de la destination dans PtsIn5
+             ([12,A0],12) X2 du coin inf. droit de la destination dans PtsIn6
+             ([12,A0],14) Y2 du coin inf. droit de la destination dans PtsIn7
+             ([4,A0],14) Adresse du MFDB source dans Contrl7-8
+               Si cette adresse est … 0, la Line A suppose que l'on lui demande
+               poliment une op‚ration sur l'‚cran en cours, et se passe donc de
+               notre sympathique MFDB.
+             ([4,A0],18) Adresse du MFDB destination dans Contrl9-10
+               Mˆme remarque.
+             (46,A0) Pointeur de Pattern dans _PatPtr
+             (52,A0) Mode du Pattern dans _MultiFill
+               0 = Pattern monochrome
+               1 = Pattern couleur
+             (116,A0) Mode de copie dans _CopyTran
+               0 = Copie Opaque, couleur vers couleur
+               1 = Copie Transparente, monochrome vers couleur (les registres
+                   IntIn1-2 sont pris en compte)
+Retour : Aucun
+
+/// A00F : Contour Fill ///
+
+Remplit une surface avec une couleur.
+
+ParamŠtres : ([12,A0]) X dans PtsIn0
+             ([12,A0],2) Y dans PtsIn1
+             ([8,A0]) Index de couleur dans IntIn0
+               Si cet index est positif, la couleur s'arrˆte de remplir
+               lorsqu'elle rencontre le bord de l'‚cran, ou la couleur de mˆme
+               index. Si par contre cet index est n‚gatif, la couleur s'arrˆte …
+               toutes les couleurs diff‚rentes de celle o— elle … ‚t‚ d‚pos‚e.
+             (118,A0) Adresse d'une routine invoqu‚e r‚guliŠrement dans
+               _Fill_Abort.
+               On peut ainsi, avec un petit programme, demander d'arrˆter de
+               remplir. Mais celui ci DOIT ˆtre le plus cours possible, ne pas
+               faire appel au systŠme
+               d'exploitation, mais directement au HardWare. Terminez par un
+               RTS.
+Retour : Aucun (sauf l'‚cran)
+

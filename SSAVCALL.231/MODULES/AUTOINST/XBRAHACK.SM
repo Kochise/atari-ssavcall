@@ -1,0 +1,46 @@
+; /// Installateur du XBRA ///
+;
+; Used registers : D7.l - Progiz' Size
+;                  D0.l > TrashCan
+;                  A0.l > TrashCan
+
+	movea.l	$88.w,A0	; TRAP #2
+
+XBRA_Verify	; On regarde si en -12 y'a XBRA (ShortXBRA)
+	; Sinon on v‚rifie pour un LongXBRA
+
+	cmpi.l	#"XBRA",(-12,A0)
+	
+	BEQ	XBRA_Match	; Y'a un ShortXBRA
+
+	; Les LongXBRA existent mais sont rares
+	; Ces XBRA ont un nom de 8 octets
+
+	cmpi.l	#"XBRA",(-16,A0)
+	
+	BNE	XBRA_Install
+
+	; On regarde si SSAVCALL est d‚j… install‚
+	; J'm'en fout de v‚rifier en -12 s'il sagissait d'un LongXBRA
+	; car je sais que le XBRA de SSAVCALL est un ShortXBRA,
+	; donc je ne v‚rifie qu'en -8...	
+
+XBRA_Match	cmpi.l	#"SSAV",(-8,A0)
+	
+	; On prend le XBRA suivant, et on recommence
+	; tant que l'on a pas trouv‚ "SSAV"
+	
+	movea.l	(-4,A0),A0	; N'affecte pas les indicateurs! Malin...
+	
+	BNE	XBRA_Verify
+
+	move.w	#-2,D0
+
+	RTS
+	
+XBRA_Install	move.l	$88.l,Old_TRAP2
+	move.l	#New_TRAP2,$88.l
+
+	clr.w	D0
+
+	RTS

@@ -1,0 +1,86 @@
+; /// Installation du Cookie NULL et SSAV ///
+;
+; Used registers : D7.l - Progiz' Size
+;                  D5.l > TrashCan
+;                  D4.l > TrashCan
+;                  D3.l > TrashCan
+;                  D2.l > TrashCan
+;                  D1.l > TrashCan
+;                  D0.l > TrashCan
+;                  A0.l > TrashCan
+
+	move.l	$5A0.w,D0	; L'adresse de la Cookie-Jar
+	BEQ	COOKIE_BadInstall	; Y'a pas, donc erreur
+	
+	movea.l	D0,A0	; Pointeur
+	move.l	D0,D1
+
+	cmpi.l	#"NULL",(A0)	; Y'a p'tet queq'chose
+	BEQ	COOKIE_NULLSize	; "NULL" est l…, en premiŠre position
+	
+COOKIE_NULL	move.l	(A0,D3*8),D0	; D3.l car travail avec la taille de la Jar,
+			; donc j'‚vite des CLR inutiles
+	BEQ	COOKIE_NULLMatch	; "" (NULL) trouv‚
+	
+	addq.l	#1,D3	; Le compteur de Cookies
+	BRA	COOKIE_NULL
+	
+COOKIE_NULLMatch	move.l	(4,A0,D3*8),D2	; Le nombre de Cookies
+	
+	move.l	D3,D5	; On modifie le nombre de Cookies
+	addq.l	#2,D5
+		
+	cmp.l	D2,D5	; On v‚rifie si on peut encore
+			; ajouter "NULL" et "SSAV"
+	BGE	COOKIE_BadInstall	; Plus de place, donc erreur
+	
+	clr.l	(8,A0,D3*8)	; On reporte le Cookie "" (NULL)
+	move.l	D2,(12,A0,D3*8)
+
+COOKIE_Move	move.l	(-8,A0,D3*8),(A0,D3*8)
+	move.l	(-4,A0,D3*8),(4,A0,D3*8)
+	subq.l	#1,D3
+	BNE	COOKIE_Move
+	
+	move.l	#"NULL",(A0)	; On place le Cookie "NULL" en d‚but de Jar
+	move.l	D2,(4,A0)
+	
+COOKIE_NULLSize	move.l	(4,A0),D3	; Nombre de Cookies
+
+	move.l	Cookie_Name,D1	; Le nom du Cookie "SSAV"
+		
+COOKIE_SSAV	cmp.l	D3,D4	; On est trop loin, erreur
+	BGE	COOKIE_BadInstall
+	move.l	(A0,D4*8),D0
+	BEQ	COOKIE_Install	; On arrive sur "" (NULL), donc
+			; ‡a veut dire que "SSAV" n'est pas
+			; l…, et qu'il faut l'installer
+	cmp.l	D0,D1
+	BEQ	COOKIE_AlReady	; C'est d‚j… le Cookie "SSAV", donc
+			; c'est qu'il est d‚j… l…
+
+	addq.l	#1,D4	; On poursuit la recherche au
+			; Cookie suivant
+
+	BRA	COOKIE_SSAV
+
+COOKIE_AlReady	move.l	#-2,D0	; D‚j… install‚
+	
+	RTS		; On sort de l'installation
+
+COOKIE_BadInstall	move.l	#-1,D0	; Y'a eu un n'os
+	
+	RTS
+
+COOKIE_Install	move.l	D1,(A0,D4*8)	; "SSAV"
+	move.l	#Start_SSAV,(4,A0,D4*8)	; Adresse de la routine
+	clr.l	(8,A0,D4*8)	; "" (NULL)
+	move.l	D2,(12,A0,D4*8)
+	
+	clr.l	D0	; Well Done...
+	
+	RTS
+
+	SECTION	DATA
+	
+Cookie_Name	dc.b	"SSAV"

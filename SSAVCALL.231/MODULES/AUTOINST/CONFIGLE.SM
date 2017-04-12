@@ -1,0 +1,479 @@
+; /// Utilisateur du fichier de configuration ///
+; A REVOIR COMPLETEMENT. L'id‚e est bonne, mais l'avanc‚e
+; trop h‚sitante.
+;
+; Used registers : D7.l - Progiz' Size
+;                  D6.w > TrashCan : Counter of the ConfigCodeRunner
+;                  D5.l - Len Of The ConfigFile
+;                  D4.w > TrashCan : Pointer on the ConfigFile
+;                  D2.l > TrashCan
+;                  D1.l > TrashCan
+;                  D0.l > TrashCan
+;                  A0.l > TrashCan
+;                  A1.l > TrashCan
+;                  A4.l - Address Of The ConfigFile
+;                  A5.l > TrashCan : Linker of the ConfigCode
+;                  A6.l > TrashCan : Pointer to the ConfigCode
+;
+; WARNING : This part run in Supervisor Mode
+
+	SECTION	TEXT
+
+; D‚finition du systŠme d'AUTO-Configuration
+;
+; CONFIG_Opt  : WORD - Nombre d'identificateurs
+;               ???? - Identificateur - NULL
+; CONFIG_Tree : LONG - Adresse de la routine
+;               LONG - Adresse de l'arbre de paramŠtres
+;
+; ParamTree   : WORD - Nombre de paramŠtres
+;
+; ParamData   : WORD - Nombre de sous-paramŠtres
+;               WORD - Type des sous-paramŠtres
+;                      0 : Le num‚ro du sous-paramŠtres (d‚but … 0)
+;                      1 : -1 si SousParam, sinon num‚ro de l'unit‚e (0:A ,...)
+;                      2 : Adresse d'une chaine de caractŠres
+;                      3 : -1 si SousParam, sinon conversion d'un nombre ASCII
+;               LONG - Adresse du premier sous-paramŠtre
+;              (LONG)- ....
+;               ....
+;
+; SousParam0  : List0 - NULL - List1 - NULL - ... - ListN - NULL-NULL
+; SousParam1  : List0 - NULL-NULL (Char A-Z or a-z -> 0-25)
+; SousParam2  : Buffer
+; SousParam3  : List0 - NULL-NULL (NumString -> WORD)
+ 
+	lea	CONFIG_Tree,A6
+	
+	lea	CONFIG_Opt,A0
+	move.w	(A0)+,D6
+	subq.w	#1,D6	
+	
+CONFIG_Loop	clr.w	D4
+
+CONFIG_Search	BSR	IdentConfigLine
+
+	BSR	VerifConfigLine
+	
+	BNE	CONFIG_Search
+	
+
+	DBF	D6,CONFIG_Loop
+	
+	
+	
+	
+
+	RTS
+
+	; On identifie la ligne, et suivant sa nature,
+	; soit on sort, soit on cherche encore
+
+IdentConfigLine	cmpi.b	#"#",(A4,D4.w)
+	BEQ	NextConfigLine
+	
+	RTS		; On a trouv‚ une lgne int‚ressante
+
+NextConfigLine	addq.w	#1,D4
+	
+	cmpi.w	#$D0A,(A4,D4.w)
+	BNE	NextConfigLine
+	
+	addq.w	#2,D4
+	
+	BRA	IdentConfigLine	; On teste la ligne suivante
+
+VerifConfigLine	move.w	
+		
+	RTS
+	
+
+
+MINIMUM_Code	; Stack -> WORD Use (0:YES, 1:NO, 2:FAST, 3:CARD)
+	;
+	;               The "FAST" option is a predifined
+	;               configuration where the minimum
+	;               is installed.
+	;
+	;               The "CARD" option should be used
+	;               in the future with a card-reader.
+	;               In this case, the CARD would
+	;               contain a personnal configuration.
+	;               So, if you travel a lotsa, you've
+	;               just to find an ATARI working under
+	;               SSAVCALL, plug your CARD into the
+	;               reader, and get the configuration
+	;               you have at home ;)
+	;               It can also be used as a key to
+	;               enter different level of uses,
+	;               and contain a personal-crypt-code
+	;               using your personal key to
+	;               secure very easily your data.
+	;               Useful if you use InterNet (with
+	;               WenSuite?) for trading stuffs...
+	
+	RTS
+
+PINPATH_Code	; Stack -> LONG (Invalid)
+	;          LONG (Valid)
+	;          LONG (Path)
+	;          WORD Device (-1:BOOT, 0:A, ...)
+	;          WORD Use (0:YES, 1:NO) 
+
+	RTS
+
+ACCPATH_Code	; Stack -> LONG (Invalid)
+	;          LONG (Valid)
+	;          LONG (Path)
+	;          WORD Device (-1:BOOT, 0:A, ...)
+	;          WORD Use (0:YES, 1:NO) 
+
+	move.l	$84.W,ACCPATH_OldGEMDOS	; OLD TRAP #1
+	move.l	#ACCPATH_NewGEMDOS,$84.W; NEW TRAP #1
+	SF	ACCPATH_ErrorFlag	; Si nul, $FF dans ACCPATH_ErrorFlag
+			; sinon $0 dans ACCPATH_ErrorFlag
+	
+	movea.l	$5A0.w,A0	; JAR Base
+	move.l	(8,A0),D2	; Nombre de Cookies
+			; C'est simple comme ‡a, hein?
+	subq.l	#1,D2	; On ajuste pour le DBF
+
+ACCPATH_LookForCPU	move.l	(A0,D2.w*8),D0
+	cmp.l	#"_CPU",D0
+	
+	BEQ	ACCPATH_CPUFound
+	
+	DBF	ACCPATH_LookForCPU
+	
+ACCPATH_CPUFound	move.l	(4,A0,D2.w*8),D0	; Type de processeur
+
+	BEQ	ACCPATH_ExitInstall	; 68000, on s'casse
+	
+	; C'est pas fin de v‚rifier la version de l'ATARI
+	; … partir de son processeur, car les cartes
+	; d'extension, ‡a existe. Mais bon, je reprend le
+	; travail de MURPHY Dave (ACCFOLDER), et je sait
+	; pas trop pourquoi y fait comme ‡a
+	
+	ST	ACCPATH_ErrorFlag	; $FF dans ErrorFlag
+
+ACCPATH_ExitInstall	RTS
+
+; Cette partie est appell‚e par le systŠme d'exploitation
+
+ACCPATH_NewGEMDOS	movem.l	A0-A2/D0,ACCPATH_SavedRegs
+	move.l	USP,A2	; ????
+	btst.l	#5,(A7)	; A2
+	
+	BEQ	ACCPATH_VerifCall
+	
+	movea.l	A7,A2
+	addq.w	#6,A2
+	
+	tst.b	ACCPATH_ErrorFlag
+	
+	BEQ	ACCPATH_VerifCall
+	
+	addq.w	#2,A2
+
+ACCPATH_VerifCall	move.w	(A2)+,D0
+	cmp.w	#"N",D0
+	
+	BEQ	ACCPATH_Call
+
+; Si l'on est pas concern‚, on prend la porte et l'on passe son chemin
+
+ACCPATH_OldWarp	movem.l	ACCPATH_SavedRegs,A0-A2/D0
+	move.l	ACCPATH_OldGEMDOS,-(A7)
+	
+	RTS
+	
+; On red‚finie le chemin des ACCessoires
+
+ACCPATH_Call	movea.l	(A2),A0
+	lea	ACCPATH_Extension,A1
+	
+	moveq.w	#6,D0
+
+ACCPATH_VerifPath	cmpm.b	(A1)+,(A0)+
+
+	BNE	ACCPATH_OldWarp
+
+	DBF	D0,ACCPATH_VerifPath
+
+	move.l	#ACCPATH_FullPath,(A2)
+	move.l	(2,SP),ACCPATH_OldPath
+	move.l	#ACCPATH_SetPath,(2,SP)
+
+	; C'est fini, on sort par derriŠre...
+
+	BRA	ACCPATH_OldWarp
+
+ACCPATH_SetPath	movem.l	A0-A2/D0-D2,-(A7)
+
+	pea	ACCPATH_Path
+	move.W	#$3B,-(A7)	; - D_SETPATH -
+	trap	#1	; *** GEMDOS ***
+	ADDQ.W	#6,A7
+
+	movem.l	(SP)+,A0-A2/D0-D2
+	move.l	ACCPATH_OldPath,-(SP)
+
+	RTS
+
+CLIPATH_Code	; Stack -> WORD Create (0:YES, 1:NO)
+	;          LONG (Path)
+	;          WORD Device (-1:BOOT, 0:A, ...)
+	;          WORD Use (0:YES, 1:NO)
+	
+	RTS
+	
+JARSIZE_Code	; Stack -> WORD Size (-1:DEFAULT, else Size)
+
+	RTS
+	
+FPUKIND_Code	; Stack -> WORD HardWare (0:AUTO
+	;                         1:NONE
+	;                         2:88?
+	;                         3:88?+SFP
+	;                         4:881
+	;                         5:881+SFP
+	;                         6:882
+	;                         7:882+SFP
+	;                         8:040
+	;                         9:040+SFP)
+	;          WORD SoftWare (0:AUTO
+	;                         1:NONE
+	;                         2:88?
+	;                         3:88?+SFP
+	;                         4:881
+	;                         5:881+SFP
+	;                         6:882
+	;                         7:882+SFP
+	;                         8:040
+	;                         9:040+SFP)
+
+	RTS
+	
+RAMSIZE_Code	; Stack -> WORD TTRam (0:MAX
+	;                      1:  1Mb
+	;                      2:  2Mb
+	;                      3:  4Mb
+	;                      4:  8Mb
+	;                      5: 16Mb
+	;                      6: 32Mb
+	;                      7: 64Mb
+	;                      8:128Mb
+	;                      9:256Mb
+	;                     10:512Mb)
+	;          WORD STRam (0:MAX
+	;                      1:  1Mb
+	;                      2:  2Mb
+	;                      3:  4Mb
+	;                      4:  8Mb
+	;                      5: 16Mb
+	;                      6: 32Mb
+	;                      7: 64Mb)
+
+	RTS
+	
+VIRTUAL_Code	; Stack -> WORD Size (-1:DEV, else Size)
+	;          LONG (Path)
+	;          WORD Device (-1:BOOT, 0:A, ...)
+	;          WORD Use (0:YES, 1:NO)
+
+	RTS
+
+	SECTION	DATA
+
+CONFIG_Name	dc.b	"SSAVCALL.CNF",0
+
+CONFIG_Opt	dc.w	8
+	dc.b	"MINIMUM=",0
+	dc.b	"PINPATH=",0
+	dc.b	"ACCPATH=",0
+	dc.b	"CLIPATH=",0
+	dc.b	"JARSIZE=",0
+	dc.b	"FPUKIND=",0
+	dc.b	"RAMSIZE=",0
+	dc.b	"VIRTUAL=",0
+	
+CONFIG_Tree	dc.l	MINIMUM_Code,MINIMUM_Tree
+	dc.l	PINPATH_Code,PINPATH_Tree
+	dc.l	ACCPATH_Code,ACCPATH_Tree
+	dc.l	CLIPATH_Code,CLIPATH_Tree
+	dc.l	JARSIZE_Code,JARSIZE_Tree
+	dc.l	FPUKIND_Code,FPUKIND_Tree
+	dc.l	RAMSIZE_Code,RAMSIZE_Tree
+	dc.l	VIRTUAL_Code,VIRTUAL_Tree
+		
+OPT_YesNo	dc.b	"YES",0
+	dc.b	"NO",0,0
+OPT_Boot	dc.b	"BOOT",0,0
+OPT_Max	dc.b	"MAX",0,0
+
+; Configuration Minimum
+
+MINIMUM_Tree	dc.w	1
+	dc.w	2,0
+	dc.l	OPT_YesNo
+	dc.l	MINIMUM_Opt1
+	
+MINIMUM_Opt1	dc.b	"FAST",0
+	dc.b	"CARD",0,0
+
+; Chemin des fichiers Plug'In
+; Use      : [YES/NO]
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Valid    : [Kind]
+; Invalid  : [Kind]
+
+PINPATH_Tree	dc.w	5
+	dc.w	1,0
+	dc.l	OPT_YesNo
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	1,2
+	dc.l	PINPATH_Path
+	dc.w	1,2
+	dc.l	PINPATH_Valid
+	dc.w	1,2
+	dc.l	PINPATH_Invalid
+	
+; Chemin des accessoires
+; Merci pour l'id‚e … MURPHY Dave (ACCFOLDR) et COUSIN Micka‰l (ACCS)
+; Use      : [YES/NO]
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Valid    : [Kind]
+; Invalid  : [Kind]
+
+ACCPATH_Tree	dc.w	5
+	dc.w	1,0
+	dc.l	OPT_YesNo
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	1,2
+	dc.l	ACCPATH_Path
+	dc.w	1,2
+	dc.l	ACCPATH_Valid
+	dc.w	1,2
+	dc.l	ACCPATH_Invalid
+	
+; Chemin du ClipBoard
+; Use      : [YES/NO]
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Create   : [YES/NO] (Only if directory NOT FOUND or NOT VALID)
+
+CLIPATH_Tree	dc.w	4
+	dc.w	1,0
+	dc.l	OPT_YesNo
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	1,2
+	dc.l	CLIPATH_Path
+	dc.w	1,0
+	dc.l	OPT_YesNo
+	
+
+; Nombre de Cookies
+; Merci pour l'id‚e aux REMOVERS [Seb/Stabylo] (Cook-It)
+; Number   : [DEFAULT/Number]
+
+JARSIZE_Tree	dc.w	1
+	dc.w	1,3
+	dc.l	JARSIZE_Opt1
+	
+JARSIZE_Opt1	dc.b	"DEFAULT",0,0
+
+; Type du coprocesseur
+; SoftWare : [AUTO/NONE/88?/881/882/040/+SFP]
+; HardWare : [AUTO/NONE/88?/881/882/040/+SFP]
+
+FPUKIND_Tree	dc.w	2
+	dc.w	1,0
+	dc.l	FPUKIND_Opt1
+	dc.w	1,0
+	dc.l	FPUKIND_Opt1
+	
+FPUKIND_Opt1	dc.b	"AUTO",0
+	dc.b	"NONE",0
+	dc.b	"88?",0
+	dc.b	"88?+SFP",0
+	dc.b	"881",0
+	dc.b	"881+SFP",0
+	dc.b	"882",0
+	dc.b	"882+SFP",0
+	dc.b	"040",0
+	dc.b	"040+SFP",0,0
+
+; Gestionnaire de m‚moire physique
+; STRam    : [MAX/1/2/4/8/16/32/64]
+; TTRam    : [MAX/1/2/4/8/16/32/64/128/256/512]
+
+RAMSIZE_Tree	dc.w	2
+	dc.w	2,0
+	dc.l	OPT_Max
+	dc.l	RAMSIZE_Opt1
+	dc.w	3,0
+	dc.l	OPT_Max
+	dc.l	RAMSIZE_Opt1
+	dc.l	RAMSIZE_Opt2
+	
+RAMSIZE_Opt1	dc.b	"1",0
+	dc.b	"2",0
+	dc.b	"4",0
+	dc.b	"8",0
+	dc.b	"16",0
+	dc.b	"32",0
+	dc.b	"64",0,0
+RAMSIZE_Opt2	dc.b	"128",0
+	dc.b	"256",0
+	dc.b	"512",0,0
+
+; Gestionnaire de m‚moire virtuelle
+; Use      : [YES/NO]
+; Drive    : [BOOT/DriveID]
+; Path     : [Path]
+; Size     : [SizeInMb]
+
+VIRTUAL_Tree	dc.w	4
+	dc.w	1,0
+	dc.l	OPT_YesNo
+	dc.w	1,1
+	dc.l	OPT_Boot
+	dc.w	1,2
+	dc.l	VIRTUAL_Path
+	dc.w	1,3
+	dc.l	VIRTUAL_Range
+	
+VIRTUAL_Range	dc.b	"DEV",0,0
+
+	SECTION	BSS
+	
+PINPATH_Path	ds.b	40
+PINPATH_Valid	ds.b	4
+PINPATH_Invalid	ds.b	4
+
+ACCPATH_Path	ds.b	40
+ACCPATH_Extension	ds.b	8
+ACCPATH_FullPath	ds.b	48
+
+AccPath	DC.B	'\ACCS\',$00
+AccExt	DC.B	'\*.ACC',$00
+AccFullPath	DC.B	'\ACCS\*.ACC',$00,$00,$00
+
+ACCPATH_Valid	ds.b	4
+ACCPATH_Invalid	ds.b	4
+ACCPATH_SavedRegs	ds.b	64
+ACCPATH_OldPath	ds.l	1
+ACCPATH_ErrorFlag	ds.w	1
+ACCPATH_OldGEMDOS	ds.b	8
+
+CLIPATH_Path	ds.b	40
+
+VIRTUAL_Path	ds.b	40
+VIRTUAL_Size	ds.l	1
+	
