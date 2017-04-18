@@ -7,7 +7,7 @@ Atari program to allow using the aes and vdi from assembler
 You need the following to get this program working :
 
 \- Atari computer with 68030 processor (original or upgraded)<br>
-\- Atari computer with DMA sound<br>
+\- Atari computer with DMA PCM sound<br>
 
 * List of programs
 
@@ -16,9 +16,9 @@ You need the following to get this program working :
 
 * How to use it
 
-Launch the 'SSAVCALL.PRG' program first to install it into memory. Then launch the 'TESTSSAV.PRG' program to display a GEM desktop coded with SSAVCALL.
+In the 'SSAVCALL.111' folder, launch the 'SSAVCALL.PRG' program first to install it into memory. Then launch the 'TESTSSAV.PRG' program to display a GEM desktop coded with SSAVCALL.
 
-Some actions are sounded using the 'PRAWPLAY' files, so you need DMA sound system (actually a Falcon030 features both 68030 and DMA).
+Some actions are sounded using the 'PRAWPLAY' files, so you need DMA sound system (actually a Falcon030 features both 68030 and DMA PCM sound).
 
 * Some infos
 
